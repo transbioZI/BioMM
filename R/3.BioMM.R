@@ -1237,17 +1237,18 @@ BioMMstage1pca <- function(trainDataList, testDataList,
 #' classifier1=classifier2 <- "randForest"
 #' predMode1=predMode2 <- "classification"
 #' paramlist1=paramlist2 <- list(ntree=300, nthreads=30)   
-#' result <- BioMM(trainData=methylData, testData=NULL,
-#'                 stratify="chromosome", pathlistDB, featureAnno=probeAnno, 
-#'                 restrictUp=10, restrictDown=200, minPathSize=10, 
-#'                 supervisedStage1, typePCA="regular", 
-#'                 resample1="BS", resample2="CV", dataMode="allTrain", 
-#'                 repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
-#'                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
-#'                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=1, 
-#'                 classifier1, classifier2, predMode1, predMode2, 
-#'                 paramlist1, paramlist2, innerCore=1,  
-#'                 outFileA2=NULL, outFileB2=NULL)
+#' ## Not Run 
+#' ## result <- BioMM(trainData=methylData, testData=NULL,
+#' ##                 stratify="chromosome", pathlistDB, featureAnno=probeAnno, 
+#' ##                 restrictUp=10, restrictDown=200, minPathSize=10, 
+#' ##                 supervisedStage1, typePCA="regular", 
+#' ##                 resample1="BS", resample2="CV", dataMode="allTrain", 
+#' ##                 repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
+#' ##                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
+#' ##                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=1, 
+#' ##                 classifier1, classifier2, predMode1, predMode2, 
+#' ##                 paramlist1, paramlist2, innerCore=1,  
+#' ##                 outFileA2=NULL, outFileB2=NULL)
 
 
 BioMM <- function(trainData, testData,
