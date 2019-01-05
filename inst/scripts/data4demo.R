@@ -1,0 +1,49 @@
+
+
+
+#' @title An example of genome-wide DNA methylation data 
+#'
+#' @description Genome-wide DNA methylation data from the Illumina Infinium 
+#' HumanMethylation27 BeadChip was downloaded from GSE38873. The data was then
+#' corrected to account for the influence of potential confounders including 
+#' age, batch, brain PMI and PH. For the demonstration, we only use a subset 
+#' of the pre-processed data to reduce the runtime.
+#' @docType data
+#' @name methylData
+#' @usage methylData
+#' @format A data.frame with 26487 variables (26486 autosomal CpG probes and 
+#' one label indicating case control status) and 40 samples (20 controls, 
+#' 20 bipolar disorder patients). 
+#' @source \url{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE38873}
+#' @keywords datasets
+NULL 
+
+
+#' @title An example of pathway database
+#'
+#' @description A list of pathways with pathway (GO) IDs and their 
+#' corresponding genes ("entrezID" is used) was processed using R library 
+#' org.Hs.eg.db.
+#' @docType data
+#' @name goDB
+#' @usage goDB
+#' @format A list with 4350 pathways with bigger than 10 genes and less than 
+#' 300 genes in each pathway. 
+#' @source library(org.Hs.eg.db)
+#' @keywords datasets
+NULL 
+
+
+#' @title An example of methylation data annotation file
+#'
+#' @description A pre-processed genomic annotation file for autosomal CpGs  
+#' from the Illumina Infinium HumanMethylation27 BeadChip.
+#' @docType data
+#' @name cpgAnno
+#' @usage cpgAnno
+#' @format A data.frame with 4 variables ("ID", "chr", "entrezID", "symbol")
+#'  and 26486 autosomal CpGs.
+#' @source \url{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE38873}
+#' @keywords datasets
+NULL 
+
