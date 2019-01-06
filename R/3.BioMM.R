@@ -758,17 +758,18 @@ predByCV <- function(data, repeats, nfolds,
 #' dataList <- omics2chrlist(data=methylData, probeAnno)
 #' length(dataList)
 #' library(ranger) 
-#' stage2data <- BioMMreconData(trainDataList=dataList, testDataList=NULL, 
-#'                              resample="CV", dataMode="allTrain", 
-#'                              repeatA=1, repeatB=1, nfolds=10, 
-#'                              FSmethod=NULL, cutP=0.1, 
-#'                              fdr=NULL, FScore=1, 
-#'                              classifier="randForest",
-#'                              predMode="classification", 
-#'                              paramlist=list(ntree=300, nthreads=10),
-#'                              innerCore=1, outFileA=NULL, outFileB=NULL) 
-#' print(dim(stage2data))
-#' print(head(stage2data[,1:5]))
+#' ## Not Run
+#' ## stage2data <- BioMMreconData(trainDataList=dataList, testDataList=NULL, 
+#' ##                             resample="CV", dataMode="allTrain", 
+#' ##                             repeatA=1, repeatB=1, nfolds=10, 
+#' ##                             FSmethod=NULL, cutP=0.1, 
+#' ##                             fdr=NULL, FScore=1, 
+#' ##                             classifier="randForest",
+#' ##                             predMode="classification", 
+#' ##                             paramlist=list(ntree=300, nthreads=10),
+#' ##                             innerCore=1, outFileA=NULL, outFileB=NULL) 
+#' ## print(dim(stage2data))
+#' ## print(head(stage2data[,1:5]))
 
 
 BioMMreconData <- function(trainDataList, testDataList,
