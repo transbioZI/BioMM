@@ -65,7 +65,7 @@ omics2genelist <- function(data, featureAnno, restrictUp=500, restrictDown=5){
     }    
     genes <- unique(probeAnno[,"entrezID"])  
     matlist <- list()
-    for (i in seq_len(length(genes))) { 
+    for (i in seq_along(genes)) { 
         # print(paste0('Gene: ', i))   
         annoSub <- probeAnno[which(probeAnno[,"entrezID"] == genes[i]),]  
         IDperGene <- annoSub[,"ID"] 
@@ -188,7 +188,7 @@ omics2pathlist <- function(data, pathlistDB, featureAnno=NULL,
         }    
     }
     pathlist <- list()
-    for (i in seq_len(length(pathlistSub))) { 
+    for (i in seq_along(pathlistSub)) { 
         # print(paste0('Pathway: ', i)) 
         entrezIDpath <- pathlistSub[[i]]
         if (!is.null(featureAnno)){ 

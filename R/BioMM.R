@@ -793,7 +793,7 @@ BioMMreconData <- function(trainDataList, testDataList,
 
     reconDataAx <- c()  
     reconDataBx <- c()  
-    for (i in seq_len(length(trainDataList))) {    
+    for (i in seq_along(trainDataList)) {    
         ## for each block
         trainData = trainDataList[[i]]
         dataAy <- trainData[,1] 
@@ -1060,7 +1060,7 @@ BioMMstage1pca <- function(trainDataList, testDataList,
         testDataY <- testData[,1]
     } 
 
-    numlist <- seq_len(length(trainDataList))
+    numlist <- seq_along(trainDataList)
     predMat <- mclapply(numlist, function(i){ 
                     # print(paste0('Block:', i))  
                     # print(paste0('BlockSize: ', c(ncol(trainData)-1))) 
