@@ -55,10 +55,12 @@ baseRandForest <- function(trainData, testData,
 
     predMode <- match.arg(predMode)
     ## input parameters
-    if ( !is.element("ntree", names(paramlist)) ) 
+    if ( !is.element("ntree", names(paramlist)) ){ 
         stop(" 'ntree' is missing in the 'paramlist'!")
-    if ( !is.element("nthreads", names(paramlist)) ) 
+    }    
+    if ( !is.element("nthreads", names(paramlist)) ){ 
         stop(" 'nthreads' is missing in the 'paramlist'!") 
+    }    
     ntree <- paramlist$ntree
     nthreads <- paramlist$nthreads
     # print(ntree)
@@ -153,14 +155,18 @@ baseSVM <- function(trainData, testData,
 
     predMode <- match.arg(predMode)
     ## input parameters
-    if ( !is.element("tuneP", names(paramlist)) ) 
+    if ( !is.element("tuneP", names(paramlist)) ){ 
         stop(" 'tuneP' is missing in the 'paramlist'!")
-    if ( !is.element("kernel", names(paramlist)) ) 
+    }    
+    if ( !is.element("kernel", names(paramlist)) ){  
         stop(" 'kernel' is missing in the 'paramlist'!")
-    if ( !is.element("gamma", names(paramlist)) ) 
+    }    
+    if ( !is.element("gamma", names(paramlist)) ){  
         stop(" 'gamma' is missing in the 'paramlist'!")
-    if ( !is.element("cost", names(paramlist)) )    
+    }    
+    if ( !is.element("cost", names(paramlist)) ){    
         stop(" 'cost' is missing in the 'paramlist'!") 
+    }    
     tuneP <- paramlist$tuneP
     kernel <- paramlist$kernel
     gamma <- paramlist$gamma
@@ -273,14 +279,18 @@ baseGLMnet <- function(trainData, testData,
 
     predMode <- match.arg(predMode)
     ## input parameters 
-    if ( !is.element("family", names(paramlist)) ) 
+    if ( !is.element("family", names(paramlist)) ){ 
         stop(" 'family' is missing in the 'paramlist'!")
-    if ( !is.element("alpha", names(paramlist)) ) 
+    }    
+    if ( !is.element("alpha", names(paramlist)) ){ 
         stop(" 'alpha' is missing in the 'paramlist'!")
-    if ( !is.element("typeMeasure", names(paramlist)) ) 
+    }    
+    if ( !is.element("typeMeasure", names(paramlist)) ){  
         stop(" 'typeMeasure' is missing in the 'paramlist'!")
-    if ( !is.element("typePred", names(paramlist)) ) 
+    }    
+    if ( !is.element("typePred", names(paramlist)) ){ 
         stop(" 'typePred' is missing in the 'paramlist'!") 
+    }    
     family <- paramlist$family 
     alpha <- paramlist$alpha 
     typeMeasure <- paramlist$typeMeasure 
@@ -365,10 +375,12 @@ baseModel <- function(trainData, testData,
                         "regression"), 
                         paramlist){ 
 
-    if ( colnames(trainData)[1] != "label" )
-    stop("The first column of the 'trainData' must be the 'label'!")
-    if ( colnames(testData)[1] != "label" )
-    stop("The first column of the 'testData' must be the 'label'!")
+    if ( colnames(trainData)[1] != "label" ){
+        stop("The first column of the 'trainData' must be the 'label'!")
+    }    
+    if ( colnames(testData)[1] != "label" ){
+        stop("The first column of the 'testData' must be the 'label'!")
+    }
     classifier <- match.arg(classifier)
     predMode <- match.arg(predMode)
     if (classifier == "randForest"){   
@@ -1297,7 +1309,7 @@ BioMM <- function(trainData, testData,
             testDataList <- NULL
         }
     } else {
-        stop("Wrong stratification method.")
+        stop("Wrong stratification method used!")
     }  
     
     ## generation of stage-2 data

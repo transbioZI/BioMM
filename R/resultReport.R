@@ -137,8 +137,9 @@ plotVarExplained <- function(data, posF=TRUE,
                             stratify=c("gene", "pathway", "chromosome"),
                             core=1, fileName=NULL){ 
 
-    if ( colnames(data)[1] != "label" )
-    stop("The first column of the 'data' must be the 'label'!") 
+    if ( colnames(data)[1] != "label" ){
+        stop("The first column of the 'data' must be the 'label'!") 
+    }
     dataX <- data[,-1]
     ## convert prob. to integer
     dataX <- apply(dataX, 2, round) 
@@ -148,8 +149,9 @@ plotVarExplained <- function(data, posF=TRUE,
         corr <- cor(dataX, dataY)
         nPos <- length(which(corr > 0))
         print(paste0("posFeature: ", nPos))
-        if (nPos == 0)
+        if (nPos == 0){
             stop("No positively outcome-associated features!")    
+        }
         dataXsub <- dataX[,which(corr > 0)]
     } else { 
         dataX <- dataXsub
@@ -254,8 +256,9 @@ plotRankedFeature <- function(data, posF=TRUE, topF=10,
     }
 
 
-    if ( colnames(data)[1] != "label" )
-    stop("The first column of the 'data' must be the 'label'!") 
+    if ( colnames(data)[1] != "label" ){
+        stop("The first column of the 'data' must be the 'label'!") 
+    }
     dataX <- data[,-1]
     ## convert prob. to integer
     dataX <- apply(dataX, 2, round) 
@@ -265,10 +268,12 @@ plotRankedFeature <- function(data, posF=TRUE, topF=10,
         corr <- cor(dataX, dataY)
         nPos <- length(which(corr > 0))
         print(paste0("posFeature: ", nPos))
-        if (nPos == 0)
+        if (nPos == 0){
             stop("No positively outcome-associated features!")
-        if (topF > nPos ) 
-            stop("'topF' bigger than # of positively associated features!")     
+        }
+        if (topF > nPos ){
+            stop("'topF' bigger than # of positively associated features!")
+        }
         dataXsub <- dataX[,which(corr > 0)]
         featurelist <- as.list(seq_len(ncol(dataXsub))) 
         metrics <- unlist(mclapply(featurelist, function(i){   

@@ -66,15 +66,17 @@ getDataAfterFS <- function(trainData, testData,
                             FSmethod, cutP=0.1, 
                             fdr=NULL, FScore=10){
 
-    if ( colnames(trainData)[1] != "label" )
-    stop("The first column of the 'trainData' must be the 'label'!")
+    if ( colnames(trainData)[1] != "label" ){
+        stop("The first column of the 'trainData' must be the 'label'!")
+    }    
     trainX <- trainData[,-1]
     trainY <- trainData[,1]
     featureNames <- colnames(trainX)
     if ( is.factor(trainY) ) {trainY <- as.numeric(trainY)-1}
     if (!is.null(testData)){ 
-        if ( colnames(testData)[1] != "label" )
-        stop("The first column of the 'testData' must be the 'label'!")
+        if ( colnames(testData)[1] != "label" ){
+            stop("The first column of the 'testData' must be the 'label'!")
+        }
         testX <- testData[,-1]
         testY <- testData[,1]  
     }

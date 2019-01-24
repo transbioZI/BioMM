@@ -44,20 +44,25 @@
 
 omics2genelist <- function(data, featureAnno, restrictUp=500, restrictDown=5){
 
-    if ( colnames(data)[1] != "label" )
-    stop("The first column of the 'data' must be the 'label'!")
+    if ( colnames(data)[1] != "label" ){
+        stop("The first column of the 'data' must be the 'label'!")
+    }
     dataX <- data[,-1] 
     dataY <- data[,1] 
     probeName <- colnames(dataX) 
     featureAnno <- as.data.frame(featureAnno, stringsAsFactors=FALSE) 
     colnameAnno <- colnames(featureAnno) 
-    if ( length(grep("^ID", colnameAnno)) == 0 )
+    if ( length(grep("^ID", colnameAnno)) == 0 ){ 
         stop("No 'ID' column in 'featureAnno'! ")
-    if ( length(grep("^entrezID", colnameAnno)) == 0)
+    }
+    if ( length(grep("^entrezID", colnameAnno)) == 0) {
         stop("No 'entrezID' column in 'featureAnno'! ")
+    }
     probeAnno <- featureAnno[is.element(featureAnno[,'ID'], probeName),
                             c('ID', 'entrezID')]
-    if ( nrow(probeAnno) == 0 ) stop("Wrong 'featureAnno' provided!")
+    if ( nrow(probeAnno) == 0 ) {
+        stop("Wrong 'featureAnno' provided!")
+    }    
     genes <- unique(probeAnno[,"entrezID"])  
     matlist <- list()
     for (i in seq_len(length(genes))) { 
@@ -152,8 +157,9 @@ omics2genelist <- function(data, featureAnno, restrictUp=500, restrictDown=5){
 omics2pathlist <- function(data, pathlistDB, featureAnno=NULL,
                             restrictUp=200, restrictDown=10, minPathSize=2){
 
-    if ( colnames(data)[1] != "label" )
-    stop("The first column of the 'data' must be the 'label'!")
+    if ( colnames(data)[1] != "label" ){ 
+        stop("The first column of the 'data' must be the 'label'!")
+    }
     dataX <- data[,-1] 
     dataY <- data[,1]
     # Restrict the pathways of size x-xx gene for downstream analysis   
@@ -169,14 +175,17 @@ omics2pathlist <- function(data, pathlistDB, featureAnno=NULL,
     probeName <- colnames(dataX)   
     if (!is.null(featureAnno)){ 
         colnameAnno <- colnames(featureAnno) 
-        if ( length(grep("^ID", colnameAnno)) == 0 )
+        if ( length(grep("^ID", colnameAnno)) == 0 ){ 
             stop("No 'ID' column in 'featureAnno'! ")
-        if ( length(grep("^entrezID", colnameAnno)) == 0)
+        }
+        if ( length(grep("^entrezID", colnameAnno)) == 0){
             stop("No 'entrezID' column in 'featureAnno'! ")
+        }
         probeAnno <- featureAnno[is.element(featureAnno[,'ID'], probeName),
                                 c('ID', 'entrezID')]
-        if ( nrow(probeAnno) == 0 ) 
+        if ( nrow(probeAnno) == 0 ){ 
             stop("Wrong matching between 'data' and 'featureAnno'!")
+        }    
     }
     pathlist <- list()
     for (i in seq_len(length(pathlistSub))) { 
@@ -248,21 +257,25 @@ omics2pathlist <- function(data, pathlistDB, featureAnno=NULL,
 
 omics2chrlist <- function(data, probeAnno){
 
-    if ( colnames(data)[1] != "label" )
-    stop("The first column of the 'data' must be the 'label'!")
+    if ( colnames(data)[1] != "label" ){
+        stop("The first column of the 'data' must be the 'label'!")
+    }
     dataX <- data[,-1] 
     dataY <- data[,1] 
 
     probeName <- colnames(dataX)    
     colnameAnno <- colnames(probeAnno) 
-    if ( length(grep("^ID", colnameAnno)) == 0 )
+    if ( length(grep("^ID", colnameAnno)) == 0 ){
         stop("No 'ID' column in 'probeAnno'! ")
-    if ( length(grep("^chr", colnameAnno)) == 0)
+    }
+    if ( length(grep("^chr", colnameAnno)) == 0){
         stop("No 'chr' column in 'probeAnno'! ")
+    }
     probeAnno <- probeAnno[is.element(probeAnno[,'ID'], probeName),
                             c('ID', 'chr')]
-    if ( nrow(probeAnno) == 0 ) stop("Wrong 'probeAnno' provided!")
-
+    if ( nrow(probeAnno) == 0 ){ 
+        stop("Wrong 'probeAnno' provided!")
+    }    
     chrDist <- table(probeAnno[,"chr"])
     currentChr <- names(chrDist)
     print("Chromosomes: ")  
