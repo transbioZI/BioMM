@@ -9,9 +9,9 @@ Development version from Github:
 
 2.) Install BioMM in R  
 ```{r eval=FALSE}
-install.packages("devtools")
-library("devtools")
-install_github("transbioZI/BioMM", build_vignettes=TRUE)
+if (!requireNamespace("BiocManager", quietly = TRUE))
+	install.packages("BiocManager")
+BiocManager::install("BioMM")
 ``` 
 
 ## Tutorial 
