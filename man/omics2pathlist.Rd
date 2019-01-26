@@ -54,6 +54,7 @@ pathways are often computationally intensive, and likely nonspecific.
 ## Load data from DNA methylation
 methylfile <- system.file("extdata", "methylData.rds", package="BioMM")  
 methylData <- readRDS(methylfile)  
+## Annotation files for Mapping CpGs into pathways 
 pathlistDBfile <- system.file("extdata", "goDB.rds", package="BioMM")
 featureAnnoFile <- system.file("extdata", "cpgAnno.rds", package="BioMM") 
 pathlistDB <- readRDS(file=pathlistDBfile)

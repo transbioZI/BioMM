@@ -28,6 +28,7 @@ expression probes, CpGs etc.) into the corresponding chromosomes.
 ## Load data from DNA methylation
 methylfile <- system.file("extdata", "methylData.rds", package="BioMM")  
 methylData <- readRDS(methylfile)  
+## Annotation files for Mapping CpGs into chromosome  
 probeAnnoFile <- system.file("extdata", "cpgAnno.rds", package="BioMM")  
 probeAnno <- readRDS(file=probeAnnoFile)  
 ## Mapping CpGs into Chromosome

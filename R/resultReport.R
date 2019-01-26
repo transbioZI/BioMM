@@ -310,12 +310,9 @@ plotRankedFeature <- function(data, posF=TRUE, topF=10,
     rankMetric <- match.arg(rankMetric)
     print(rankMetric)
     blockInfo2 <- blockInfo[order(blockInfo[, rankMetric], decreasing=TRUE),]  
-    topPat <- head(blockInfo2, topF) 
-    # topPat$ID <- factor(topPat$ID, 
-    #                     levels=topPat$ID[order(topPat[,rankMetric])])
+    topPat <- head(blockInfo2, topF)  
     topPat$ID <- factor(topPat$ID, levels=rev(unique(topPat$ID))) 
-    print(head(topPat))
-    # str(topPat) 
+    print(head(topPat)) 
     x <- "ID"
     y <- rankMetric
     print(y)

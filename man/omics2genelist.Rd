@@ -39,6 +39,7 @@ gene, therefore gene-based stratification is feasible
 ## Load data from DNA methylation
 methylfile <- system.file("extdata", "methylData.rds", package="BioMM")  
 methylData <- readRDS(methylfile)  
+## Annotation files for Mapping CpGs into genes  
 featureAnnoFile <- system.file("extdata", "cpgAnno.rds", package="BioMM")  
 featureAnno <- readRDS(file=featureAnnoFile)  
 ## Mapping CpGs into gene list

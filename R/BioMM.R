@@ -62,8 +62,7 @@ baseRandForest <- function(trainData, testData,
         stop(" 'nthreads' is missing in the 'paramlist'!") 
     }    
     ntree <- paramlist$ntree
-    nthreads <- paramlist$nthreads
-    # print(ntree)
+    nthreads <- paramlist$nthreads 
     if (predMode == "probability"){ 
             trainData$label <- as.factor(trainData$label)
             model <- ranger(label~., data=trainData, num.trees=ntree, 
@@ -460,9 +459,7 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr, FScore,
                         FSmethod, cutP, fdr, FScore)
     ## include the label
     trainDataSub <- datalist[[1]] 
-    testDataSub <- datalist[[2]] 
-    # print("Dimension after FS: ")
-    # print(dim(trainDataSub))
+    testDataSub <- datalist[[2]]  
 
     ## If no selected features or just one selected feature.
     if (is.null(trainDataSub) || ncol(trainDataSub)==2){ 
@@ -559,8 +556,7 @@ predByBS <- function(trainData, testData,
         data <- trainData 
         predTmp <- rep(NA, nrow(data))  
         replist <- seq_len(repeats)
-        predTmpList <- bplapply(replist, function(reps){  
-            # set.seed(reps)    
+        predTmpList <- bplapply(replist, function(reps){     
             trainIndex <- unique(sample(nrow(data), replace=TRUE))
             testIndex <- setdiff(seq_len(nrow(data)), trainIndex)
             trainData <- data[trainIndex, ]
@@ -571,8 +567,7 @@ predByBS <- function(trainData, testData,
                                         fdr, FScore, classifier,
                                         predMode, paramlist)  
                                         predTmp
-        }, BPPARAM=SnowParam(workers=innerCore)) 
-        # str(predTmpList) 
+        }, BPPARAM=SnowParam(workers=innerCore))  
         predTest <- round(rowMeans(do.call(cbind, predTmpList), na.rm=TRUE),3)  
         naCount <- sum(is.na(predTest))
         ## If not enough bootstrapping repeats
@@ -585,8 +580,7 @@ predByBS <- function(trainData, testData,
             data <- trainData 
             predTmp <- rep(NA, nrow(data))  
             replist <- seq_len(repeats)
-            predTmpList <- bplapply(replist, function(reps){  
-                # set.seed(reps)    
+            predTmpList <- bplapply(replist, function(reps){   
                 trainIndex <- unique(sample(nrow(data), replace=TRUE)) 
                 trainData <- data[trainIndex, ] 
                 predTmp <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
@@ -597,16 +591,14 @@ predByBS <- function(trainData, testData,
         } else if (dataMode == "allTrain") {  
             predTmp <- rep(NA, nrow(testData))  
             replist <- seq_len(repeats)
-            predTmpList <- bplapply(replist, function(reps){  
-                # set.seed(reps)       
+            predTmpList <- bplapply(replist, function(reps){       
                 predTmp <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                                     FScore, classifier, predMode, paramlist)  
                 predTmp
-            }, BPPARAM=SnowParam(workers=innerCore)) 
-            # str(predTmpList) 
+            }, BPPARAM=SnowParam(workers=innerCore))  
             predTest <- round(rowMeans(do.call(cbind, predTmpList)),3)  
         }
-    } else {print("Input data is wrong!")}
+    } else {message("Input data is wrong!")}
     
     if (predMode == "classification"){ 
         predTest <- ifelse(predTest>=.5, 1, 0) 
@@ -676,8 +668,7 @@ predByCV <- function(data, repeats, nfolds,
 
     cvMat <- c()
     replist <- seq_len(repeats)
-    for (reps in replist){ 
-        # set.seed(reps) 
+    for (reps in replist){  
         foldlists <- split(sample(nrow(data)), rep(seq_len(nfolds),
                             length=nrow(data)))
         cvY <- rep(NA, nrow(data))
@@ -688,8 +679,7 @@ predByCV <- function(data, repeats, nfolds,
                                 FScore, classifier, predMode, paramlist)  
         }, BPPARAM=SnowParam(workers=innerCore)) 
         cvY[unlist(foldlists)] <- unlist(cvEstimate)
-        cvMat <- cbind(cvMat, cvY)
-        # print(dim(cvMat))
+        cvMat <- cbind(cvMat, cvY) 
     }
 
     if (repeats == 1){
@@ -796,29 +786,16 @@ BioMMreconData <- function(trainDataList, testDataList,
     for (i in seq_along(trainDataList)) {    
         ## for each block
         trainData = trainDataList[[i]]
-        dataAy <- trainData[,1] 
-        # print(paste0('Block:', i))  
-        # print(paste0('Block_numFeature: ', c(ncol(trainData)-1))) 
+        dataAy <- trainData[,1]  
         if (resample == "CV"){ 
             predA <- predByCV(data=trainData, repeats=repeatA, nfolds,
                             FSmethod, cutP, fdr, FScore, classifier, 
-                            predMode, paramlist, innerCore) 
-            # print("CrossValidation >>> ")
+                            predMode, paramlist, innerCore)  
         } else if (resample == "BS") {
             predA <- predByBS(trainData, testData=NULL, dataMode,
                             repeats=repeatA, FSmethod, cutP, fdr, FScore, 
-                            classifier, predMode, paramlist, innerCore)  
-            # print("Bootstrapping >>> ")
-        }
-        ## Cross validation or Bootstrapping prediction accuracy  
-        if (predMode == "probability"){   
-            predA2 <- ifelse(predA>=.5, 1, 0)
-            # print(paste0("Resampling ACC: ", classifiACC(predA2, dataAy)))
-        } else if (predMode == "classification"){  
-            # print(paste0("Resampling ACC: ", classifiACC(predA, dataAy)))
-        } else if (predMode == "regression"){
-            # print(paste0("Resampling Corr: ", cor(predA, dataAy)))
-        }     
+                            classifier, predMode, paramlist, innerCore)   
+        } 
         reconDataAx <- cbind(reconDataAx, predA)  
 
         if (!is.null(testDataList)){ ## ind. prediction 
@@ -826,16 +803,7 @@ BioMMreconData <- function(trainDataList, testDataList,
             dataBy <- testData[,1]
             predB <- predByBS(trainData, testData, dataMode, repeats=repeatB,
                             FSmethod, cutP, fdr, FScore, classifier, 
-                            predMode, paramlist, innerCore)
-            ## prediction accuracy for the ind. test performance
-            if (predMode == "probability"){   
-                predB2 <- ifelse(predB>=.5, 1, 0)
-                # print(paste0("Test ACC: ", classifiACC(predB2, dataBy)))
-            } else if (predMode == "classification"){  
-                # print(paste0("Test ACC: ", classifiACC(predB, dataBy)))
-            } else if (predMode == "regression"){
-                # print(paste0("Test Corr: ", cor(predB, dataBy)))
-            }       
+                            predMode, paramlist, innerCore)    
             reconDataBx <- cbind(reconDataBx, predB)    
         }
     }
@@ -1061,9 +1029,7 @@ BioMMstage1pca <- function(trainDataList, testDataList,
     } 
 
     numlist <- seq_along(trainDataList)
-    predMat <- bplapply(numlist, function(i){ 
-                    # print(paste0('Block:', i))  
-                    # print(paste0('BlockSize: ', c(ncol(trainData)-1))) 
+    predMat <- bplapply(numlist, function(i){  
                     trainData <- trainDataList[[i]] 
                     trainDataX = trainData[,-1]
                     if (!is.null(testDataList)){ 
@@ -1094,14 +1060,10 @@ BioMMstage1pca <- function(trainDataList, testDataList,
                                 predB <- predict(nspc, testX2)[,topPC] 
                             }   
                         }
-                    }   
-                    # print(paste0("CorTrain: ",
-                    #         round(cor(predA, trainDataY), 3)))
+                    }    
                     predA <- round(predA, 3)    
                     pred <- predA
-                    if (!is.null(testDataList)){
-                        # print(paste0("CorTest:  ", 
-                        #     round(cor(predB, testDataY), 3)))  
+                    if (!is.null(testDataList)){  
                         predB <- round(predB, 3)  
                         pred <- list(predA, predB)   
                     }     
