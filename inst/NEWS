@@ -1,7 +1,9 @@
 
+-------------------------------------------------------
 Changes in version 0.99.6 
-
-
+* updated plotRankedFeature() and getMetrics()
+* increased core number for parallel computing
+* removed Duplicated descriptions in *.Rd files
 
 -------------------------------------------------------
 Changes in version 0.99.5 
