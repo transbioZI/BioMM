@@ -1,31 +1,38 @@
 
-Changes in version 0.99.5
--------------------------- 
+Changes in version 0.99.6 
 
 
 
-Changes in version 0.99.4
--------------------------- 
-updated example in BioMMreconData()
+-------------------------------------------------------
+Changes in version 0.99.5 
+* reformatted code by using formatR
+* bplapply() instead of mclapply
+* message() instead of print() for end-user messages 
+* improved usage of which()
+* use seq_along() instead of seq_len(length())   
+* updated installation method
+* renamed R source files
 
-Changes in version 0.99.3
--------------------------- 
-updated example in BioMM()
+-------------------------------------------------------
+Changes in version 0.99.4 
+* updated example in BioMMreconData()
 
-Changes in version 0.99.2
--------------------------- 
-updated R version dependency (from 3.5.2 to 3.6) 
-Removed the file LICENSE
+-------------------------------------------------------
+Changes in version 0.99.3 
+* updated example in BioMM()
 
-Changes in version 0.99.1
--------------------------- 
-updated R version dependency (from 3.5.0 to 3.5.2) 
+-------------------------------------------------------
+Changes in version 0.99.2 
+* updated R version dependency (from 3.5.2 to 3.6) 
+* Removed the file LICENSE
 
+-------------------------------------------------------
+Changes in version 0.99.1 
+* updated R version dependency (from 3.5.0 to 3.5.2) 
 
-Changes in version 0.99.0
---------------------------
-
-Removed the file "BioMM.Rproj" 
+-------------------------------------------------------
+Changes in version 0.99.0 
+* Removed the file "BioMM.Rproj" 
 
 
  
