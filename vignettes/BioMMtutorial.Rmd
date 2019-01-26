@@ -63,7 +63,7 @@ BiocManager::install("BioMM")
 * Load required libraries
 ```{r loadPkg, eval=TRUE, results="hide"}
 library(BioMM)  
-library(parallel)  
+library(BiocParallel)  
 library(ranger)
 library(rms) 
 library(glmnet) 
