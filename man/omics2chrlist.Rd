@@ -12,12 +12,12 @@ Rows are the samples, columns are the probes/genes, except that
 the first column is the label.}
 
 \item{probeAnno}{The annotation data stored in a data.frame for probe 
-mapping. It must have at least two columns named "ID" and "chr".}
+mapping. It must have at least two columns named 'ID' and 'chr'.}
 }
 \value{
 A list of matrices with chromosome IDs as the associated list 
 member names. For each matrix, rows are the samples and columns are the  
-probe names, except that the first column is named "label".
+probe names, except that the first column is named 'label'.
 }
 \description{
 Map a set of individual probes from different omics (i.e. SNPs, gene 
@@ -26,10 +26,10 @@ expression probes, CpGs etc.) into the corresponding chromosomes.
 \examples{
  
 ## Load data from DNA methylation
-methylfile <- system.file("extdata", "methylData.rds", package="BioMM")  
+methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 methylData <- readRDS(methylfile)  
 ## Annotation files for Mapping CpGs into chromosome  
-probeAnnoFile <- system.file("extdata", "cpgAnno.rds", package="BioMM")  
+probeAnnoFile <- system.file('extdata', 'cpgAnno.rds', package='BioMM')  
 probeAnno <- readRDS(file=probeAnnoFile)  
 ## Mapping CpGs into Chromosome
 dataList <- omics2chrlist(data=methylData, probeAnno)

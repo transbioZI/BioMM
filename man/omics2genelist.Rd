@@ -12,7 +12,7 @@ Rows are the samples, columns are the probes, except that
 the first column is the label.}
 
 \item{featureAnno}{The annotation data stored in a data.frame for probe 
-mapping. It must have at least two columns named "ID" and "entrezID".}
+mapping. It must have at least two columns named 'ID' and 'entrezID'.}
 
 \item{restrictUp}{The upper-bound of the number of probes in each gene.
 The default is 500.}
@@ -23,7 +23,7 @@ The default is 5.}
 \value{
 A list of matrices with gene IDs as the associated list member  
 names. For each matrix, rows are the samples and columns are the probe 
-names, except that the first column is named "label".
+names, except that the first column is named 'label'.
 }
 \description{
 Map a set of individual probes from different omics 
@@ -37,10 +37,10 @@ gene, therefore gene-based stratification is feasible
 \examples{
  
 ## Load data from DNA methylation
-methylfile <- system.file("extdata", "methylData.rds", package="BioMM")  
+methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 methylData <- readRDS(methylfile)  
 ## Annotation files for Mapping CpGs into genes  
-featureAnnoFile <- system.file("extdata", "cpgAnno.rds", package="BioMM")  
+featureAnnoFile <- system.file('extdata', 'cpgAnno.rds', package='BioMM')  
 featureAnno <- readRDS(file=featureAnnoFile)  
 ## Mapping CpGs into gene list
 ## Not run 

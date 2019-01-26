@@ -11,13 +11,13 @@ omics2pathlist(data, pathlistDB, featureAnno = NULL, restrictUp = 200,
 \item{data}{The input dataset (either data.frame or matrix). 
 Rows are the samples, columns are the probes/genes, except that 
 the first column is the label. If it's transcriptomic data, gene ID is 
-the "entrezID".}
+the 'entrezID'.}
 
 \item{pathlistDB}{A list of pathways with pathway IDs and their 
-corresponding genes ("entrezID" is used).}
+corresponding genes ('entrezID' is used).}
 
 \item{featureAnno}{The annotation data stored in a data.frame for probe 
-mapping. It must have at least two columns named "ID" and "entrezID".  
+mapping. It must have at least two columns named 'ID' and 'entrezID'.  
 If it's NULL, then the input probe is from transcriptomic data.}
 
 \item{restrictUp}{The upper-bound of the number of genes in each pathway. 
@@ -32,7 +32,7 @@ after mapping the input data to \code{pathlistDB}.}
 \value{
 A list of matrices with pathway IDs as the associated list member
 names. For each matrix, rows are the samples and columns are the probe   
-names, except that the first column is named "label".
+names, except that the first column is named 'label'.
 }
 \description{
 Map a set of individual probes from different omics (i.e. SNPs, gene 
@@ -52,11 +52,11 @@ pathways are often computationally intensive, and likely nonspecific.
 \examples{
  
 ## Load data from DNA methylation
-methylfile <- system.file("extdata", "methylData.rds", package="BioMM")  
+methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 methylData <- readRDS(methylfile)  
 ## Annotation files for Mapping CpGs into pathways 
-pathlistDBfile <- system.file("extdata", "goDB.rds", package="BioMM")
-featureAnnoFile <- system.file("extdata", "cpgAnno.rds", package="BioMM") 
+pathlistDBfile <- system.file('extdata', 'goDB.rds', package='BioMM')
+featureAnnoFile <- system.file('extdata', 'cpgAnno.rds', package='BioMM') 
 pathlistDB <- readRDS(file=pathlistDBfile)
 featureAnno <- readRDS(file=featureAnnoFile)  
 ## To reduce runtime

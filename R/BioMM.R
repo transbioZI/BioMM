@@ -1,5 +1,5 @@
 
-# File : 3.BioMM.R Author: Junfang Chen
+# File : BioMM.R Author: Junfang Chen
 
 
 ############################################################################### 
@@ -60,18 +60,19 @@ baseRandForest <- function(trainData, testData, predMode = c("classification",
     nthreads <- paramlist$nthreads
     if (predMode == "probability") {
         trainData$label <- as.factor(trainData$label)
-        model <- ranger(label ~ ., data = trainData, num.trees = ntree, num.threads = nthreads, 
-            write.forest = TRUE, probability = TRUE)
+        model <- ranger(label ~ ., data = trainData, num.trees = ntree,
+            num.threads = nthreads, write.forest = TRUE, probability = TRUE)
         yhatClassProb <- predictions(predict(model, testData))
         predTest <- round(yhatClassProb[, 2], 3)
     } else if (predMode == "classification") {
         trainData$label <- as.factor(trainData$label)
-        model <- ranger(label ~ ., data = trainData, num.trees = ntree, num.threads = nthreads, 
-            write.forest = TRUE, classification = TRUE)
+        model <- ranger(label ~ ., data = trainData, num.trees = ntree,
+            num.threads = nthreads, write.forest = TRUE, classification = TRUE)
         predTest <- predictions(predict(model, testData))
         predTest <- as.numeric(predTest) - 1
     } else if (predMode == "regression") {
-        model <- ranger(label ~ ., data = trainData, num.trees = ntree, num.threads = nthreads)
+        model <- ranger(label ~ ., data = trainData, num.trees = ntree, 
+            num.threads = nthreads)
         predTest <- predictions(predict(model, testData))
         predTest <- round(predTest, 3)
     }
@@ -136,8 +137,9 @@ baseRandForest <- function(trainData, testData, predMode = c("classification",
 #' print(accuracy) 
 
 
-baseSVM <- function(trainData, testData, predMode = c("classification", "probability", 
-    "regression"), paramlist = list(tuneP = TRUE, kernel = "radial", gamma = 10^(-3:-1), 
+baseSVM <- function(trainData, testData, 
+    predMode = c("classification", "probability", "regression"), 
+    paramlist = list(tuneP = TRUE, kernel = "radial", gamma = 10^(-3:-1), 
     cost = 10^(-2:2))) {
     
     predMode <- match.arg(predMode)
@@ -181,8 +183,8 @@ baseSVM <- function(trainData, testData, predMode = c("classification", "probabi
     if (predMode == "probability") {
         if (tuneP == TRUE) {
             ## use internal CV
-            tuneOut <- tune.svm(label ~ ., data = trainData, type, kernel, gamma, 
-                cost, probability = TRUE)
+            tuneOut <- tune.svm(label ~ ., data = trainData, type, kernel, 
+                gamma, cost, probability = TRUE)
             model <- tuneOut$best.model
         } else {
             ## no internal CV required
@@ -194,8 +196,8 @@ baseSVM <- function(trainData, testData, predMode = c("classification", "probabi
     } else {
         if (tuneP == TRUE) {
             ## use internal CV
-            tuneOut <- tune.svm(label ~ ., data = trainData, type, kernel, gamma, 
-                cost)
+            tuneOut <- tune.svm(label ~ ., data = trainData, type, kernel, 
+                gamma, cost)
             model <- tuneOut$best.model
         } else {
             ## no CV required
@@ -266,8 +268,9 @@ baseSVM <- function(trainData, testData, predMode = c("classification", "probabi
 #' print(accuracy)  
 
 
-baseGLMnet <- function(trainData, testData, predMode = c("classification", "probability", 
-    "regression"), paramlist = list(family = "binomial", alpha = 0.5, typeMeasure = "mse", 
+baseGLMnet <- function(trainData, testData, 
+    predMode = c("classification", "probability", "regression"), 
+    paramlist = list(family = "binomial", alpha = 0.5, typeMeasure = "mse", 
     typePred = "class")) {
     
     predMode <- match.arg(predMode)
@@ -299,10 +302,10 @@ baseGLMnet <- function(trainData, testData, predMode = c("classification", "prob
         trainDataX <- trainData[, -1]
         testDataX <- testData[, -1]
     }
-    cvfit <- cv.glmnet(as.matrix(trainDataX), trainDataY, family = family, type.measure = typeMeasure, 
-        nfolds = 10)
-    model <- glmnet(as.matrix(trainDataX), trainDataY, family = family, alpha = alpha, 
-        lambda = cvfit$lambda.min)
+    cvfit <- cv.glmnet(as.matrix(trainDataX), trainDataY, family = family, 
+        type.measure = typeMeasure, nfolds = 10)
+    model <- glmnet(as.matrix(trainDataX), trainDataY, family = family, 
+        alpha = alpha, lambda = cvfit$lambda.min)
     yhat <- predict(model, as.matrix(testDataX), type = typePred)
     
     if (predMode == "classification") {
@@ -361,8 +364,9 @@ baseGLMnet <- function(trainData, testData, predMode = c("classification", "prob
 #' accuracy <- classifiACC(dataY=testY, predY=predY)
 #' print(accuracy)  
 
-baseModel <- function(trainData, testData, classifier = c("randForest", "SVM", 
-    "glmnet"), predMode = c("classification", "probability", "regression"), paramlist) {
+baseModel <- function(trainData, testData, 
+    classifier = c("randForest", "SVM", "glmnet"), 
+    predMode = c("classification", "probability", "regression"), paramlist) {
     
     if (colnames(trainData)[1] != "label") {
         stop("The first column of the 'trainData' must be the 'label'!")
@@ -401,7 +405,7 @@ baseModel <- function(trainData, testData, classifier = c("randForest", "SVM",
 #' c(NULL, 'positive', 'wilcox.test', 'cor.test', 'chisq.test', 'posWilcox', 
 #' or 'top10pCor').
 #' @param cutP The cutoff used for p value thresholding.  
-#' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc.). The default is 0.05.
+#' Commonly used cutoffs are c(0.5, 0.1, 0.05, etc.). The default is 0.05.
 #' @param fdr Multiple testing correction method. Available options are 
 #' c(NULL, 'fdr', 'BH', 'holm', etc.). 
 #' See also \code{\link[stats]{p.adjust}}. The default is NULL.
@@ -441,8 +445,8 @@ baseModel <- function(trainData, testData, classifier = c("randForest", "SVM",
 #' print(accuracy)  
 
 
-predByFS <- function(trainData, testData, FSmethod, cutP, fdr, FScore, classifier, 
-    predMode, paramlist) {
+predByFS <- function(trainData, testData, FSmethod, cutP, fdr, FScore, 
+    classifier, predMode, paramlist) {
     
     datalist <- getDataAfterFS(trainData, testData, FSmethod, cutP, fdr, FScore)
     ## include the label
@@ -653,19 +657,20 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
 #' print(accuracy)  
 
 
-predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore, classifier, 
-    predMode, paramlist, innerCore) {
+predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore, 
+    classifier, predMode, paramlist, innerCore) {
     
     cvMat <- c()
     replist <- seq_len(repeats)
     for (reps in replist) {
-        foldlists <- split(sample(nrow(data)), rep(seq_len(nfolds), length = nrow(data)))
+        foldlists <- split(sample(nrow(data)), rep(seq_len(nfolds), 
+            length = nrow(data)))
         cvY <- rep(NA, nrow(data))
         cvEstimate <- bplapply(foldlists, function(fold) {
             trainData <- data[-fold, ]
             testData <- data[fold, ]
-            predTest <- predByFS(trainData, testData, FSmethod, cutP, fdr, FScore, 
-                classifier, predMode, paramlist)
+            predTest <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
+                FScore, classifier, predMode, paramlist)
         }, BPPARAM = SnowParam(workers = innerCore))
         cvY[unlist(foldlists)] <- unlist(cvEstimate)
         cvMat <- cbind(cvMat, cvY)
@@ -763,9 +768,9 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore, classif
 #' ## print(head(stage2data[,1:5]))
 
 
-BioMMreconData <- function(trainDataList, testDataList, resample = "BS", dataMode, 
-    repeatA, repeatB, nfolds, FSmethod, cutP, fdr, FScore, classifier, predMode, 
-    paramlist, innerCore, outFileA = NULL, outFileB = NULL) {
+BioMMreconData <- function(trainDataList, testDataList, resample = "BS", 
+    dataMode, repeatA, repeatB, nfolds, FSmethod, cutP, fdr, FScore, classifier, 
+    predMode, paramlist, innerCore, outFileA = NULL, outFileB = NULL) {
     
     reconDataAx <- c()
     reconDataBx <- c()
@@ -774,12 +779,13 @@ BioMMreconData <- function(trainDataList, testDataList, resample = "BS", dataMod
         trainData = trainDataList[[i]]
         dataAy <- trainData[, 1]
         if (resample == "CV") {
-            predA <- predByCV(data = trainData, repeats = repeatA, nfolds, FSmethod, 
-                cutP, fdr, FScore, classifier, predMode, paramlist, innerCore)
-        } else if (resample == "BS") {
-            predA <- predByBS(trainData, testData = NULL, dataMode, repeats = repeatA, 
+            predA <- predByCV(data = trainData, repeats = repeatA, nfolds, 
                 FSmethod, cutP, fdr, FScore, classifier, predMode, paramlist, 
                 innerCore)
+        } else if (resample == "BS") {
+            predA <- predByBS(trainData, testData = NULL, dataMode, 
+                repeats = repeatA, FSmethod, cutP, fdr, FScore, classifier, 
+                predMode, paramlist, innerCore)
         }
         reconDataAx <- cbind(reconDataAx, predA)
         
@@ -880,9 +886,9 @@ BioMMreconData <- function(trainDataList, testDataList, resample = "BS", dataMod
 #' @author Junfang Chen 
 
 
-BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode, repeatA = 1, 
-    repeatB = 1, nfolds, FSmethod, cutP, fdr, FScore, classifier, predMode, paramlist, 
-    innerCore, outFileA = NULL, outFileB = NULL) {
+BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode, 
+    repeatA = 1, repeatB = 1, nfolds, FSmethod, cutP, fdr, FScore, classifier, 
+    predMode, paramlist, innerCore, outFileA = NULL, outFileB = NULL) {
     
     resample <- match.arg(resample)
     if (!is.null(resample)) {
@@ -891,13 +897,14 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode, repe
         }
         trainDataY <- trainData$label
         if (resample == "CV") {
-            predY <- predByCV(data = trainData, repeats = repeatA, nfolds, FSmethod, 
-                cutP, fdr, FScore, classifier, predMode, paramlist, innerCore)
-            message("CrossValidation >>> ")
-        } else if (resample == "BS") {
-            predY <- predByBS(trainData, testData = NULL, dataMode, repeats = repeatA, 
+            predY <- predByCV(data = trainData, repeats = repeatA, nfolds, 
                 FSmethod, cutP, fdr, FScore, classifier, predMode, paramlist, 
                 innerCore)
+            message("CrossValidation >>> ")
+        } else if (resample == "BS") {
+            predY <- predByBS(trainData, testData = NULL, dataMode, 
+                repeats = repeatA, FSmethod, cutP, fdr, FScore, classifier, 
+                predMode, paramlist, innerCore)
             message("Bootstrapping >>> ")
         }
         
@@ -922,7 +929,8 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode, repe
         }
         testY <- testData$label
         predTest <- predByBS(trainData, testData, dataMode, repeats = repeatB, 
-            FSmethod, cutP, fdr, FScore, classifier, predMode, paramlist, innerCore)
+            FSmethod, cutP, fdr, FScore, classifier, predMode, paramlist, 
+            innerCore)
         ## Prediction performance for the ind. test performance
         message(paste0("Test set performance: "))
         if (predMode == "probability") {
@@ -1223,30 +1231,32 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' ##                 outFileA2=NULL, outFileB2=NULL)
 
 
-BioMM <- function(trainData, testData, stratify = c("gene", "pathway", "chromosome"), 
-    pathlistDB, featureAnno, restrictUp, restrictDown, minPathSize, supervisedStage1 = TRUE, 
-    typePCA, resample1 = "BS", resample2 = "CV", dataMode = "allTrain", repeatA1, 
-    repeatA2, repeatB1, repeatB2, nfolds, FSmethod1, FSmethod2, cutP1, cutP2, 
-    fdr1, fdr2, FScore, classifier1, classifier2, predMode1, predMode2, paramlist1, 
-    paramlist2, innerCore, outFileA2 = NULL, outFileB2 = NULL) {
+BioMM <- function(trainData, testData, 
+    stratify = c("gene", "pathway", "chromosome"), pathlistDB, featureAnno, 
+    restrictUp, restrictDown, minPathSize, supervisedStage1 = TRUE, 
+    typePCA, resample1 = "BS", resample2 = "CV", dataMode = "allTrain", 
+    repeatA1, repeatA2, repeatB1, repeatB2, nfolds, FSmethod1, FSmethod2, 
+    cutP1, cutP2, fdr1, fdr2, FScore, classifier1, classifier2, 
+    predMode1, predMode2, paramlist1, paramlist2, innerCore, 
+    outFileA2 = NULL, outFileB2 = NULL) {
     
     stratify <- match.arg(stratify)
     ## blocks of sub-datasets preparation
     if (stratify == "gene") {
-        trainDataList <- omics2genelist(data = trainData, featureAnno, restrictUp, 
-            restrictDown)
+        trainDataList <- omics2genelist(data = trainData, featureAnno, 
+            restrictUp, restrictDown)
         if (!is.null(testData)) {
-            testDataList <- omics2genelist(data = testData, featureAnno, restrictUp, 
-                restrictDown)
+            testDataList <- omics2genelist(data = testData, featureAnno, 
+                restrictUp, restrictDown)
         } else {
             testDataList <- NULL
         }
     } else if (stratify == "pathway") {
-        trainDataList <- omics2pathlist(data = trainData, pathlistDB, featureAnno, 
-            restrictUp, restrictDown, minPathSize)
+        trainDataList <- omics2pathlist(data = trainData, pathlistDB, 
+            featureAnno, restrictUp, restrictDown, minPathSize)
         if (!is.null(testData)) {
-            testDataList <- omics2pathlist(data = testData, pathlistDB, featureAnno, 
-                restrictUp, restrictDown, minPathSize)
+            testDataList <- omics2pathlist(data = testData, pathlistDB, 
+                featureAnno, restrictUp, restrictDown, minPathSize)
         } else {
             testDataList <- NULL
         }
@@ -1263,14 +1273,17 @@ BioMM <- function(trainData, testData, stratify = c("gene", "pathway", "chromoso
     
     ## generation of stage-2 data
     if (supervisedStage1 == TRUE) {
-        stage2data <- BioMMreconData(trainDataList = trainDataList, testDataList = testDataList, 
-            resample = resample1, dataMode, repeatA = repeatA1, repeatB = repeatB1, 
-            nfolds, FSmethod = FSmethod1, cutP = cutP1, fdr = fdr1, FScore, classifier = classifier1, 
-            predMode = predMode1, paramlist = paramlist1, innerCore, outFileA = NULL, 
-            outFileB = NULL)
+        stage2data <- BioMMreconData(trainDataList = trainDataList, 
+            testDataList = testDataList,  resample = resample1, dataMode, 
+            repeatA = repeatA1, repeatB = repeatB1, nfolds, 
+            FSmethod = FSmethod1, cutP = cutP1, fdr = fdr1, FScore, 
+            classifier = classifier1, predMode = predMode1, 
+            paramlist = paramlist1, innerCore, 
+            outFileA = NULL, outFileB = NULL)
     } else {
-        stage2data <- BioMMstage1pca(trainDataList = trainDataList, testDataList = testDataList, 
-            typeMode = typePCA, topPC = 1, innerCore, outFileA = NULL, outFileB = NULL)
+        stage2data <- BioMMstage1pca(trainDataList = trainDataList, 
+            testDataList = testDataList, typeMode = typePCA, topPC = 1, 
+            innerCore, outFileA = NULL, outFileB = NULL)
     }
     
     if (is.null(testDataList)) {
@@ -1300,10 +1313,11 @@ BioMM <- function(trainData, testData, stratify = c("gene", "pathway", "chromoso
     } else {
         ## make prediction
         result <- BioMMstage2pred(trainData = trainPos2, testData = testPos2, 
-            resample = resample2, dataMode, repeatA = repeatA2, repeatB = repeatB2, 
-            nfolds, FSmethod = FSmethod2, cutP = cutP2, fdr = fdr2, FScore, classifier = classifier2, 
-            predMode = predMode2, paramlist = paramlist2, innerCore, outFileA = outFileA2, 
-            outFileB = outFileB2)
+            resample = resample2, dataMode, repeatA = repeatA2, 
+            repeatB = repeatB2, nfolds, FSmethod = FSmethod2, cutP = cutP2, 
+            fdr = fdr2, FScore, classifier = classifier2, 
+            predMode = predMode2, paramlist = paramlist2, 
+            innerCore, outFileA = outFileA2, outFileB = outFileB2)
     }
     return(result)
 }
