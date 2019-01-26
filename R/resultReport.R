@@ -85,9 +85,9 @@ getMetrics <- function(dataY, predY) {
     ACC <- classifiACC(dataY, predY)
     pv <- chisq.test(table(dataY, predY))$p.value
     if (nlevels(factor(predY)) > 1) {
-        Cor <- cor(predY, dataY)
-        AUC <- auc(predY, dataY)
-        R2 <- lrm(predY ~ dataY)$stats["R2"]
+        Cor <- cor(dataY, predY)
+        AUC <- auc(dataY, predY)
+        R2 <- lrm(dataY ~ predY)$stats["R2"]
         eMat <- data.frame(pv = pv, cor = round(Cor, 2), AUC = round(AUC, 2), 
             ACC = round(ACC, 2), R2 = round(R2, 3))
     } else {
@@ -284,19 +284,20 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
         dataXsub <- dataX[, which(corr > 0)]
         featurelist <- as.list(seq_len(ncol(dataXsub)))
         metrics <- unlist(bplapply(featurelist, function(i) {
-            eMat <- getMetrics(dataXsub[, i], dataY)
-        }, BPPARAM = SnowParam(workers = core)))
+            invisible(capture.output(eMat <- getMetrics(dataXsub[, i], dataY)))
+            eMat
+        },  BPPARAM = SnowParam(workers = core)))
     } else {
         featurelist <- as.list(seq_len(ncol(dataX)))
         metrics <- unlist(bplapply(featurelist, function(i) {
-            eMat <- getMetrics(dataX[, i], dataY)
+            invisible(capture.output(eMat <- getMetrics(dataX[, i], dataY)))
+            eMat
         }, BPPARAM = SnowParam(workers = core)))
         dataXsub <- dataX
     }
     
     eMat <- matrix(unlist(metrics), nrow = ncol(dataXsub), byrow = TRUE)
-    met1 <- getMetrics(dataXsub[, 1], dataY)
-    colnames(eMat) <- colnames(met1)
+    colnames(eMat) <- c("pv", "cor", "AUC", "ACC", "R2")
     if (stratify == "pathway") {
         goID <- gsub("\\:", ".", colnames(dataXsub))
         rownames(eMat) <- goID
@@ -307,8 +308,10 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
     blockSize <- .getBlockSize(blocklist, stratify)
     ## double check the overlapping IDs
     sharedID <- intersect(rownames(eMat), blockSize[, "ID"])
-    eMat2 <- eMat[match(rownames(eMat), sharedID), ]
-    blockMatch <- blockSize[match(rownames(eMat), sharedID), ]
+    eMatSub <- eMat[is.element(rownames(eMat), sharedID), ]
+    eMat2 <- eMatSub[match(rownames(eMatSub), sharedID), ]
+    blockSub <- blockSize[is.element(blockSize[, "ID"], sharedID), ]
+    blockMatch <- blockSub[match(rownames(eMatSub), blockSub[, "ID"]), ]
     ## attached block Size
     blockInfo <- data.frame(eMat2, blockMatch, stringsAsFactors = FALSE)
     ## ranking
