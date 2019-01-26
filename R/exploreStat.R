@@ -83,9 +83,9 @@ getDataAfterFS <- function(trainData, testData,
         
     if (is.null(FSmethod)){  ## no FS;  
         selFeature <- seq_len(ncol(trainX))
-    } else if (FSmethod == "positive"){ ## only positively correlated
-        whPos <- which(cor(trainX, trainY) > 0)  
-        selFeature <- whPos
+    } else if (FSmethod == "positive"){ ## only positively correlated 
+        # use 'which' to keep the remaining index
+        selFeature <- which(cor(trainX, trainY) > 0)  
     } else if (FSmethod == "wilcox.test"){  
         featurelist <- as.list(seq_len(ncol(trainX)))
         pvTrain <- unlist(bplapply(featurelist, function(i){

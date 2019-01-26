@@ -67,7 +67,7 @@ omics2genelist <- function(data, featureAnno, restrictUp=500, restrictDown=5){
     matlist <- list()
     for (i in seq_along(genes)) { 
         # print(paste0('Gene: ', i))   
-        annoSub <- probeAnno[which(probeAnno[,"entrezID"] == genes[i]),]  
+        annoSub <- probeAnno[probeAnno[,"entrezID"] == genes[i],]  
         IDperGene <- annoSub[,"ID"] 
         dataXsub <- dataX[,intersect(probeName, IDperGene)] 
         if (length(IDperGene) == 1){
@@ -82,8 +82,7 @@ omics2genelist <- function(data, featureAnno, restrictUp=500, restrictDown=5){
     names(matlist) <- genes  
     ## exclude the label
     geneSize <- unlist(lapply(matlist, function(i) {ncol(i)-1}))  
-    geneFilteredIndex <- which(geneSize >= restrictDown &
-                                geneSize <= restrictUp) 
+    geneFilteredIndex <- geneSize >= restrictDown & geneSize <= restrictUp
     subGeneSize <- geneSize[geneFilteredIndex]
     matlistSub <- matlist[geneFilteredIndex]
     print("# Genes summary: ")  
@@ -165,10 +164,10 @@ omics2pathlist <- function(data, pathlistDB, featureAnno=NULL,
     # Restrict the pathways of size x-xx gene for downstream analysis   
     genePerPath <- lapply(pathlistDB, function(i){length(i)})  
     if (!is.null(restrictUp)) { 
-        pathSizeIndex <- which(genePerPath >= restrictDown &
-                                genePerPath <= restrictUp) 
+        pathSizeIndex <- genePerPath >= restrictDown &
+                            genePerPath <= restrictUp
     } else { 
-        pathSizeIndex <- which(genePerPath >= restrictDown) 
+        pathSizeIndex <- genePerPath >= restrictDown
     } 
     pathlistSub <- pathlistDB[pathSizeIndex]
     
@@ -208,7 +207,7 @@ omics2pathlist <- function(data, pathlistDB, featureAnno=NULL,
     names(pathlist) <- names(pathlistSub)  
     ## exclude the label
     probeNperPath <- unlist(lapply(pathlist, function(i) {ncol(i)-1})) 
-    # print(summary(probeNperPath))
+    # use 'which' to keep the remaining index
     minPathIndex <- which(probeNperPath < minPathSize) 
     ## remove pathways with too small size
     if (length(minPathIndex)!=0) {pathlist <- pathlist[-minPathIndex]}
@@ -284,7 +283,7 @@ omics2chrlist <- function(data, probeAnno){
     matlist <- list()
     for (i in currentChr){ 
         # print(paste0('Chr: ', i)) 
-        annoSub <- probeAnno[which(probeAnno[,"chr"] == i),]
+        annoSub <- probeAnno[probeAnno[,"chr"] == i,]
         entrezIDperChr <- annoSub[,"ID"] 
         dataXsub <- dataX[,intersect(probeName, entrezIDperChr)] 
         mat <- cbind(label=dataY, dataXsub)

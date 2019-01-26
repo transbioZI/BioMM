@@ -152,7 +152,8 @@ plotVarExplained <- function(data, posF=TRUE,
         if (nPos == 0){
             stop("No positively outcome-associated features!")    
         }
-        dataXsub <- dataX[,which(corr > 0)]
+        ## use 'which' to avoid possible 'NAs'
+        dataXsub <- dataX[,which(corr > 0)] 
     } else { 
         dataX <- dataXsub
     }       
@@ -274,6 +275,7 @@ plotRankedFeature <- function(data, posF=TRUE, topF=10,
         if (topF > nPos ){
             stop("'topF' bigger than # of positively associated features!")
         }
+        ## use 'which' to avoid possible 'NAs'
         dataXsub <- dataX[,which(corr > 0)]
         featurelist <- as.list(seq_len(ncol(dataXsub))) 
         metrics <- unlist(bplapply(featurelist, function(i){   
