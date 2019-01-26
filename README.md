@@ -11,7 +11,7 @@ Development version from Github:
 ```{r eval=FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
 	install.packages("BiocManager")
-BiocManager::install("BioMM")
+BiocManager::install("transbioZI/BioMM")
 ``` 
 
 ## Tutorial 
