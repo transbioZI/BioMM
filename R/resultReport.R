@@ -157,9 +157,9 @@ plotVarExplained <- function(data, posF=TRUE,
         dataX <- dataXsub
     }       
     featurelist <- seq_len(ncol(dataXsub))    
-    r2mat <- unlist(mclapply(featurelist, function(i){  
+    r2mat <- unlist(bplapply(featurelist, function(i){  
             r2 <-  lrm(dataXsub[,i]~dataY)$stats["R2"]  
-    }, mc.cores=core))  
+    }, BPPARAM=SnowParam(workers=core)))  
 
     r2plot <- data.frame(Stage2data=r2mat)
     stratify <- match.arg(stratify) 
@@ -276,14 +276,14 @@ plotRankedFeature <- function(data, posF=TRUE, topF=10,
         }
         dataXsub <- dataX[,which(corr > 0)]
         featurelist <- as.list(seq_len(ncol(dataXsub))) 
-        metrics <- unlist(mclapply(featurelist, function(i){   
+        metrics <- unlist(bplapply(featurelist, function(i){   
                 eMat <- getMetrics(dataXsub[,i], dataY)
-        }, mc.cores=core))  
+        }, BPPARAM=SnowParam(workers=core)))  
     } else { 
         featurelist <- as.list(seq_len(ncol(dataX))) 
-        metrics <- unlist(mclapply(featurelist, function(i){   
+        metrics <- unlist(bplapply(featurelist, function(i){   
                 eMat <- getMetrics(dataX[,i], dataY)
-        }, mc.cores=core)) 
+        }, BPPARAM=SnowParam(workers=core))) 
         dataXsub <- dataX
     }    
     

@@ -559,7 +559,7 @@ predByBS <- function(trainData, testData,
         data <- trainData 
         predTmp <- rep(NA, nrow(data))  
         replist <- seq_len(repeats)
-        predTmpList <- mclapply(replist, function(reps){  
+        predTmpList <- bplapply(replist, function(reps){  
             # set.seed(reps)    
             trainIndex <- unique(sample(nrow(data), replace=TRUE))
             testIndex <- setdiff(seq_len(nrow(data)), trainIndex)
@@ -571,7 +571,7 @@ predByBS <- function(trainData, testData,
                                         fdr, FScore, classifier,
                                         predMode, paramlist)  
                                         predTmp
-        }, mc.cores=innerCore) 
+        }, BPPARAM=SnowParam(workers=innerCore)) 
         # str(predTmpList) 
         predTest <- round(rowMeans(do.call(cbind, predTmpList), na.rm=TRUE),3)  
         naCount <- sum(is.na(predTest))
@@ -585,24 +585,24 @@ predByBS <- function(trainData, testData,
             data <- trainData 
             predTmp <- rep(NA, nrow(data))  
             replist <- seq_len(repeats)
-            predTmpList <- mclapply(replist, function(reps){  
+            predTmpList <- bplapply(replist, function(reps){  
                 # set.seed(reps)    
                 trainIndex <- unique(sample(nrow(data), replace=TRUE)) 
                 trainData <- data[trainIndex, ] 
                 predTmp <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                                     FScore, classifier, predMode, paramlist)   
                 predTmp 
-            }, mc.cores=innerCore)  
+            }, BPPARAM=SnowParam(workers=innerCore))  
             predTest <- round(rowMeans(do.call(cbind, predTmpList)),3)  
         } else if (dataMode == "allTrain") {  
             predTmp <- rep(NA, nrow(testData))  
             replist <- seq_len(repeats)
-            predTmpList <- mclapply(replist, function(reps){  
+            predTmpList <- bplapply(replist, function(reps){  
                 # set.seed(reps)       
                 predTmp <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                                     FScore, classifier, predMode, paramlist)  
                 predTmp
-            }, mc.cores=innerCore) 
+            }, BPPARAM=SnowParam(workers=innerCore)) 
             # str(predTmpList) 
             predTest <- round(rowMeans(do.call(cbind, predTmpList)),3)  
         }
@@ -681,12 +681,12 @@ predByCV <- function(data, repeats, nfolds,
         foldlists <- split(sample(nrow(data)), rep(seq_len(nfolds),
                             length=nrow(data)))
         cvY <- rep(NA, nrow(data))
-        cvEstimate <-  mclapply(foldlists, function(fold){
+        cvEstimate <-  bplapply(foldlists, function(fold){
             trainData <- data[-fold, ]
             testData <- data[fold,]  
             predTest <- predByFS(trainData, testData, FSmethod, cutP, fdr,
                                 FScore, classifier, predMode, paramlist)  
-        }, mc.cores=innerCore) 
+        }, BPPARAM=SnowParam(workers=innerCore)) 
         cvY[unlist(foldlists)] <- unlist(cvEstimate)
         cvMat <- cbind(cvMat, cvY)
         # print(dim(cvMat))
@@ -1061,7 +1061,7 @@ BioMMstage1pca <- function(trainDataList, testDataList,
     } 
 
     numlist <- seq_along(trainDataList)
-    predMat <- mclapply(numlist, function(i){ 
+    predMat <- bplapply(numlist, function(i){ 
                     # print(paste0('Block:', i))  
                     # print(paste0('BlockSize: ', c(ncol(trainData)-1))) 
                     trainData <- trainDataList[[i]] 
@@ -1106,7 +1106,7 @@ BioMMstage1pca <- function(trainDataList, testDataList,
                         pred <- list(predA, predB)   
                     }     
                     pred
-    }, mc.cores=innerCore)      
+    }, BPPARAM=SnowParam(workers=innerCore))      
 
     if (!is.null(testDataList)){ ##  PC1
         predMatA <- lapply(predMat, function(data){data[[1]]})

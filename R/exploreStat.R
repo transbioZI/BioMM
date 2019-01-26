@@ -88,34 +88,34 @@ getDataAfterFS <- function(trainData, testData,
         selFeature <- whPos
     } else if (FSmethod == "wilcox.test"){  
         featurelist <- as.list(seq_len(ncol(trainX)))
-        pvTrain <- unlist(mclapply(featurelist, function(i){
+        pvTrain <- unlist(bplapply(featurelist, function(i){
                         wilcox.test(trainX[,i]~as.factor(trainY))$p.value}, 
-                        mc.cores=FScore))
+                        BPPARAM=SnowParam(workers=FScore)))
         selFeature <- which(pvTrain < cutP)
     } else if (FSmethod == "cor.test"){
         featurelist <- as.list(seq_len(ncol(trainX))) 
-        pvTrain <- unlist(mclapply(featurelist, function(i){
+        pvTrain <- unlist(bplapply(featurelist, function(i){
                         cor.test(trainX[,i], trainY)$p.value}, 
-                    mc.cores=FScore))   
+                    BPPARAM=SnowParam(workers=FScore)))   
         selFeature <- which(pvTrain < cutP)   
     } else if (FSmethod == "chisq.test"){
         featurelist <- as.list(seq_len(ncol(trainX))) 
-        pvTrain <- unlist(mclapply(featurelist, function(i){ 
+        pvTrain <- unlist(bplapply(featurelist, function(i){ 
             if (length(table(trainX[,i]))!=1){  
                 pv <- chisq.test(trainX[,i], as.factor(trainY))$p.value  
                 names(pv) <- featureNames[i]
                 pv 
             }             
-        }, mc.cores=FScore))
+        }, BPPARAM=SnowParam(workers=FScore)))
         indexNew <- match(featureNames, names(pvTrain)) 
         pvTrain2 <- pvTrain[indexNew]
         selFeature <- which(pvTrain2 < cutP)   
     } else if (FSmethod == "posWilcox"){
         whPos <- which(cor(trainX, trainY) > 0) 
         featurelist <- as.list(seq_len(ncol(trainX)))
-        pvTrain <- unlist(mclapply(featurelist, function(i){
+        pvTrain <- unlist(bplapply(featurelist, function(i){
                     wilcox.test(trainX[,i]~as.factor(trainY))$p.value},
-                    mc.cores=FScore))
+                    BPPARAM=SnowParam(workers=FScore)))
         varTmp <- which(pvTrain < cutP) 
         selFeature <- intersect(whPos, varTmp)
     } else if (FSmethod == "top10pCor"){
