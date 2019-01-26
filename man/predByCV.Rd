@@ -57,13 +57,14 @@ dataY <- methylData[,1]
 ## select a subset of genome-wide methylation data at random
 methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
 library(ranger) 
+library(BiocParallel)
 predY <- predByCV(methylSub, repeats=1, nfolds=10,   
                   FSmethod=NULL, cutP=0.1, 
                   fdr=NULL, FScore=1, 
                   classifier='randForest',
                   predMode='classification', 
                   paramlist=list(ntree=300, nthreads=1),
-                  innerCore=1)  
+                  innerCore=10)  
 dataY <- methylData[,1]
 accuracy <- classifiACC(dataY=dataY, predY=predY)
 print(accuracy)  

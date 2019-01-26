@@ -49,7 +49,7 @@ set.seed(123)
 predY <- baseModel(trainData, testData, 
                    classifier='randForest',  
                    predMode='classification', 
-                   paramlist=list(ntree=300, nthreads=10)) 
+                   paramlist=list(ntree=300, nthreads=20)) 
 print(table(predY)) 
 testY <- testData[,1]
 accuracy <- classifiACC(dataY=testY, predY=predY)

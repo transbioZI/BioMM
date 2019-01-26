@@ -65,16 +65,17 @@ classifiACC <- function(dataY, predY) {
 #' methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 #' methylData <- readRDS(methylfile)   
 #' dataY <- methylData[,1]
-#' methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
+#' methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
 #' library(ranger) 
 #' library(rms)
+#' library(BiocParallel)
 #' predY <- predByCV(methylSub, repeats=1, nfolds=10,   
 #'                   FSmethod=NULL, cutP=0.1, 
 #'                   fdr=NULL, FScore=1, 
 #'                   classifier='randForest',
 #'                   predMode='classification', 
-#'                   paramlist=list(ntree=300, nthreads=1),
-#'                   innerCore=1)   
+#'                   paramlist=list(ntree=300, nthreads=20),
+#'                   innerCore=10)   
 #' accuracy <- getMetrics(dataY=dataY, predY=predY)
 #' print(accuracy)  
 

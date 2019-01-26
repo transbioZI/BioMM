@@ -46,7 +46,7 @@ testData = methylSub[-trainIndex,]
 library(ranger)
 predY <- baseRandForest(trainData, testData, 
                         predMode='classification', 
-                        paramlist=list(ntree=300, nthreads=10)) 
+                        paramlist=list(ntree=300, nthreads=20)) 
 testY <- testData[,1]
 accuracy <- classifiACC(dataY=testY, predY=predY)
 print(accuracy) 

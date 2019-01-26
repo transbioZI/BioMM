@@ -67,14 +67,15 @@ trainIndex <- sample(nrow(methylSub), 30)
 trainData = methylSub[trainIndex,]
 testData = methylSub[-trainIndex,]
 library(ranger) 
+library(BiocParallel)
 predY <- predByBS(trainData, testData, 
                   dataMode='allTrain', repeats=50,
                   FSmethod=NULL, cutP=0.1, 
                   fdr=NULL, FScore=1, 
                   classifier='randForest',
                   predMode='classification', 
-                  paramlist=list(ntree=300, nthreads=1),
-                  innerCore=1)  
+                  paramlist=list(ntree=300, nthreads=10),
+                  innerCore=20)  
 testY <- testData[,1]
 accuracy <- classifiACC(dataY=testY, predY=predY)
 print(accuracy)  

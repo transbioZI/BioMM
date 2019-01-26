@@ -39,7 +39,7 @@
 #' library(ranger)
 #' predY <- baseRandForest(trainData, testData, 
 #'                         predMode='classification', 
-#'                         paramlist=list(ntree=300, nthreads=10)) 
+#'                         paramlist=list(ntree=300, nthreads=20)) 
 #' testY <- testData[,1]
 #' accuracy <- classifiACC(dataY=testY, predY=predY)
 #' print(accuracy) 
@@ -358,7 +358,7 @@ baseGLMnet <- function(trainData, testData,
 #' predY <- baseModel(trainData, testData, 
 #'                    classifier='randForest',  
 #'                    predMode='classification', 
-#'                    paramlist=list(ntree=300, nthreads=10)) 
+#'                    paramlist=list(ntree=300, nthreads=20)) 
 #' print(table(predY)) 
 #' testY <- testData[,1]
 #' accuracy <- classifiACC(dataY=testY, predY=predY)
@@ -439,7 +439,7 @@ baseModel <- function(trainData, testData,
 #'                   fdr=NULL, FScore=1, 
 #'                   classifier='randForest',
 #'                   predMode='classification', 
-#'                   paramlist=list(ntree=300, nthreads=10))  
+#'                   paramlist=list(ntree=300, nthreads=20))  
 #' testY <- testData[,1]
 #' accuracy <- classifiACC(dataY=testY, predY=predY)
 #' print(accuracy)  
@@ -529,14 +529,15 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr, FScore,
 #' trainData = methylSub[trainIndex,]
 #' testData = methylSub[-trainIndex,]
 #' library(ranger) 
+#' library(BiocParallel)
 #' predY <- predByBS(trainData, testData, 
 #'                   dataMode='allTrain', repeats=50,
 #'                   FSmethod=NULL, cutP=0.1, 
 #'                   fdr=NULL, FScore=1, 
 #'                   classifier='randForest',
 #'                   predMode='classification', 
-#'                   paramlist=list(ntree=300, nthreads=1),
-#'                   innerCore=1)  
+#'                   paramlist=list(ntree=300, nthreads=10),
+#'                   innerCore=20)  
 #' testY <- testData[,1]
 #' accuracy <- classifiACC(dataY=testY, predY=predY)
 #' print(accuracy)  
@@ -645,13 +646,14 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
 #' ## select a subset of genome-wide methylation data at random
 #' methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
 #' library(ranger) 
+#' library(BiocParallel)
 #' predY <- predByCV(methylSub, repeats=1, nfolds=10,   
 #'                   FSmethod=NULL, cutP=0.1, 
 #'                   fdr=NULL, FScore=1, 
 #'                   classifier='randForest',
 #'                   predMode='classification', 
 #'                   paramlist=list(ntree=300, nthreads=1),
-#'                   innerCore=1)  
+#'                   innerCore=10)  
 #' dataY <- methylData[,1]
 #' accuracy <- classifiACC(dataY=dataY, predY=predY)
 #' print(accuracy)  
@@ -754,6 +756,7 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore,
 #' dataList <- omics2chrlist(data=methylData, probeAnno)
 #' length(dataList)
 #' library(ranger) 
+#' library(BiocParallel)
 #' ## Not Run
 #' ## stage2data <- BioMMreconData(trainDataList=dataList, testDataList=NULL, 
 #' ##                             resample='CV', dataMode='allTrain', 
@@ -762,8 +765,8 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore,
 #' ##                             fdr=NULL, FScore=1, 
 #' ##                             classifier='randForest',
 #' ##                             predMode='classification', 
-#' ##                             paramlist=list(ntree=300, nthreads=10),
-#' ##                             innerCore=1, outFileA=NULL, outFileB=NULL) 
+#' ##                             paramlist=list(ntree=300, nthreads=20),
+#' ##                             innerCore=10, outFileA=NULL, outFileB=NULL) 
 #' ## print(dim(stage2data))
 #' ## print(head(stage2data[,1:5]))
 
@@ -1001,9 +1004,10 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
 #' ## Mapping CpGs into Chromosome
 #' dataList <- omics2chrlist(data=methylData, probeAnno)
 #' length(dataList) 
+#' library(BiocParallel)
 #' stage2data <- BioMMstage1pca(trainDataList=dataList, testDataList=NULL, 
 #'                              typeMode='regular', topPC=1,  
-#'                              innerCore=1, outFileA=NULL, outFileB=NULL) 
+#'                              innerCore=10, outFileA=NULL, outFileB=NULL) 
 #' print(dim(stage2data))
 #' print(head(stage2data[,1:5]))
 
@@ -1217,6 +1221,8 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' classifier1=classifier2 <- 'randForest'
 #' predMode1=predMode2 <- 'classification'
 #' paramlist1=paramlist2 <- list(ntree=300, nthreads=30)   
+#' library(BiocParallel)
+#' library(ranger)
 #' ## Not Run 
 #' ## result <- BioMM(trainData=methylData, testData=NULL,
 #' ##                 stratify='chromosome', pathlistDB, featureAnno=probeAnno, 
@@ -1227,7 +1233,7 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' ##                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
 #' ##                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=1, 
 #' ##                 classifier1, classifier2, predMode1, predMode2, 
-#' ##                 paramlist1, paramlist2, innerCore=1,  
+#' ##                 paramlist1, paramlist2, innerCore=20,  
 #' ##                 outFileA2=NULL, outFileB2=NULL)
 
 

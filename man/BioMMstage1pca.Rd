@@ -52,9 +52,10 @@ probeAnno <- readRDS(file=probeAnnoFile)
 ## Mapping CpGs into Chromosome
 dataList <- omics2chrlist(data=methylData, probeAnno)
 length(dataList) 
+library(BiocParallel)
 stage2data <- BioMMstage1pca(trainDataList=dataList, testDataList=NULL, 
                              typeMode='regular', topPC=1,  
-                             innerCore=1, outFileA=NULL, outFileB=NULL) 
+                             innerCore=10, outFileA=NULL, outFileB=NULL) 
 print(dim(stage2data))
 print(head(stage2data[,1:5]))
 }

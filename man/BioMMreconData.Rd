@@ -86,6 +86,7 @@ probeAnno <- readRDS(file=probeAnnoFile)
 dataList <- omics2chrlist(data=methylData, probeAnno)
 length(dataList)
 library(ranger) 
+library(BiocParallel)
 ## Not Run
 ## stage2data <- BioMMreconData(trainDataList=dataList, testDataList=NULL, 
 ##                             resample='CV', dataMode='allTrain', 
@@ -94,8 +95,8 @@ library(ranger)
 ##                             fdr=NULL, FScore=1, 
 ##                             classifier='randForest',
 ##                             predMode='classification', 
-##                             paramlist=list(ntree=300, nthreads=10),
-##                             innerCore=1, outFileA=NULL, outFileB=NULL) 
+##                             paramlist=list(ntree=300, nthreads=20),
+##                             innerCore=10, outFileA=NULL, outFileB=NULL) 
 ## print(dim(stage2data))
 ## print(head(stage2data[,1:5]))
 }

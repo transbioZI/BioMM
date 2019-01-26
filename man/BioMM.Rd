@@ -148,6 +148,8 @@ supervisedStage1=TRUE
 classifier1=classifier2 <- 'randForest'
 predMode1=predMode2 <- 'classification'
 paramlist1=paramlist2 <- list(ntree=300, nthreads=30)   
+library(BiocParallel)
+library(ranger)
 ## Not Run 
 ## result <- BioMM(trainData=methylData, testData=NULL,
 ##                 stratify='chromosome', pathlistDB, featureAnno=probeAnno, 
@@ -158,7 +160,7 @@ paramlist1=paramlist2 <- list(ntree=300, nthreads=30)
 ##                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
 ##                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=1, 
 ##                 classifier1, classifier2, predMode1, predMode2, 
-##                 paramlist1, paramlist2, innerCore=1,  
+##                 paramlist1, paramlist2, innerCore=20,  
 ##                 outFileA2=NULL, outFileB2=NULL)
 }
 \references{
