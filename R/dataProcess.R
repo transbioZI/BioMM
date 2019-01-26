@@ -85,12 +85,12 @@ omics2genelist <- function(data, featureAnno, restrictUp=500, restrictDown=5){
     geneFilteredIndex <- geneSize >= restrictDown & geneSize <= restrictUp
     subGeneSize <- geneSize[geneFilteredIndex]
     matlistSub <- matlist[geneFilteredIndex]
-    print("# Genes summary: ")  
+    message("# Genes summary: ")  
     print(summary(geneSize))   
-    print("# Filtered Genes summary: ") 
+    message("# Filtered Genes summary: ") 
     print(summary(subGeneSize))   
-    print(paste0('Total number of original genes: ', length(matlist))) 
-    print(paste0('Total number of filtered genes: ', length(matlistSub)))  
+    message(paste0('Total number of original genes: ', length(matlist))) 
+    message(paste0('Total number of filtered genes: ', length(matlistSub)))  
     return(matlistSub) 
 }
 
@@ -211,14 +211,14 @@ omics2pathlist <- function(data, pathlistDB, featureAnno=NULL,
     minPathIndex <- which(probeNperPath < minPathSize) 
     ## remove pathways with too small size
     if (length(minPathIndex)!=0) {pathlist <- pathlist[-minPathIndex]}
-    print("Summary stat of # probes in each mapped pathway: ")
+    message("Summary stat of # probes in each mapped pathway: ")
     print(summary(unlist(lapply(pathlist, function(i) {ncol(i)-1} )))) 
     
-    print(paste0('Total number of original pathways: ', length(pathlistDB))) 
-    print(paste0('Total number of filtered original pathways: ',
+    message(paste0('Total number of original pathways: ', length(pathlistDB))) 
+    message(paste0('Total number of filtered original pathways: ',
                 length(pathlistSub))) 
-    print('Remove pathways of too small size if any')
-    print(paste0('Total number of retained pathways: ', length(pathlist))) 
+    message('Remove pathways of too small size if any')
+    message(paste0('Total number of retained pathways: ', length(pathlist))) 
     return(pathlist) 
 }
 
@@ -277,7 +277,7 @@ omics2chrlist <- function(data, probeAnno){
     }    
     chrDist <- table(probeAnno[,"chr"])
     currentChr <- names(chrDist)
-    print("Chromosomes: ")  
+    message("Chromosomes: ")  
     print(currentChr) 
 
     matlist <- list()
@@ -294,7 +294,7 @@ omics2chrlist <- function(data, probeAnno){
     names(matlist) <- paste0("chr", currentChr)
     ## exclude the label
     probeNperChr <- unlist(lapply(matlist, function(i) {ncol(i)-1}))  
-    print("Summary stat of # probes in each Chr: ")
+    message("Summary stat of # probes in each Chr: ")
     print(summary(probeNperChr))  
     return(matlist) 
 }

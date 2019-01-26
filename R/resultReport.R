@@ -93,7 +93,7 @@ getMetrics <- function(dataY, predY){
         eMat <- data.frame(pv=pv, cor=round(Cor,2),
                     AUC=round(AUC,2), ACC=round(ACC,2), R2=round(R2,3))  
     } else {
-        print("Warning: all predicted samples in one class!") 
+        message("Warning: all predicted samples in one class!") 
         eMat <- data.frame(pv=pv, cor=0, AUC=0.5, ACC=round(ACC,2), R2=0) 
     }   
     print(eMat) 
@@ -148,7 +148,7 @@ plotVarExplained <- function(data, posF=TRUE,
     if (posF){ 
         corr <- cor(dataX, dataY)
         nPos <- length(which(corr > 0))
-        print(paste0("posFeature: ", nPos))
+        message(paste0("posFeature: ", nPos))
         if (nPos == 0){
             stop("No positively outcome-associated features!")    
         }
@@ -268,7 +268,7 @@ plotRankedFeature <- function(data, posF=TRUE, topF=10,
     if (posF){ 
         corr <- cor(dataX, dataY)
         nPos <- length(which(corr > 0))
-        print(paste0("posFeature: ", nPos))
+        message(paste0("posFeature: ", nPos))
         if (nPos == 0){
             stop("No positively outcome-associated features!")
         }

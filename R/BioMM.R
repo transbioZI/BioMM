@@ -477,7 +477,7 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr, FScore,
         predTest <- baseModel(trainData=trainDataSub, testData=testDataSub,
                             classifier, predMode, paramlist)     
 
-    } else { print("Error: Input data is wrong!")}
+    } else { message("Error: Input data is wrong!")}
 
     if (is.factor(predTest)){ predTest <- as.numeric(predTest)-1 }
     return(predTest)
@@ -577,7 +577,7 @@ predByBS <- function(trainData, testData,
         naCount <- sum(is.na(predTest))
         ## If not enough bootstrapping repeats
         if (naCount > 0){
-            print(paste0("Warning: ", naCount, " NA(s) in predicted testY!"))
+            message(paste0("Warning: ", naCount, " NA(s) in predicted testY!"))
         }
 
     } else if (!is.null(testData)){ ## repeated prediction on test data
@@ -939,12 +939,12 @@ BioMMstage2pred <- function(trainData, testData,
             predY <- predByCV(data=trainData, repeats=repeatA, nfolds,
                             FSmethod, cutP, fdr, FScore, classifier, 
                             predMode, paramlist, innerCore)  
-            print("CrossValidation >>> ")
+            message("CrossValidation >>> ")
         } else if (resample == "BS"){
             predY <- predByBS(trainData, testData=NULL, dataMode,
                             repeats=repeatA, FSmethod, cutP, fdr, FScore,
                             classifier, predMode, paramlist, innerCore)  
-            print("Bootstrapping >>> ")
+            message("Bootstrapping >>> ")
         } 
 
         if (predMode == "probability"){   
@@ -970,7 +970,7 @@ BioMMstage2pred <- function(trainData, testData,
                             FSmethod, cutP, fdr, FScore, classifier,
                             predMode, paramlist, innerCore)  
         ## Prediction performance for the ind. test performance
-        print(paste0("Test set performance: "))  
+        message(paste0("Test set performance: "))  
         if (predMode == "probability"){   
             predTest <- ifelse(predTest>=.5, 1, 0)
             metricTest <- getMetrics(dataY=testY, predTest)  
@@ -1333,12 +1333,12 @@ BioMM <- function(trainData, testData,
 
     if (is.null(testDataList)){ 
         trainData2 <- stage2data 
-        print("Stage-2: >>> ")
-        print(paste0("Number of blocks: ", ncol(trainData2)-1 ))
+        message("Stage-2: >>> ")
+        message(paste0("Number of blocks: ", ncol(trainData2)-1 ))
         trainPos2 <- getDataAfterFS(trainData=trainData2, testData=NULL, 
                                     FSmethod="positive", cutP=0.1, 
                                     fdr=NULL, FScore=1)  
-        print(paste0("Number of positive blocks: ", ncol(trainPos2)-1 )) 
+        message(paste0("Number of positive blocks: ", ncol(trainPos2)-1 )) 
         testPos2 <- NULL
     } else { ## if testData provided
         trainData2 <- stage2data[[1]]
@@ -1348,12 +1348,12 @@ BioMM <- function(trainData, testData,
         ## include the label
         trainPos2 <- datalist[[1]] 
         testPos2 <- datalist[[2]] 
-        print(paste0("Number of positive blocks: ", ncol(trainPos2)-1 )) 
+        message(paste0("Number of positive blocks: ", ncol(trainPos2)-1 )) 
     }   
 
     ## If no positive features  
     if (is.null(trainPos2)){
-        print("Warning: no positive features!!")
+        message("Warning: no positive features!!")
         result <- data.frame(pv=1, cor=0, AUC=0.5, ACC=0.5, R2=0) 
     } else { 
         ## make prediction 

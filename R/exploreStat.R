@@ -126,7 +126,7 @@ getDataAfterFS <- function(trainData, testData,
         if (length(corTrain) <= 2){
             selFeature <- order(corTrain, decreasing=TRUE)[seq_len(2)]
         }   
-        print("top 10% correlated Features")
+        message("top 10% correlated Features")
     }  
 
     if (!is.null(fdr)){ ## For FS based on fdr
@@ -137,7 +137,7 @@ getDataAfterFS <- function(trainData, testData,
         }
 
     if (length(selFeature) == 0) { ## return NULL 
-        print("Warning: No feature selected!")
+        message("Warning: No feature selected!")
         subTrain <- NULL
         subTest <- NULL  
     } else if (length(selFeature) == 1){ ## in case only 1 feature is selected
