@@ -525,7 +525,7 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr, FScore,
 
 #' @return The predicted output for the test data. 
 #' @export  
-#' @import parallel 
+#' @import BiocParallel 
 #' @examples  
 #' ## Load data  
 #' methylfile <- system.file("extdata", "methylData.rds", package="BioMM")  
@@ -649,7 +649,7 @@ predByBS <- function(trainData, testData,
 
 #' @return The predicted cross validation output. 
 #' @export 
-#' @import doParallel 
+#' @import BiocParallel 
 #' @examples  
 #' ## Load data  
 #' methylfile <- system.file("extdata", "methylData.rds", package="BioMM")  
@@ -757,7 +757,7 @@ predByCV <- function(data, repeats, nfolds,
 #' independent test set prediction.
 #' @export  
 #' @import stats
-#' @import parallel 
+#' @import BiocParallel 
 #' @author Junfang Chen 
 #' @examples  
 #' ## Load data  
@@ -1027,7 +1027,7 @@ BioMMstage2pred <- function(trainData, testData,
 #' @export 
 #' @import nsprcomp
 #' @import stats
-#' @import parallel
+#' @import BiocParallel
 
 #' @author Junfang Chen   
 #' @examples  

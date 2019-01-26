@@ -127,7 +127,7 @@ getMetrics <- function(dataY, predY){
 #' stacking: Building seemingly predictive models on random data. ACM SIGKDD 
 #' Explorations Newsletter, 12(2):11–15, 2011.
 
-#' @import parallel
+#' @import BiocParallel
 #' @import variancePartition
 #' @import grDevices
 #' @export  
@@ -219,7 +219,7 @@ plotVarExplained <- function(data, posF=TRUE,
 #' stacking: Building seemingly predictive models on random data. ACM SIGKDD 
 #' Explorations Newsletter, 12(2):11–15, 2011.
 
-#' @import parallel 
+#' @import BiocParallel 
 #' @import lattice  
 #' @import ggplot2 
 #' @export  

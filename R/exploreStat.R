@@ -44,7 +44,7 @@
 #' "chisq.test" is suggested for GWAS data due to the binary/discrete input
 #'  and output.
 #' @export 
-#' @import parallel
+#' @import BiocParallel
 #' @author Junfang Chen
 #' @examples  
 #' ## Load data  
