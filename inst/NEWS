@@ -1,4 +1,11 @@
 
+
+-------------------------------------------------------
+Changes in version 0.99.7
+* updated parallel evaluation environments
+* updated installation method in README.md 
+* more cores (non-windows) for parallel computing used in the vignettes to reduce runtime
+
 -------------------------------------------------------
 Changes in version 0.99.6 
 * updated plotRankedFeature() and getMetrics()
