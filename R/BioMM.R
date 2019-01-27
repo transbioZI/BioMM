@@ -546,6 +546,11 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr, FScore,
 predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP, 
     fdr, FScore, classifier, predMode, paramlist, innerCore) {
     
+    if (.Platform$OS.type == "windows") {
+        biocParam <- SnowParam(workers = 1)
+    } else {
+        biocParam <- MulticoreParam(workers = innerCore)
+    }
     if (is.null(testData)) {
         ## BS only applied for training data
         data <- trainData
@@ -560,7 +565,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
             predTmp[testIndex] <- predByFS(trainData, testData, FSmethod, cutP, 
                 fdr, FScore, classifier, predMode, paramlist)
             predTmp
-        }, BPPARAM = SnowParam(workers = innerCore))
+        }, BPPARAM = biocParam)
         predTest <- round(rowMeans(do.call(cbind, predTmpList), na.rm = TRUE), 
             3)
         naCount <- sum(is.na(predTest))
@@ -581,7 +586,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
                 predTmp <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                   FScore, classifier, predMode, paramlist)
                 predTmp
-            }, BPPARAM = SnowParam(workers = innerCore))
+            }, BPPARAM = biocParam)
             predTest <- round(rowMeans(do.call(cbind, predTmpList)), 3)
         } else if (dataMode == "allTrain") {
             predTmp <- rep(NA, nrow(testData))
@@ -590,7 +595,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
                 predTmp <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                   FScore, classifier, predMode, paramlist)
                 predTmp
-            }, BPPARAM = SnowParam(workers = innerCore))
+            }, BPPARAM = biocParam)
             predTest <- round(rowMeans(do.call(cbind, predTmpList)), 3)
         }
     } else {
@@ -662,6 +667,11 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
 predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore, 
     classifier, predMode, paramlist, innerCore) {
     
+    if (.Platform$OS.type == "windows") {
+        biocParam <- SnowParam(workers = 1)
+    } else {
+        biocParam <- MulticoreParam(workers = innerCore)
+    }
     cvMat <- c()
     replist <- seq_len(repeats)
     for (reps in replist) {
@@ -673,7 +683,7 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore,
             testData <- data[fold, ]
             predTest <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                 FScore, classifier, predMode, paramlist)
-        }, BPPARAM = SnowParam(workers = innerCore))
+        }, BPPARAM = biocParam)
         cvY[unlist(foldlists)] <- unlist(cvEstimate)
         cvMat <- cbind(cvMat, cvY)
     }
@@ -1025,6 +1035,11 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
     }
     
     numlist <- seq_along(trainDataList)
+    if (.Platform$OS.type == "windows") {
+        biocParam <- SnowParam(workers = 1)
+    } else {
+        biocParam <- MulticoreParam(workers = innerCore)
+    }
     predMat <- bplapply(numlist, function(i) {
         trainData <- trainDataList[[i]]
         trainDataX = trainData[, -1]
@@ -1066,7 +1081,7 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
             pred <- list(predA, predB)
         }
         pred
-    }, BPPARAM = SnowParam(workers = innerCore))
+    }, BPPARAM = biocParam)
     
     if (!is.null(testDataList)) {
         ## PC1

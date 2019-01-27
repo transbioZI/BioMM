@@ -159,9 +159,16 @@ plotVarExplained <- function(data, posF = TRUE, stratify = c("gene", "pathway",
         dataX <- dataXsub
     }
     featurelist <- seq_len(ncol(dataXsub))
+
+    if (.Platform$OS.type == "windows") {
+        biocParam <- SnowParam(workers = 1)
+    } else {
+        biocParam <- MulticoreParam(workers = core)
+    }
+
     r2mat <- unlist(bplapply(featurelist, function(i) {
         r2 <- lrm(dataXsub[, i] ~ dataY)$stats["R2"]
-    }, BPPARAM = SnowParam(workers = core)))
+    }, BPPARAM = biocParam)
     
     r2plot <- data.frame(Stage2data = r2mat)
     stratify <- match.arg(stratify)
@@ -271,6 +278,13 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
     if (is.factor(dataY)) {
         dataY <- as.numeric(dataY) - 1
     }
+
+    if (.Platform$OS.type == "windows") {
+        biocParam <- SnowParam(workers = 1)
+    } else {
+        biocParam <- MulticoreParam(workers = core)
+    }
+
     if (posF) {
         corr <- cor(dataX, dataY)
         nPos <- length(which(corr > 0))
@@ -287,13 +301,13 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
         metrics <- unlist(bplapply(featurelist, function(i) {
             invisible(capture.output(eMat <- getMetrics(dataXsub[, i], dataY)))
             eMat
-        },  BPPARAM = SnowParam(workers = core)))
+        },  BPPARAM = biocParam)
     } else {
         featurelist <- as.list(seq_len(ncol(dataX)))
         metrics <- unlist(bplapply(featurelist, function(i) {
             invisible(capture.output(eMat <- getMetrics(dataX[, i], dataY)))
             eMat
-        }, BPPARAM = SnowParam(workers = core)))
+        }, BPPARAM = biocParam)
         dataXsub <- dataX
     }
     
