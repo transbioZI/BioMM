@@ -5,9 +5,8 @@ BioMM: Biological-informed Multi-stage Machine learning framework for phenotype 
 # Getting started  
 
 ## Installation 
-Development version from Github:
+Development version:
 
-2.) Install BioMM in R  
 ```{r eval=FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
 	install.packages("BiocManager")
