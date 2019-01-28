@@ -166,10 +166,10 @@ result <- BioMM(trainData=studyData, testData=NULL,
                 supervisedStage1, typePCA="regular", 
                 resample1="BS", resample2="CV", dataMode="allTrain", 
                 repeatA1=50, repeatA2=1, repeatB1=20, repeatB2=1, 
-                nfolds=10, FSmethod1=NULL, FSmethod2="positive", 
+                nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=1, 
                 classifier1, classifier2, predMode1, predMode2, 
-                paramlist1, paramlist2, innerCore=10,  
+                paramlist1, paramlist2, innerCore=4,  
                 outFileA2=NULL, outFileB2=NULL)
 
 ``` 
@@ -241,10 +241,10 @@ result <- BioMM(trainData=studyData, testData=NULL,
                 supervisedStage1, typePCA="regular", 
                 resample1="BS", resample2="CV", dataMode="allTrain", 
                 repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
-                nfolds=10, FSmethod1=NULL, FSmethod2="positive", 
+                nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=1, 
                 classifier1, classifier2, predMode1, predMode2, 
-                paramlist1, paramlist2, innerCore=1,  
+                paramlist1, paramlist2, innerCore=4,  
                 outFileA2=NULL, outFileB2=NULL)
 ``` 
 
@@ -264,7 +264,7 @@ stage2dataA <- BioMMreconData(trainDataList=pathlist, testDataList=NULL,
                               repeatA=50, repeatB=1, nfolds=10, 
                               FSmethod=NULL, cutP=0.1, fdr=NULL, FScore=1,  
                               classifier, predMode, paramlist,
-                              innerCore=1, outFileA=NULL, outFileB=NULL)
+                              innerCore=4, outFileA=NULL, outFileB=NULL)
 head(stage2dataA[,1:2])
 dim(stage2dataA)
 ``` 
