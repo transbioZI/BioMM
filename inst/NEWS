@@ -1,4 +1,9 @@
 
+-------------------------------------------------------
+Changes in version 0.99.8
+* updated author, maintainer section in DESCRIPTION 
+* updated parallel computing cores used in the vignettes 
+
 
 -------------------------------------------------------
 Changes in version 0.99.7
