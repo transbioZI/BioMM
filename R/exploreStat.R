@@ -96,13 +96,13 @@ getDataAfterFS <- function(trainData, testData, FSmethod, cutP = 0.1,
         featurelist <- as.list(seq_len(ncol(trainX)))
         pvTrain <- unlist(bplapply(featurelist, function(i) {
             wilcox.test(trainX[, i] ~ as.factor(trainY))$p.value
-        }, BPPARAM = biocParam)
+        }, BPPARAM = biocParam))
         selFeature <- which(pvTrain < cutP)
     } else if (FSmethod == "cor.test") {
         featurelist <- as.list(seq_len(ncol(trainX)))
         pvTrain <- unlist(bplapply(featurelist, function(i) {
             cor.test(trainX[, i], trainY)$p.value
-        }, BPPARAM = biocParam)
+        }, BPPARAM = biocParam))
         selFeature <- which(pvTrain < cutP)
     } else if (FSmethod == "chisq.test") {
         featurelist <- as.list(seq_len(ncol(trainX)))
@@ -112,7 +112,7 @@ getDataAfterFS <- function(trainData, testData, FSmethod, cutP = 0.1,
                 names(pv) <- featureNames[i]
                 pv
             }
-        }, BPPARAM = biocParam)
+        }, BPPARAM = biocParam))
         indexNew <- match(featureNames, names(pvTrain))
         pvTrain2 <- pvTrain[indexNew]
         selFeature <- which(pvTrain2 < cutP)
@@ -121,7 +121,7 @@ getDataAfterFS <- function(trainData, testData, FSmethod, cutP = 0.1,
         featurelist <- as.list(seq_len(ncol(trainX)))
         pvTrain <- unlist(bplapply(featurelist, function(i) {
             wilcox.test(trainX[, i] ~ as.factor(trainY))$p.value
-        }, BPPARAM = biocParam)
+        }, BPPARAM = biocParam))
         varTmp <- which(pvTrain < cutP)
         selFeature <- intersect(whPos, varTmp)
     } else if (FSmethod == "top10pCor") {

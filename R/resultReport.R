@@ -168,7 +168,7 @@ plotVarExplained <- function(data, posF = TRUE, stratify = c("gene", "pathway",
 
     r2mat <- unlist(bplapply(featurelist, function(i) {
         r2 <- lrm(dataXsub[, i] ~ dataY)$stats["R2"]
-    }, BPPARAM = biocParam)
+    }, BPPARAM = biocParam))
     
     r2plot <- data.frame(Stage2data = r2mat)
     stratify <- match.arg(stratify)
@@ -301,13 +301,13 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
         metrics <- unlist(bplapply(featurelist, function(i) {
             invisible(capture.output(eMat <- getMetrics(dataXsub[, i], dataY)))
             eMat
-        },  BPPARAM = biocParam)
+        },  BPPARAM = biocParam))
     } else {
         featurelist <- as.list(seq_len(ncol(dataX)))
         metrics <- unlist(bplapply(featurelist, function(i) {
             invisible(capture.output(eMat <- getMetrics(dataX[, i], dataY)))
             eMat
-        }, BPPARAM = biocParam)
+        }, BPPARAM = biocParam))
         dataXsub <- dataX
     }
     
