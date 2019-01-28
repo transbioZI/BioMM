@@ -2,8 +2,8 @@ Package: BioMM
 Type: Package
 Title: BioMM: Biological-informed Multi-stage Machine learning framework 
 	for phenotype prediction using omics data
-Version: 0.99.7
-Date: 2019-01-05 
+Version: 0.99.8
+Date: 2019-01-28
 Authors@R: c(
 	person("Junfang", "Chen", role=c("aut", "cre", "cph"), 
 			email="junfang.che33@gmail.com"),
