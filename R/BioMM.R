@@ -927,8 +927,7 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
         } else if (predMode == "classification") {
             metricCV <- getMetrics(dataY = trainDataY, predY)
         } else if (predMode == "regression") {
-            metricCV <- cor(trainDataY, predY)
-            print(metricCV)
+            metricCV <- cor(trainDataY, predY) 
         }
         if (!is.null(outFileA)) {
             write.csv2(metricCV, file = outFileA, quote = FALSE)
