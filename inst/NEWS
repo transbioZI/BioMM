@@ -1,5 +1,10 @@
 
 -------------------------------------------------------
+Changes in version 0.99.9
+* removed uncessary print statements
+
+
+-------------------------------------------------------
 Changes in version 0.99.8
 * updated author, maintainer section in DESCRIPTION 
 * updated parallel computing cores used in the vignettes 

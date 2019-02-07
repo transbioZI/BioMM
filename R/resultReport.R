@@ -96,8 +96,7 @@ getMetrics <- function(dataY, predY) {
         eMat <- data.frame(pv = pv, cor = 0, AUC = 0.5, ACC = round(ACC, 2), 
             R2 = 0)
     }
-    print(eMat)
-    return(eMat)
+
 }
 
 
@@ -331,15 +330,11 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
     blockInfo <- data.frame(eMat2, blockMatch, stringsAsFactors = FALSE)
     ## ranking
     rankMetric <- match.arg(rankMetric)
-    print(rankMetric)
-    blockInfo2 <- blockInfo[order(blockInfo[, rankMetric], decreasing = TRUE), 
-        ]
+    blockInfo2 <- blockInfo[order(blockInfo[, rankMetric], decreasing = TRUE),]
     topPat <- head(blockInfo2, topF)
-    topPat$ID <- factor(topPat$ID, levels = rev(unique(topPat$ID)))
-    print(head(topPat))
+    topPat$ID <- factor(topPat$ID, levels = rev(unique(topPat$ID))) 
     x <- "ID"
-    y <- rankMetric
-    print(y)
+    y <- rankMetric 
     colorby <- match.arg(colorMetric)
     stratify <- match.arg(stratify)
     if (stratify == "gene") {
