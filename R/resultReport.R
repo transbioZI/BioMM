@@ -147,13 +147,13 @@ plotVarExplained <- function(data, posF = TRUE, stratify = c("gene", "pathway",
     }
     if (posF) {
         corr <- cor(dataX, dataY)
-        nPos <- length(which(corr > 0))
+        nPos <- sum(corr > 0)
         message(paste0("posFeature: ", nPos))
         if (nPos == 0) {
             stop("No positively outcome-associated features!")
         }
-        ## use 'which' to avoid possible 'NAs'
-        dataXsub <- dataX[, which(corr > 0)]
+        ## 'NA' may appear, use is.element to avoid NA.
+        dataXsub <- dataX[, is.element(corr > 0, TRUE)]
     } else {
         dataX <- dataXsub
     }
@@ -286,7 +286,7 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
 
     if (posF) {
         corr <- cor(dataX, dataY)
-        nPos <- length(which(corr > 0))
+        nPos <- sum(corr > 0)
         message(paste0("posFeature: ", nPos))
         if (nPos == 0) {
             stop("No positively outcome-associated features!")
@@ -294,8 +294,8 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
         if (topF > nPos) {
             stop("'topF' bigger than # of positively associated features!")
         }
-        ## use 'which' to avoid possible 'NAs'
-        dataXsub <- dataX[, which(corr > 0)]
+        ## 'NA' may appear, use is.element to avoid NA.
+        dataXsub <- dataX[, is.element(corr>0, TRUE)] 
         featurelist <- as.list(seq_len(ncol(dataXsub)))
         metrics <- unlist(bplapply(featurelist, function(i) {
             invisible(capture.output(eMat <- getMetrics(dataXsub[, i], dataY)))

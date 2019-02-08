@@ -1047,8 +1047,8 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
             testDataX = testData[, -1]
         }
         ## remove zero variance columns from trainData
-        whNon0var <- which(apply(trainDataX, 2, var) != 0)
-        if (length(whNon0var) == 0) {
+        whNon0var <- apply(trainDataX, 2, var) != 0
+        if (sum(whNon0var) == 0) {
             ## if all features constant..
             predA <- trainDataX[, 1]
             if (!is.null(testDataList)) {
