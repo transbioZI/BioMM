@@ -3,7 +3,7 @@ title: "BioMM: Biological-informed Multi-stage Machine learning framework for ph
 author:
  - name: Junfang Chen and Emanuel Schwarz
    affiliation: Central Institute of Mental Health, Heidelberg University, Germany  
-date: "Modified: 04 Jan 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
+date: "Modified: 08 Feb 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
 output: 
   BiocStyle::html_document: 
     toc_float: false
@@ -68,6 +68,7 @@ library(ranger)
 library(rms) 
 library(glmnet) 
 library(e1071) 
+library(variancePartition)  
 ```
 
 # Omics data 
@@ -102,18 +103,23 @@ head(featureAnno)
 str(pathlistDB[1:3])
 ``` 
 
-```{r eval=TRUE} 
+```{r chrlist, eval=TRUE} 
 ## Map to chromosomes
 chrlist <- omics2chrlist(data=studyData, probeAnno=featureAnno) 
 ``` 
 
-```{r eval=FALSE}
-## Map to pathways
-pathlist <- omics2pathlist(data=studyData, pathlistDB, featureAnno, 
-                           restrictUp=200, restrictDown=10, minPathSize=10) 
-## Map to genes
-genelist <- omics2genelist(data=studyData, featureAnno, 
-                           restrictUp=200, restrictDown=10) 
+```{r pathlist, eval=TRUE} 
+## Map to pathways (input 100 pathways only)
+pathlistDBsub <- pathlistDB[1:100]
+pathlist <- omics2pathlist(data=studyData, pathlistDBsub, featureAnno, 
+                           restrictUp=100, restrictDown=20, minPathSize=10) 
+``` 
+ 
+```{r genelist, eval=FALSE} 
+## Map to genes 
+studyDataSub <- studyData[,1:2000]
+genelist <- omics2genelist(data=studyDataSub, featureAnno, 
+                           restrictUp=200, restrictDown=2) 
 ``` 
 # BioMM framework
 
@@ -153,25 +159,26 @@ existence of an additional X chromosome in female samples. Therefore it's
 suggested to exclude sex chromosome in the user-supplied `featureAnno` input 
 file.
 
-```{r eval=TRUE}
+```{r BioMMrandForest, eval=TRUE}
 ## Parameters
 supervisedStage1=TRUE
 classifier1=classifier2 <- "randForest"
 predMode1=predMode2 <- "classification"
 paramlist1=paramlist2 <- list(ntree=300, nthreads=10)   
 
-result <- BioMM(trainData=studyData, testData=NULL,
+studyDataSub <- studyData[,1:2000] ## less computation
+result <- BioMM(trainData=studyDataSub, testData=NULL,
                 stratify="chromosome", pathlistDB, featureAnno, 
                 restrictUp=10, restrictDown=200, minPathSize=10, 
                 supervisedStage1, typePCA="regular", 
                 resample1="BS", resample2="CV", dataMode="allTrain", 
-                repeatA1=50, repeatA2=1, repeatB1=20, repeatB2=1, 
+                repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=1, 
                 classifier1, classifier2, predMode1, predMode2, 
                 paramlist1, paramlist2, innerCore=4,  
                 outFileA2=NULL, outFileB2=NULL)
-
+print(result)
 ``` 
 
 Other machine learning models can be employed with the following respective 
@@ -183,7 +190,7 @@ unsupervised learning `supervisedStage1=FALSE`, regular PCA
 `typePCA="regular"` is applied and followed with random forest classification 
 `classifier2=TRUE`.
 
-```{r eval=TRUE}
+```{r BioMMpara, eval=TRUE}
 ## SVM 
 supervisedStage1=TRUE
 classifier1=classifier2 <- "SVM"
@@ -222,30 +229,29 @@ coding region probes.
 
 #### Example
 End-to-end prediction based on pathway-wide stratification on genome-wide DNA 
-methylation data is demonstrated below. Random forest models are applied on 
-both stages. 
+methylation data is demonstrated below. PCA is used at stage-1 to reconstruct 
+pathway level data, then the random forest model with 10-fold cross validation
+is applied on stage-2 data to estimate the prediction performance.
 
-```{r eval=TRUE}
+```{r BioMMpathway, eval=TRUE}
 ## Parameters
-supervisedStage1=TRUE
-classifier1=classifier2 <- "randForest"
-predMode1=predMode2 <- "classification"
-paramlist1=paramlist2 <- list(ntree=300, nthreads=10)  
-``` 
+supervisedStage1=FALSE
+classifier <- "randForest"
+predMode <- "classification"
+paramlist <- list(ntree=300, nthreads=10)   
 
-```{r eval=FALSE} 
-## NOT RUN: This will take a bit long
 result <- BioMM(trainData=studyData, testData=NULL,
-                stratify="pathway", pathlistDB, featureAnno, 
-                restrictUp, restrictDown, minPathSize, 
+                stratify="pathway", pathlistDBsub, featureAnno, 
+                restrictUp=100, restrictDown=10, minPathSize=10, 
                 supervisedStage1, typePCA="regular", 
                 resample1="BS", resample2="CV", dataMode="allTrain", 
-                repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
+                repeatA1=40, repeatA2=1, repeatB1=40, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=1, 
                 classifier1, classifier2, predMode1, predMode2, 
                 paramlist1, paramlist2, innerCore=4,  
                 outFileA2=NULL, outFileB2=NULL)
+print(result)
 ``` 
 
 ## Stage-2 data exploration 
@@ -254,18 +260,18 @@ Here we demonstrate using supervised random forest method on genome-wide DNA
 methylation. Gene ontology pathways are used for the generation of stage-2 
 data.
 
-```{r eval=FALSE}
+```{r stage2data, eval=TRUE}
 ## Parameters  
 classifier <- "randForest"
 predMode <- "classification"
-paramlist <- list(ntree=300, nthreads=10)  
+paramlist <- list(ntree=50, nthreads=40)  
 stage2dataA <- BioMMreconData(trainDataList=pathlist, testDataList=NULL, 
                               resample="BS", dataMode="allTrain", 
-                              repeatA=50, repeatB=1, nfolds=10, 
+                              repeatA=25, repeatB=1, nfolds=10, 
                               FSmethod=NULL, cutP=0.1, fdr=NULL, FScore=1,  
                               classifier, predMode, paramlist,
                               innerCore=4, outFileA=NULL, outFileB=NULL)
-head(stage2dataA[,1:2])
+head(stage2dataA[,1:5])
 dim(stage2dataA)
 ``` 
 
@@ -278,8 +284,7 @@ compute the explained variance. The argument `posF=TRUE` indicates that only
 positively outcome-associated features are plotted, since negative 
 associations likely reflect random effects in the underlying data [6].
 
-``` {r eval=FALSE}
-library(variancePartition)  
+``` {r stage2dataViz, eval=TRUE}
 plotVarExplained(data=stage2dataA, posF=TRUE, 
                  stratify="pathway", core=1, fileName=NULL)
 ``` 
@@ -293,7 +298,7 @@ R-squared measure is utilized to evaluate the importance of the ranked
 features as indicated by the argument `rankMetric="R2"`. The size of the 
 investigated pathway is pictured as the argument `colorMetric="size"`. 
 
-``` {r eval=FALSE} 
+``` {r topFstage2data, eval=TRUE} 
 plotRankedFeature(data=stage2dataA, 
                   posF=TRUE, topF=10, 
                   blocklist=pathlist, 
@@ -304,6 +309,14 @@ plotRankedFeature(data=stage2dataA,
 ``` 
 ![](plotTopF10_R2_pathway.png)
 
+## Computational consideration
+BioMM with supervised models at both stages and gene or pathway based 
+stratification methods will take longer to run than unsupervised
+approaches or chromosome based stratification. But the prediction
+is more powerful in many scenarios. Therefore, we suggest the former even
+if the computation is more demanding. Parallel computing is implemented and 
+recommended for such scenario. In this vignette, due to the runtime, we 
+only showcased the smaller examples and models with less computation.
 
 # Session information
 
