@@ -76,8 +76,7 @@ baseRandForest <- function(trainData, testData, predMode = c("classification",
         predTest <- predictions(predict(model, testData))
         predTest <- round(predTest, 3)
     }
-    
-    return(predTest)
+
 }
 
 
@@ -208,8 +207,7 @@ baseSVM <- function(trainData, testData,
             predTest <- as.numeric(predTest) - 1
         }
     }
-    
-    return(predTest)
+
 }
 
 
@@ -314,7 +312,7 @@ baseGLMnet <- function(trainData, testData,
     } else if (predMode == "probability" || predMode == "regression") {
         predTest = round(yhat[, 1], 3)
     }
-    return(predTest)
+
 }
 
 
@@ -383,8 +381,7 @@ baseModel <- function(trainData, testData,
     } else if (classifier == "glmnet") {
         predTest <- baseGLMnet(trainData, testData, predMode, paramlist)
     }
-    
-    return(predTest)
+
 }
 
 
@@ -473,7 +470,7 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr, FScore,
     if (is.factor(predTest)) {
         predTest <- as.numeric(predTest) - 1
     }
-    return(predTest)
+
 }
 
 
@@ -698,7 +695,7 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore,
     if (predMode == "classification") {
         predTest <- ifelse(predTest >= 0.5, 1, 0)
     }
-    return(predTest)
+
 }
 
 
@@ -832,7 +829,7 @@ BioMMreconData <- function(trainDataList, testDataList, resample = "BS",
     } else {
         result <- reconDataA
     }
-    return(result)
+
 }
 
 
@@ -960,8 +957,7 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
     } else {
         result <- metricCV
     }
-    
-    return(result)
+
 }
 
 
@@ -1117,7 +1113,7 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
         }
         result <- reconDataA
     }
-    return(result)
+
 }
 
 
@@ -1339,5 +1335,5 @@ BioMM <- function(trainData, testData,
             predMode = predMode2, paramlist = paramlist2, 
             innerCore, outFileA = outFileA2, outFileB = outFileB2)
     }
-    return(result)
+    
 }

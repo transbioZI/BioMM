@@ -170,5 +170,4 @@ getDataAfterFS <- function(trainData, testData, FSmethod, cutP = 0.1,
         result <- subTrain
     }
     
-    return(result)
 }
