@@ -206,12 +206,9 @@ omics2pathlist <- function(data, pathlistDB, featureAnno = NULL,
     probeNperPath <- unlist(lapply(pathlist, function(i) {
         ncol(i) - 1
     }))
-    # use 'which' to keep the remaining index
-    minPathIndex <- which(probeNperPath < minPathSize)
+
     ## remove pathways with too small size
-    if (length(minPathIndex) != 0) {
-        pathlist <- pathlist[-minPathIndex]
-    }
+    pathlist <- pathlist[probeNperPath >= minPathSize]
     message("Summary stat of # probes in each mapped pathway: ")
     print(summary(unlist(lapply(pathlist, function(i) {
         ncol(i) - 1
