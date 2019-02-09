@@ -52,8 +52,9 @@
 #' trainData = methylData[trainIndex,]
 #' testData = methylData[-trainIndex,]
 #' ## Feature selection
+#' param <- MulticoreParam(workers = 2)
 #' datalist <- getDataAfterFS(trainData, testData, FSmethod=NULL, 
-#'                            cutP=0.1, fdr=NULL, FScore=1)
+#'                            cutP=0.1, fdr=NULL, FScore=param)
 #' trainDataSub <- datalist[[1]] 
 #' testDataSub <- datalist[[2]] 
 #' print(dim(trainData))
@@ -61,7 +62,7 @@
 
 
 getDataAfterFS <- function(trainData, testData, FSmethod, cutP = 0.1, 
-    fdr = NULL, FScore = 10) {
+    fdr = NULL, FScore = MulticoreParam()) {
     
     if (colnames(trainData)[1] != "label") {
         stop("The first column of the 'trainData' must be the 'label'!")
@@ -80,12 +81,6 @@ getDataAfterFS <- function(trainData, testData, FSmethod, cutP = 0.1,
         testY <- testData[, 1]
     }
     
-    if (.Platform$OS.type == "windows") {
-        biocParam <- SnowParam(workers = 1)
-    } else {
-        biocParam <- MulticoreParam(workers = FScore)
-    }
-
     if (is.null(FSmethod)) {
         ## no FS;
         selFeature <- seq_len(ncol(trainX))
@@ -96,13 +91,13 @@ getDataAfterFS <- function(trainData, testData, FSmethod, cutP = 0.1,
         featurelist <- as.list(seq_len(ncol(trainX)))
         pvTrain <- unlist(bplapply(featurelist, function(i) {
             wilcox.test(trainX[, i] ~ as.factor(trainY))$p.value
-        }, BPPARAM = biocParam))
+        }, BPPARAM = FScore))
         selFeature <- which(pvTrain < cutP)
     } else if (FSmethod == "cor.test") {
         featurelist <- as.list(seq_len(ncol(trainX)))
         pvTrain <- unlist(bplapply(featurelist, function(i) {
             cor.test(trainX[, i], trainY)$p.value
-        }, BPPARAM = biocParam))
+        }, BPPARAM = FScore))
         selFeature <- which(pvTrain < cutP)
     } else if (FSmethod == "chisq.test") {
         featurelist <- as.list(seq_len(ncol(trainX)))
@@ -112,7 +107,7 @@ getDataAfterFS <- function(trainData, testData, FSmethod, cutP = 0.1,
                 names(pv) <- featureNames[i]
                 pv
             }
-        }, BPPARAM = biocParam))
+        }, BPPARAM = FScore))
         indexNew <- match(featureNames, names(pvTrain))
         pvTrain2 <- pvTrain[indexNew]
         selFeature <- which(pvTrain2 < cutP)
@@ -121,7 +116,7 @@ getDataAfterFS <- function(trainData, testData, FSmethod, cutP = 0.1,
         featurelist <- as.list(seq_len(ncol(trainX)))
         pvTrain <- unlist(bplapply(featurelist, function(i) {
             wilcox.test(trainX[, i] ~ as.factor(trainY))$p.value
-        }, BPPARAM = biocParam))
+        }, BPPARAM = FScore))
         varTmp <- which(pvTrain < cutP)
         selFeature <- intersect(whPos, varTmp)
     } else if (FSmethod == "top10pCor") {

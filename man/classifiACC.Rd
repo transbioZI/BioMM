@@ -23,15 +23,18 @@ Compute the classification accuracy for the binary classification problem.
 methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 methylData <- readRDS(methylfile) 
 dataY <- methylData[,1]
-methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
-library(ranger) 
+methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
+library(ranger)  
+library(BiocParallel)
+param1 <- MulticoreParam(workers = 1) 
+param2 <- MulticoreParam(workers = 10) 
 predY <- predByCV(methylSub, repeats=1, nfolds=10,   
                   FSmethod=NULL, cutP=0.1, 
-                  fdr=NULL, FScore=1, 
+                  fdr=NULL, FScore=param1, 
                   classifier='randForest',
                   predMode='classification', 
                   paramlist=list(ntree=300, nthreads=1),
-                  innerCore=1)  
+                  innerCore=param2)  
 accuracy <- classifiACC(dataY=dataY, predY=predY)
 print(accuracy)  
 }

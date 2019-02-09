@@ -5,7 +5,7 @@
 \title{Plot data summary statistics}
 \usage{
 plotVarExplained(data, posF = TRUE, stratify = c("gene", "pathway",
-  "chromosome"), core = 1, fileName = NULL)
+  "chromosome"), core = MulticoreParam(), fileName = NULL)
 }
 \arguments{
 \item{data}{The input dataset (either data.frame or matrix). 

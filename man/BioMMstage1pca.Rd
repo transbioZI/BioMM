@@ -5,7 +5,8 @@
 \title{Reconstruct stage-2 data by PCA}
 \usage{
 BioMMstage1pca(trainDataList, testDataList, typeMode = "regular",
-  topPC = 1, innerCore, outFileA = NULL, outFileB = NULL)
+  topPC = 1, innerCore = MulticoreParam(), outFileA = NULL,
+  outFileB = NULL)
 }
 \arguments{
 \item{trainDataList}{The input training data list containing ordered 
@@ -53,9 +54,10 @@ probeAnno <- readRDS(file=probeAnnoFile)
 dataList <- omics2chrlist(data=methylData, probeAnno)
 length(dataList) 
 library(BiocParallel)
+param <- MulticoreParam(workers = 10) 
 stage2data <- BioMMstage1pca(trainDataList=dataList, testDataList=NULL, 
                              typeMode='regular', topPC=1,  
-                             innerCore=10, outFileA=NULL, outFileB=NULL) 
+                             innerCore=param, outFileA=NULL, outFileB=NULL) 
 print(dim(stage2data))
 print(head(stage2data[,1:5]))
 }

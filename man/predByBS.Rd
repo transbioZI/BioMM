@@ -6,7 +6,8 @@
 feature selection}
 \usage{
 predByBS(trainData, testData, dataMode, repeats, FSmethod, cutP, fdr,
-  FScore, classifier, predMode, paramlist, innerCore)
+  FScore = MulticoreParam(), classifier, predMode, paramlist,
+  innerCore = MulticoreParam())
 }
 \arguments{
 \item{trainData}{The input training dataset. The first column
@@ -68,14 +69,16 @@ trainData = methylSub[trainIndex,]
 testData = methylSub[-trainIndex,]
 library(ranger) 
 library(BiocParallel)
+param1 <- MulticoreParam(workers = 1)
+param2 <- MulticoreParam(workers = 20)
 predY <- predByBS(trainData, testData, 
                   dataMode='allTrain', repeats=50,
                   FSmethod=NULL, cutP=0.1, 
-                  fdr=NULL, FScore=1, 
+                  fdr=NULL, FScore=param1, 
                   classifier='randForest',
                   predMode='classification', 
                   paramlist=list(ntree=300, nthreads=10),
-                  innerCore=20)  
+                  innerCore=param2)  
 testY <- testData[,1]
 accuracy <- classifiACC(dataY=testY, predY=predY)
 print(accuracy)  

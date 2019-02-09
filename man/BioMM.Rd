@@ -9,8 +9,9 @@ BioMM(trainData, testData, stratify = c("gene", "pathway", "chromosome"),
   supervisedStage1 = TRUE, typePCA, resample1 = "BS",
   resample2 = "CV", dataMode = "allTrain", repeatA1, repeatA2,
   repeatB1, repeatB2, nfolds, FSmethod1, FSmethod2, cutP1, cutP2, fdr1,
-  fdr2, FScore, classifier1, classifier2, predMode1, predMode2, paramlist1,
-  paramlist2, innerCore, outFileA2 = NULL, outFileB2 = NULL)
+  fdr2, FScore = MulticoreParam(), classifier1, classifier2, predMode1,
+  predMode2, paramlist1, paramlist2, innerCore = MulticoreParam(),
+  outFileA2 = NULL, outFileB2 = NULL)
 }
 \arguments{
 \item{trainData}{The input training dataset. The first column
@@ -150,6 +151,8 @@ predMode1=predMode2 <- 'classification'
 paramlist1=paramlist2 <- list(ntree=300, nthreads=30)   
 library(BiocParallel)
 library(ranger)
+param1 <- MulticoreParam(workers = 2)
+param2 <- MulticoreParam(workers = 20)
 ## Not Run 
 ## result <- BioMM(trainData=methylData, testData=NULL,
 ##                 stratify='chromosome', pathlistDB, featureAnno=probeAnno, 
@@ -158,9 +161,9 @@ library(ranger)
 ##                 resample1='BS', resample2='CV', dataMode='allTrain', 
 ##                 repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
 ##                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
-##                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=1, 
+##                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=param1, 
 ##                 classifier1, classifier2, predMode1, predMode2, 
-##                 paramlist1, paramlist2, innerCore=20,  
+##                 paramlist1, paramlist2, innerCore=param2,  
 ##                 outFileA2=NULL, outFileB2=NULL)
 }
 \references{

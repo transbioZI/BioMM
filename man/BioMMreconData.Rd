@@ -5,8 +5,9 @@
 \title{Reconstruct stage-2 data by supervised machine learning prediction}
 \usage{
 BioMMreconData(trainDataList, testDataList, resample = "BS", dataMode,
-  repeatA, repeatB, nfolds, FSmethod, cutP, fdr, FScore, classifier,
-  predMode, paramlist, innerCore, outFileA = NULL, outFileB = NULL)
+  repeatA, repeatB, nfolds, FSmethod, cutP, fdr,
+  FScore = MulticoreParam(), classifier, predMode, paramlist,
+  innerCore = MulticoreParam(), outFileA = NULL, outFileB = NULL)
 }
 \arguments{
 \item{trainDataList}{The input training data list containing ordered 
@@ -87,16 +88,18 @@ dataList <- omics2chrlist(data=methylData, probeAnno)
 length(dataList)
 library(ranger) 
 library(BiocParallel)
+param1 <- MulticoreParam(workers = 1)
+param2 <- MulticoreParam(workers = 20)
 ## Not Run
 ## stage2data <- BioMMreconData(trainDataList=dataList, testDataList=NULL, 
 ##                             resample='CV', dataMode='allTrain', 
 ##                             repeatA=1, repeatB=1, nfolds=10, 
 ##                             FSmethod=NULL, cutP=0.1, 
-##                             fdr=NULL, FScore=1, 
+##                             fdr=NULL, FScore=param1, 
 ##                             classifier='randForest',
 ##                             predMode='classification', 
 ##                             paramlist=list(ntree=300, nthreads=20),
-##                             innerCore=10, outFileA=NULL, outFileB=NULL) 
+##                             innerCore=param2, outFileA=NULL, outFileB=NULL) 
 ## print(dim(stage2data))
 ## print(head(stage2data[,1:5]))
 }

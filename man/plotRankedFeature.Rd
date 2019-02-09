@@ -7,7 +7,7 @@
 plotRankedFeature(data, posF = TRUE, topF = 10, blocklist,
   stratify = c("gene", "pathway", "chromosome"), rankMetric = c("cor",
   "AUC", "ACC", "R2", "size"), colorMetric = c("cor", "AUC", "ACC", "R2",
-  "size"), core = 10, fileName = NULL)
+  "size"), core = MulticoreParam(), fileName = NULL)
 }
 \arguments{
 \item{data}{The input stage-2 data (either data.frame or matrix). 

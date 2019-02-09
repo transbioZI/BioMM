@@ -5,8 +5,9 @@
 \title{Cross validation prediction by supervised machine learning and feature 
 selection}
 \usage{
-predByCV(data, repeats, nfolds, FSmethod, cutP, fdr, FScore, classifier,
-  predMode, paramlist, innerCore)
+predByCV(data, repeats, nfolds, FSmethod, cutP, fdr,
+  FScore = MulticoreParam(), classifier, predMode, paramlist,
+  innerCore = MulticoreParam())
 }
 \arguments{
 \item{data}{The input dataset. The first column
@@ -58,13 +59,15 @@ dataY <- methylData[,1]
 methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
 library(ranger) 
 library(BiocParallel)
+param1 <- MulticoreParam(workers = 1)
+param2 <- MulticoreParam(workers = 20)
 predY <- predByCV(methylSub, repeats=1, nfolds=10,   
                   FSmethod=NULL, cutP=0.1, 
-                  fdr=NULL, FScore=1, 
+                  fdr=NULL, FScore=param1, 
                   classifier='randForest',
                   predMode='classification', 
                   paramlist=list(ntree=300, nthreads=1),
-                  innerCore=10)  
+                  innerCore=param2)
 dataY <- methylData[,1]
 accuracy <- classifiACC(dataY=dataY, predY=predY)
 print(accuracy)  

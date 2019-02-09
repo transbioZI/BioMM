@@ -4,8 +4,8 @@
 \alias{predByFS}
 \title{Prediction by supervised machine learning along with feature selection}
 \usage{
-predByFS(trainData, testData, FSmethod, cutP, fdr, FScore, classifier,
-  predMode, paramlist)
+predByFS(trainData, testData, FSmethod, cutP, fdr,
+  FScore = MulticoreParam(), classifier, predMode, paramlist)
 }
 \arguments{
 \item{trainData}{The input training dataset. The first column
@@ -54,14 +54,16 @@ methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')
 methylData <- readRDS(methylfile)  
 dataY <- methylData[,1]
 ## select a subset of genome-wide methylation data at random
-methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
+methylSub <- data.frame(label=dataY, methylData[,c(2:501)])  
 trainIndex <- sample(nrow(methylSub), 30)
 trainData = methylSub[trainIndex,]
 testData = methylSub[-trainIndex,]
 library(ranger) 
+library(BiocParallel)
+param <- MulticoreParam(workers = 10)
 predY <- predByFS(trainData, testData, 
                   FSmethod='cor.test', cutP=0.1, 
-                  fdr=NULL, FScore=1, 
+                  fdr=NULL, FScore=param, 
                   classifier='randForest',
                   predMode='classification', 
                   paramlist=list(ntree=300, nthreads=20))  

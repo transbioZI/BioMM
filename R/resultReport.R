@@ -20,15 +20,18 @@
 #' methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 #' methylData <- readRDS(methylfile) 
 #' dataY <- methylData[,1]
-#' methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
-#' library(ranger) 
+#' methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
+#' library(ranger)  
+#' library(BiocParallel)
+#' param1 <- MulticoreParam(workers = 1) 
+#' param2 <- MulticoreParam(workers = 10) 
 #' predY <- predByCV(methylSub, repeats=1, nfolds=10,   
 #'                   FSmethod=NULL, cutP=0.1, 
-#'                   fdr=NULL, FScore=1, 
+#'                   fdr=NULL, FScore=param1, 
 #'                   classifier='randForest',
 #'                   predMode='classification', 
 #'                   paramlist=list(ntree=300, nthreads=1),
-#'                   innerCore=1)  
+#'                   innerCore=param2)  
 #' accuracy <- classifiACC(dataY=dataY, predY=predY)
 #' print(accuracy)  
 
@@ -68,14 +71,16 @@ classifiACC <- function(dataY, predY) {
 #' methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
 #' library(ranger) 
 #' library(rms)
-#' library(BiocParallel)
+#' library(BiocParallel) 
+#' param1 <- MulticoreParam(workers = 1) 
+#' param2 <- MulticoreParam(workers = 10)  
 #' predY <- predByCV(methylSub, repeats=1, nfolds=10,   
 #'                   FSmethod=NULL, cutP=0.1, 
-#'                   fdr=NULL, FScore=1, 
+#'                   fdr=NULL, FScore=param1, 
 #'                   classifier='randForest',
 #'                   predMode='classification', 
 #'                   paramlist=list(ntree=300, nthreads=20),
-#'                   innerCore=10)   
+#'                   innerCore=param2)   
 #' accuracy <- getMetrics(dataY=dataY, predY=predY)
 #' print(accuracy)  
 
@@ -133,7 +138,7 @@ getMetrics <- function(dataY, predY) {
 
 
 plotVarExplained <- function(data, posF = TRUE, stratify = c("gene", "pathway", 
-    "chromosome"), core = 1, fileName = NULL) {
+    "chromosome"), core = MulticoreParam(), fileName = NULL) {
     
     if (colnames(data)[1] != "label") {
         stop("The first column of the 'data' must be the 'label'!")
@@ -159,15 +164,9 @@ plotVarExplained <- function(data, posF = TRUE, stratify = c("gene", "pathway",
     }
     featurelist <- seq_len(ncol(dataXsub))
 
-    if (.Platform$OS.type == "windows") {
-        biocParam <- SnowParam(workers = 1)
-    } else {
-        biocParam <- MulticoreParam(workers = core)
-    }
-
     r2mat <- unlist(bplapply(featurelist, function(i) {
         r2 <- lrm(dataXsub[, i] ~ dataY)$stats["R2"]
-    }, BPPARAM = biocParam))
+    }, BPPARAM = core))
     
     r2plot <- data.frame(Stage2data = r2mat)
     stratify <- match.arg(stratify)
@@ -239,7 +238,7 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
     stratify = c("gene", "pathway", "chromosome"), 
     rankMetric = c("cor", "AUC", "ACC", "R2", "size"), 
     colorMetric = c("cor", "AUC", "ACC", "R2", "size"), 
-    core = 10, fileName = NULL) {
+    core = MulticoreParam(), fileName = NULL) {
     
     .getBlockSize <- function(blocklist, 
         stratify = c("gene", "pathway", "chromosome")) {
@@ -277,13 +276,7 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
     if (is.factor(dataY)) {
         dataY <- as.numeric(dataY) - 1
     }
-
-    if (.Platform$OS.type == "windows") {
-        biocParam <- SnowParam(workers = 1)
-    } else {
-        biocParam <- MulticoreParam(workers = core)
-    }
-
+    
     if (posF) {
         corr <- cor(dataX, dataY)
         nPos <- sum(corr > 0)
@@ -300,13 +293,13 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
         metrics <- unlist(bplapply(featurelist, function(i) {
             invisible(capture.output(eMat <- getMetrics(dataXsub[, i], dataY)))
             eMat
-        },  BPPARAM = biocParam))
+        },  BPPARAM = core))
     } else {
         featurelist <- as.list(seq_len(ncol(dataX)))
         metrics <- unlist(bplapply(featurelist, function(i) {
             invisible(capture.output(eMat <- getMetrics(dataX[, i], dataY)))
             eMat
-        }, BPPARAM = biocParam))
+        }, BPPARAM = core))
         dataXsub <- dataX
     }
     

@@ -5,7 +5,7 @@
 \title{Return the data after feature selection}
 \usage{
 getDataAfterFS(trainData, testData, FSmethod, cutP = 0.1, fdr = NULL,
-  FScore = 10)
+  FScore = MulticoreParam())
 }
 \arguments{
 \item{trainData}{The input training dataset. The first column is the label.}
@@ -61,8 +61,9 @@ trainIndex <- sample(nrow(methylData), 20)
 trainData = methylData[trainIndex,]
 testData = methylData[-trainIndex,]
 ## Feature selection
+param <- MulticoreParam(workers = 2)
 datalist <- getDataAfterFS(trainData, testData, FSmethod=NULL, 
-                           cutP=0.1, fdr=NULL, FScore=1)
+                           cutP=0.1, fdr=NULL, FScore=param)
 trainDataSub <- datalist[[1]] 
 testDataSub <- datalist[[2]] 
 print(dim(trainData))

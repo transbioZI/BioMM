@@ -426,14 +426,16 @@ baseModel <- function(trainData, testData,
 #' methylData <- readRDS(methylfile)  
 #' dataY <- methylData[,1]
 #' ## select a subset of genome-wide methylation data at random
-#' methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
+#' methylSub <- data.frame(label=dataY, methylData[,c(2:501)])  
 #' trainIndex <- sample(nrow(methylSub), 30)
 #' trainData = methylSub[trainIndex,]
 #' testData = methylSub[-trainIndex,]
 #' library(ranger) 
+#' library(BiocParallel)
+#' param <- MulticoreParam(workers = 10)
 #' predY <- predByFS(trainData, testData, 
 #'                   FSmethod='cor.test', cutP=0.1, 
-#'                   fdr=NULL, FScore=1, 
+#'                   fdr=NULL, FScore=param, 
 #'                   classifier='randForest',
 #'                   predMode='classification', 
 #'                   paramlist=list(ntree=300, nthreads=20))  
@@ -442,8 +444,8 @@ baseModel <- function(trainData, testData,
 #' print(accuracy)  
 
 
-predByFS <- function(trainData, testData, FSmethod, cutP, fdr, FScore, 
-    classifier, predMode, paramlist) {
+predByFS <- function(trainData, testData, FSmethod, cutP, fdr, 
+    FScore = MulticoreParam(), classifier, predMode, paramlist) {
     
     datalist <- getDataAfterFS(trainData, testData, FSmethod, cutP, fdr, FScore)
     ## include the label
@@ -528,27 +530,25 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr, FScore,
 #' testData = methylSub[-trainIndex,]
 #' library(ranger) 
 #' library(BiocParallel)
+#' param1 <- MulticoreParam(workers = 1)
+#' param2 <- MulticoreParam(workers = 20)
 #' predY <- predByBS(trainData, testData, 
 #'                   dataMode='allTrain', repeats=50,
 #'                   FSmethod=NULL, cutP=0.1, 
-#'                   fdr=NULL, FScore=1, 
+#'                   fdr=NULL, FScore=param1, 
 #'                   classifier='randForest',
 #'                   predMode='classification', 
 #'                   paramlist=list(ntree=300, nthreads=10),
-#'                   innerCore=20)  
+#'                   innerCore=param2)  
 #' testY <- testData[,1]
 #' accuracy <- classifiACC(dataY=testY, predY=predY)
 #' print(accuracy)  
 
 
 predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP, 
-    fdr, FScore, classifier, predMode, paramlist, innerCore) {
+    fdr, FScore = MulticoreParam(), classifier, predMode, paramlist, 
+    innerCore = MulticoreParam()) {
     
-    if (.Platform$OS.type == "windows") {
-        biocParam <- SnowParam(workers = 1)
-    } else {
-        biocParam <- MulticoreParam(workers = innerCore)
-    }
     if (is.null(testData)) {
         ## BS only applied for training data
         data <- trainData
@@ -563,7 +563,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
             predTmp[testIndex] <- predByFS(trainData, testData, FSmethod, cutP, 
                 fdr, FScore, classifier, predMode, paramlist)
             predTmp
-        }, BPPARAM = biocParam)
+        }, BPPARAM = innerCore)
         predTest <- round(rowMeans(do.call(cbind, predTmpList), na.rm = TRUE), 
             3)
         naCount <- sum(is.na(predTest))
@@ -584,7 +584,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
                 predTmp <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                   FScore, classifier, predMode, paramlist)
                 predTmp
-            }, BPPARAM = biocParam)
+            }, BPPARAM = innerCore)
             predTest <- round(rowMeans(do.call(cbind, predTmpList)), 3)
         } else if (dataMode == "allTrain") {
             predTmp <- rep(NA, nrow(testData))
@@ -593,7 +593,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
                 predTmp <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                   FScore, classifier, predMode, paramlist)
                 predTmp
-            }, BPPARAM = biocParam)
+            }, BPPARAM = innerCore)
             predTest <- round(rowMeans(do.call(cbind, predTmpList)), 3)
         }
     } else {
@@ -650,26 +650,23 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
 #' methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
 #' library(ranger) 
 #' library(BiocParallel)
+#' param1 <- MulticoreParam(workers = 1)
+#' param2 <- MulticoreParam(workers = 20)
 #' predY <- predByCV(methylSub, repeats=1, nfolds=10,   
 #'                   FSmethod=NULL, cutP=0.1, 
-#'                   fdr=NULL, FScore=1, 
+#'                   fdr=NULL, FScore=param1, 
 #'                   classifier='randForest',
 #'                   predMode='classification', 
 #'                   paramlist=list(ntree=300, nthreads=1),
-#'                   innerCore=10)  
+#'                   innerCore=param2)
 #' dataY <- methylData[,1]
 #' accuracy <- classifiACC(dataY=dataY, predY=predY)
 #' print(accuracy)  
 
 
-predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore, 
-    classifier, predMode, paramlist, innerCore) {
+predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore = MulticoreParam(), 
+    classifier, predMode, paramlist, innerCore = MulticoreParam()) {
     
-    if (.Platform$OS.type == "windows") {
-        biocParam <- SnowParam(workers = 1)
-    } else {
-        biocParam <- MulticoreParam(workers = innerCore)
-    }
     cvMat <- c()
     replist <- seq_len(repeats)
     for (reps in replist) {
@@ -681,7 +678,7 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore,
             testData <- data[fold, ]
             predTest <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                 FScore, classifier, predMode, paramlist)
-        }, BPPARAM = biocParam)
+        }, BPPARAM = innerCore)
         cvY[unlist(foldlists)] <- unlist(cvEstimate)
         cvMat <- cbind(cvMat, cvY)
     }
@@ -765,23 +762,25 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore,
 #' length(dataList)
 #' library(ranger) 
 #' library(BiocParallel)
+#' param1 <- MulticoreParam(workers = 1)
+#' param2 <- MulticoreParam(workers = 20)
 #' ## Not Run
 #' ## stage2data <- BioMMreconData(trainDataList=dataList, testDataList=NULL, 
 #' ##                             resample='CV', dataMode='allTrain', 
 #' ##                             repeatA=1, repeatB=1, nfolds=10, 
 #' ##                             FSmethod=NULL, cutP=0.1, 
-#' ##                             fdr=NULL, FScore=1, 
+#' ##                             fdr=NULL, FScore=param1, 
 #' ##                             classifier='randForest',
 #' ##                             predMode='classification', 
 #' ##                             paramlist=list(ntree=300, nthreads=20),
-#' ##                             innerCore=10, outFileA=NULL, outFileB=NULL) 
+#' ##                             innerCore=param2, outFileA=NULL, outFileB=NULL) 
 #' ## print(dim(stage2data))
 #' ## print(head(stage2data[,1:5]))
 
 
 BioMMreconData <- function(trainDataList, testDataList, resample = "BS", 
-    dataMode, repeatA, repeatB, nfolds, FSmethod, cutP, fdr, FScore, classifier, 
-    predMode, paramlist, innerCore, outFileA = NULL, outFileB = NULL) {
+    dataMode, repeatA, repeatB, nfolds, FSmethod, cutP, fdr, FScore = MulticoreParam(), classifier, 
+    predMode, paramlist, innerCore = MulticoreParam(), outFileA = NULL, outFileB = NULL) {
     
     reconDataAx <- c()
     reconDataBx <- c()
@@ -898,8 +897,8 @@ BioMMreconData <- function(trainDataList, testDataList, resample = "BS",
 
 
 BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode, 
-    repeatA = 1, repeatB = 1, nfolds, FSmethod, cutP, fdr, FScore, classifier, 
-    predMode, paramlist, innerCore, outFileA = NULL, outFileB = NULL) {
+    repeatA = 1, repeatB = 1, nfolds, FSmethod, cutP, fdr, FScore = MulticoreParam(), classifier, 
+    predMode, paramlist, innerCore = MulticoreParam(), outFileA = NULL, outFileB = NULL) {
     
     resample <- match.arg(resample)
     if (!is.null(resample)) {
@@ -1011,15 +1010,16 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
 #' dataList <- omics2chrlist(data=methylData, probeAnno)
 #' length(dataList) 
 #' library(BiocParallel)
+#' param <- MulticoreParam(workers = 10) 
 #' stage2data <- BioMMstage1pca(trainDataList=dataList, testDataList=NULL, 
 #'                              typeMode='regular', topPC=1,  
-#'                              innerCore=10, outFileA=NULL, outFileB=NULL) 
+#'                              innerCore=param, outFileA=NULL, outFileB=NULL) 
 #' print(dim(stage2data))
 #' print(head(stage2data[,1:5]))
 
 
 BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular", 
-    topPC = 1, innerCore, outFileA = NULL, outFileB = NULL) {
+    topPC = 1, innerCore = MulticoreParam(), outFileA = NULL, outFileB = NULL) {
     
     reconDataAx <- c()  ## for stage-2 training data   
     trainData <- trainDataList[[1]]
@@ -1031,11 +1031,6 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
     }
     
     numlist <- seq_along(trainDataList)
-    if (.Platform$OS.type == "windows") {
-        biocParam <- SnowParam(workers = 1)
-    } else {
-        biocParam <- MulticoreParam(workers = innerCore)
-    }
     predMat <- bplapply(numlist, function(i) {
         trainData <- trainDataList[[i]]
         trainDataX = trainData[, -1]
@@ -1077,7 +1072,7 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
             pred <- list(predA, predB)
         }
         pred
-    }, BPPARAM = biocParam)
+    }, BPPARAM = innerCore)
     
     if (!is.null(testDataList)) {
         ## PC1
@@ -1234,6 +1229,8 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' paramlist1=paramlist2 <- list(ntree=300, nthreads=30)   
 #' library(BiocParallel)
 #' library(ranger)
+#' param1 <- MulticoreParam(workers = 2)
+#' param2 <- MulticoreParam(workers = 20)
 #' ## Not Run 
 #' ## result <- BioMM(trainData=methylData, testData=NULL,
 #' ##                 stratify='chromosome', pathlistDB, featureAnno=probeAnno, 
@@ -1242,9 +1239,9 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' ##                 resample1='BS', resample2='CV', dataMode='allTrain', 
 #' ##                 repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
 #' ##                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
-#' ##                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=1, 
+#' ##                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=param1, 
 #' ##                 classifier1, classifier2, predMode1, predMode2, 
-#' ##                 paramlist1, paramlist2, innerCore=20,  
+#' ##                 paramlist1, paramlist2, innerCore=param2,  
 #' ##                 outFileA2=NULL, outFileB2=NULL)
 
 
@@ -1253,8 +1250,8 @@ BioMM <- function(trainData, testData,
     restrictUp, restrictDown, minPathSize, supervisedStage1 = TRUE, 
     typePCA, resample1 = "BS", resample2 = "CV", dataMode = "allTrain", 
     repeatA1, repeatA2, repeatB1, repeatB2, nfolds, FSmethod1, FSmethod2, 
-    cutP1, cutP2, fdr1, fdr2, FScore, classifier1, classifier2, 
-    predMode1, predMode2, paramlist1, paramlist2, innerCore, 
+    cutP1, cutP2, fdr1, fdr2, FScore = MulticoreParam(), classifier1, classifier2, 
+    predMode1, predMode2, paramlist1, paramlist2, innerCore = MulticoreParam(), 
     outFileA2 = NULL, outFileB2 = NULL) {
     
     stratify <- match.arg(stratify)
@@ -1308,7 +1305,7 @@ BioMM <- function(trainData, testData,
         message("Stage-2: >>> ")
         message(paste0("Number of blocks: ", ncol(trainData2) - 1))
         trainPos2 <- getDataAfterFS(trainData = trainData2, testData = NULL, 
-            FSmethod = "positive", cutP = 0.1, fdr = NULL, FScore = 1)
+            FSmethod = "positive", cutP = 0.1, fdr = NULL, FScore)
         message(paste0("Number of positive blocks: ", ncol(trainPos2) - 1))
         testPos2 <- NULL
     } else {
@@ -1316,7 +1313,7 @@ BioMM <- function(trainData, testData,
         trainData2 <- stage2data[[1]]
         testData2 <- stage2data[[2]]
         datalist <- getDataAfterFS(trainData2, testData2, FSmethod = "positive", 
-            cutP = 0.1, fdr = NULL, FScore = 1)
+            cutP = 0.1, fdr = NULL, FScore)
         ## include the label
         trainPos2 <- datalist[[1]]
         testPos2 <- datalist[[2]]

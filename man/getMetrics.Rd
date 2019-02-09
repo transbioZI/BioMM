@@ -33,14 +33,16 @@ dataY <- methylData[,1]
 methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
 library(ranger) 
 library(rms)
-library(BiocParallel)
+library(BiocParallel) 
+param1 <- MulticoreParam(workers = 1) 
+param2 <- MulticoreParam(workers = 10)  
 predY <- predByCV(methylSub, repeats=1, nfolds=10,   
                   FSmethod=NULL, cutP=0.1, 
-                  fdr=NULL, FScore=1, 
+                  fdr=NULL, FScore=param1, 
                   classifier='randForest',
                   predMode='classification', 
                   paramlist=list(ntree=300, nthreads=20),
-                  innerCore=10)   
+                  innerCore=param2)   
 accuracy <- getMetrics(dataY=dataY, predY=predY)
 print(accuracy)  
 }
