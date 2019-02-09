@@ -471,6 +471,7 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr, FScore,
         predTest <- as.numeric(predTest) - 1
     }
 
+    return(predTest)
 }
 
 
