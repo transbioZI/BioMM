@@ -3,7 +3,7 @@ title: "BioMM: Biological-informed Multi-stage Machine learning framework for ph
 author:
  - name: Junfang Chen and Emanuel Schwarz
    affiliation: Central Institute of Mental Health, Heidelberg University, Germany  
-date: "Modified: 08 Feb 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
+date: "Modified: 09 Feb 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
 output: 
   BiocStyle::html_document: 
     toc_float: false
@@ -46,7 +46,7 @@ omics-scale data based on biological prior information.
 4. End-to-end prediction at the individual level based on biological 
 stratified patterns.   
 5. Possibility for extension to machine learning models of interest.   
-6. Parallel computing on Linux machines.  
+6. Parallel computing. 
 
 # Getting started  
 
@@ -165,6 +165,8 @@ supervisedStage1=TRUE
 classifier1=classifier2 <- "randForest"
 predMode1=predMode2 <- "classification"
 paramlist1=paramlist2 <- list(ntree=300, nthreads=10)   
+param1 <- MulticoreParam(workers = 1)
+param2 <- MulticoreParam(workers = 10)
 
 studyDataSub <- studyData[,1:2000] ## less computation
 result <- BioMM(trainData=studyDataSub, testData=NULL,
@@ -174,9 +176,9 @@ result <- BioMM(trainData=studyDataSub, testData=NULL,
                 resample1="BS", resample2="CV", dataMode="allTrain", 
                 repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
-                cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=1, 
+                cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=param1, 
                 classifier1, classifier2, predMode1, predMode2, 
-                paramlist1, paramlist2, innerCore=4,  
+                paramlist1, paramlist2, innerCore=param2,  
                 outFileA2=NULL, outFileB2=NULL)
 print(result)
 ``` 
@@ -239,6 +241,8 @@ supervisedStage1=FALSE
 classifier <- "randForest"
 predMode <- "classification"
 paramlist <- list(ntree=300, nthreads=10)   
+param1 <- MulticoreParam(workers = 1)
+param2 <- MulticoreParam(workers = 10)
 
 result <- BioMM(trainData=studyData, testData=NULL,
                 stratify="pathway", pathlistDBsub, featureAnno, 
@@ -247,9 +251,9 @@ result <- BioMM(trainData=studyData, testData=NULL,
                 resample1="BS", resample2="CV", dataMode="allTrain", 
                 repeatA1=40, repeatA2=1, repeatB1=40, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
-                cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=1, 
+                cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=param1, 
                 classifier1, classifier2, predMode1, predMode2, 
-                paramlist1, paramlist2, innerCore=4,  
+                paramlist1, paramlist2, innerCore=param2,  
                 outFileA2=NULL, outFileB2=NULL)
 print(result)
 ``` 
@@ -257,7 +261,7 @@ print(result)
 ## Stage-2 data exploration 
 ### Reconstruction
 Here we demonstrate using supervised random forest method on genome-wide DNA 
-methylation. Gene ontology pathways are used for the generation of stage-2 
+methylation. Gene ontological pathways are used for the generation of stage-2 
 data.
 
 ```{r stage2data, eval=TRUE}
@@ -265,12 +269,16 @@ data.
 classifier <- "randForest"
 predMode <- "classification"
 paramlist <- list(ntree=50, nthreads=40)  
+param1 <- MulticoreParam(workers = 1)
+param2 <- MulticoreParam(workers = 10)
+
+set.seed(123)
 stage2dataA <- BioMMreconData(trainDataList=pathlist, testDataList=NULL, 
                               resample="BS", dataMode="allTrain", 
                               repeatA=25, repeatB=1, nfolds=10, 
-                              FSmethod=NULL, cutP=0.1, fdr=NULL, FScore=1,  
+                              FSmethod=NULL, cutP=0.1, fdr=NULL, FScore=param1,  
                               classifier, predMode, paramlist,
-                              innerCore=4, outFileA=NULL, outFileB=NULL)
+                              innerCore=param2, outFileA=NULL, outFileB=NULL)
 head(stage2dataA[,1:5])
 dim(stage2dataA)
 ``` 
@@ -285,8 +293,9 @@ positively outcome-associated features are plotted, since negative
 associations likely reflect random effects in the underlying data [6].
 
 ``` {r stage2dataViz, eval=TRUE}
+param <- MulticoreParam(workers = 1) 
 plotVarExplained(data=stage2dataA, posF=TRUE, 
-                 stratify="pathway", core=1, fileName=NULL)
+                 stratify="pathway", core=param, fileName=NULL)
 ``` 
 ![](R2explained.png)
 
@@ -299,13 +308,14 @@ features as indicated by the argument `rankMetric="R2"`. The size of the
 investigated pathway is pictured as the argument `colorMetric="size"`. 
 
 ``` {r topFstage2data, eval=TRUE} 
+param <- MulticoreParam(workers = 1) 
 plotRankedFeature(data=stage2dataA, 
                   posF=TRUE, topF=10, 
                   blocklist=pathlist, 
                   stratify="pathway",
                   rankMetric="R2", 
                   colorMetric="size", 
-                  core=1, fileName=NULL)
+                  core=param, fileName=NULL)
 ``` 
 ![](plotTopF10_R2_pathway.png)
 
