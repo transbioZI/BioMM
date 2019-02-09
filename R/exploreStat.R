@@ -52,6 +52,7 @@
 #' trainData = methylData[trainIndex,]
 #' testData = methylData[-trainIndex,]
 #' ## Feature selection
+#' library(BiocParallel)
 #' param <- MulticoreParam(workers = 2)
 #' datalist <- getDataAfterFS(trainData, testData, FSmethod=NULL, 
 #'                            cutP=0.1, fdr=NULL, FScore=param)
