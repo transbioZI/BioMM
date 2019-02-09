@@ -2,6 +2,10 @@
 -------------------------------------------------------
 Changes in version 0.99.9
 * removed uncessary print statements
+* removed 'return' calls for some functions 
+* removed unnecessary 'which' statements  
+* replaced the usage of MulticoreParam() 
+* updated tutorial with smaller examples and models with less computation 
 
 
 -------------------------------------------------------
