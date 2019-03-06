@@ -125,7 +125,7 @@ getDataAfterFS <- function(trainData, testData, FSmethod, cutP = 0.1,
         ## Note, NA is ranked at bottom;
         topN <- round(length(corTrain) * 0.1)
         selFeature <- order(corTrain, decreasing = TRUE)[seq_len(topN)]
-        if (length(corTrain) <= 2) {
+        if (length(selFeature) <= 2) {
             selFeature <- order(corTrain, decreasing = TRUE)[seq_len(2)]
         }
         message("top 10% correlated Features")
