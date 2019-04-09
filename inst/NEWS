@@ -1,65 +1,65 @@
--------------------------------------------------------
-Changes in version 0.99.10
+Changes in version 1.0.0
+=============
++ minor bug fixed in getDataAfterFS()
++ updated installation method
 
-
-
--------------------------------------------------------
+=============
 Changes in version 0.99.9
-* removed uncessary print statements
-* removed 'return' calls for some functions 
-* removed unnecessary 'which' statements  
-* replaced the usage of MulticoreParam() 
-* updated tutorial with smaller examples and models with less computation 
++ removed uncessary print statements
++ removed 'return' calls for some functions 
++ removed unnecessary 'which' statements  
++ replaced the usage of MulticoreParam() 
++ updated tutorial with smaller examples and models with less computation 
 
 
--------------------------------------------------------
+=============
 Changes in version 0.99.8
-* updated author, maintainer section in DESCRIPTION 
-* updated parallel computing cores used in the vignettes 
++ updated author, maintainer section in DESCRIPTION 
++ updated parallel computing cores used in the vignettes 
 
 
--------------------------------------------------------
+=============
 Changes in version 0.99.7
-* updated parallel evaluation environments
-* updated installation method in README.md 
-* more cores (non-windows) for parallel computing used in the vignettes to reduce runtime
++ updated parallel evaluation environments
++ updated installation method in README.md 
++ more cores (non-windows) for parallel computing used in the vignettes to reduce runtime
 
--------------------------------------------------------
+=============
 Changes in version 0.99.6 
-* updated plotRankedFeature() and getMetrics()
-* increased core number for parallel computing
-* removed Duplicated descriptions in *.Rd files
++ updated plotRankedFeature() and getMetrics()
++ increased core number for parallel computing
++ removed Duplicated descriptions in *.Rd files
 
--------------------------------------------------------
+=============
 Changes in version 0.99.5 
-* reformatted code by using formatR
-* bplapply() instead of mclapply
-* message() instead of print() for end-user messages 
-* improved usage of which()
-* use seq_along() instead of seq_len(length())   
-* updated installation method
-* renamed R source files
++ reformatted code by using formatR
++ bplapply() instead of mclapply
++ message() instead of print() for end-user messages 
++ improved usage of which()
++ use seq_along() instead of seq_len(length())   
++ updated installation method
++ renamed R source files
 
--------------------------------------------------------
+=============
 Changes in version 0.99.4 
-* updated example in BioMMreconData()
++ updated example in BioMMreconData()
 
--------------------------------------------------------
+=============
 Changes in version 0.99.3 
-* updated example in BioMM()
++ updated example in BioMM()
 
--------------------------------------------------------
+=============
 Changes in version 0.99.2 
-* updated R version dependency (from 3.5.2 to 3.6) 
-* Removed the file LICENSE
++ updated R version dependency (from 3.5.2 to 3.6) 
++ Removed the file LICENSE
 
--------------------------------------------------------
+=============
 Changes in version 0.99.1 
-* updated R version dependency (from 3.5.0 to 3.5.2) 
++ updated R version dependency (from 3.5.0 to 3.5.2) 
 
--------------------------------------------------------
+=============
 Changes in version 0.99.0 
-* Removed the file "BioMM.Rproj" 
++ Removed the file "BioMM.Rproj" 
 
 
  
