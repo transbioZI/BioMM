@@ -1,65 +1,87 @@
-Changes in version 1.0.0
+Changes in version 0.99.13
 =============
-+ minor bug fixed in getDataAfterFS()
-+ updated installation method
+	o updated the format of NEWS
+	o updated BioMMtutorial.Rmd 
+	o updated data4demo.R 
+		o replaced the generation of stage-2 data by BioMMreconData() 
+		  with preprocessed 'stage2dataA' to reduce runtime
+		o increased repeatA1 to 50 for BioMM() example to avoid any NAs.  
+	o created stage2dataA.rds
+	
+
+Changes in version 0.99.12
+=============
+	o updated the format of NEWS
+
+
+Changes in version 0.99.11
+=============
+	o updated DESCRIPTION file
+
+
+Changes in version 0.99.10
+=============
+	o minor bug fixed in getDataAfterFS()
+	o updated installation method
+
 
 =============
 Changes in version 0.99.9
-+ removed uncessary print statements
-+ removed 'return' calls for some functions 
-+ removed unnecessary 'which' statements  
-+ replaced the usage of MulticoreParam() 
-+ updated tutorial with smaller examples and models with less computation 
+	o removed uncessary print statements
+	o removed 'return' calls for some functions 
+	o removed unnecessary 'which' statements  
+	o replaced the usage of MulticoreParam() 
+	o updated tutorial with smaller examples and models with less computation 
 
 
 =============
 Changes in version 0.99.8
-+ updated author, maintainer section in DESCRIPTION 
-+ updated parallel computing cores used in the vignettes 
+	o updated author, maintainer section in DESCRIPTION 
+	o updated parallel computing cores used in the vignettes 
 
 
 =============
 Changes in version 0.99.7
-+ updated parallel evaluation environments
-+ updated installation method in README.md 
-+ more cores (non-windows) for parallel computing used in the vignettes to reduce runtime
+	o updated parallel evaluation environments
+	o updated installation method in README.md 
+	o more cores (non-windows) for parallel computing used in the vignettes to reduce runtime
 
 =============
 Changes in version 0.99.6 
-+ updated plotRankedFeature() and getMetrics()
-+ increased core number for parallel computing
-+ removed Duplicated descriptions in *.Rd files
+	o updated plotRankedFeature() and getMetrics()
+	o increased core number for parallel computing
+	o removed Duplicated descriptions in *.Rd files
 
 =============
 Changes in version 0.99.5 
-+ reformatted code by using formatR
-+ bplapply() instead of mclapply
-+ message() instead of print() for end-user messages 
-+ improved usage of which()
-+ use seq_along() instead of seq_len(length())   
-+ updated installation method
-+ renamed R source files
+	o reformatted code by using formatR
+	o bplapply() instead of mclapply
+	o message() instead of print() for end-user messages 
+	o improved usage of which()
+	o use seq_along() instead of seq_len(length())   
+	o updated installation method
+	o renamed R source files
 
 =============
 Changes in version 0.99.4 
-+ updated example in BioMMreconData()
+	o updated example in BioMMreconData()
 
 =============
 Changes in version 0.99.3 
-+ updated example in BioMM()
+	o updated example in BioMM()
 
 =============
 Changes in version 0.99.2 
-+ updated R version dependency (from 3.5.2 to 3.6) 
-+ Removed the file LICENSE
+	o updated R version dependency (from 3.5.2 to 3.6) 
+	o Removed the file LICENSE
 
 =============
 Changes in version 0.99.1 
-+ updated R version dependency (from 3.5.0 to 3.5.2) 
+	o updated R version dependency (from 3.5.0 to 3.5.2) 
 
 =============
 Changes in version 0.99.0 
-+ Removed the file "BioMM.Rproj" 
+	o Removed the file "BioMM.Rproj" 
 
 
  
