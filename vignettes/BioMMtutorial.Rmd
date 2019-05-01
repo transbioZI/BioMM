@@ -3,7 +3,7 @@ title: "BioMM: Biological-informed Multi-stage Machine learning framework for ph
 author:
  - name: Junfang Chen and Emanuel Schwarz
    affiliation: Central Institute of Mental Health, Heidelberg University, Germany  
-date: "Modified: 14 Feb 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
+date: "Modified: 01 May 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
 output: 
   BiocStyle::html_document: 
     toc_float: false
@@ -174,7 +174,7 @@ result <- BioMM(trainData=studyDataSub, testData=NULL,
                 restrictUp=10, restrictDown=200, minPathSize=10, 
                 supervisedStage1, typePCA="regular", 
                 resample1="BS", resample2="CV", dataMode="allTrain", 
-                repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
+                repeatA1=50, repeatA2=1, repeatB1=20, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=param1, 
                 classifier1, classifier2, predMode1, predMode2, 
@@ -265,22 +265,31 @@ methylation. Gene ontological pathways are used for the generation of stage-2
 data.
 
 ```{r stage2data, eval=TRUE}
-## Parameters  
-classifier <- "randForest"
-predMode <- "classification"
-paramlist <- list(ntree=50, nthreads=40)  
-param1 <- MulticoreParam(workers = 1)
-param2 <- MulticoreParam(workers = 10)
+## Pathway level data or stage-2 data prepared by BioMMreconData()
+stage2dataA <- readRDS(system.file("extdata", "/stage2dataA.rds", 
+                       package="BioMM"))
 
-set.seed(123)
-stage2dataA <- BioMMreconData(trainDataList=pathlist, testDataList=NULL, 
-                              resample="BS", dataMode="allTrain", 
-                              repeatA=25, repeatB=1, nfolds=10, 
-                              FSmethod=NULL, cutP=0.1, fdr=NULL, FScore=param1,  
-                              classifier, predMode, paramlist,
-                              innerCore=param2, outFileA=NULL, outFileB=NULL)
 head(stage2dataA[,1:5])
 dim(stage2dataA)
+``` 
+
+```{r stage2dataAprepare, eval=FALSE} 
+#### Alternatively, 'stage2dataA' can be created by the following code:
+## Parameters  
+classifier <- "randForest" 
+predMode <- "probability" 
+paramlist <- list(ntree=300, nthreads=40)  
+param1 <- MulticoreParam(workers = 1)
+param2 <- MulticoreParam(workers = 10) 
+set.seed(123)
+## This will take a bit longer to run
+stage2dataA <- BioMMreconData(trainDataList=pathlist, testDataList=NULL,
+                            resample="BS", dataMode="allTrain",
+                            repeatA=25, repeatB=1, nfolds=10,
+                            FSmethod=NULL, cutP=0.1, fdr=NULL, FScore=param1,
+                            classifier, predMode, paramlist,
+                            innerCore=param2, outFileA=NULL, outFileB=NULL)
+
 ``` 
 
 ### Visualization
@@ -324,9 +333,11 @@ BioMM with supervised models at both stages and gene or pathway based
 stratification methods will take longer to run than unsupervised
 approaches or chromosome based stratification. But the prediction
 is more powerful in many scenarios. Therefore, we suggest the former even
-if the computation is more demanding. Parallel computing is implemented and 
+if the computation is more demanding, as the adoption of 5G is pushing advances 
+in computational storage and speed. Parallel computing is implemented and 
 recommended for such scenario. In this vignette, due to the runtime, we 
-only showcased the smaller examples and models with less computation.
+only showcased the smaller examples and models with less computation. 
+
 
 # Session information
 
