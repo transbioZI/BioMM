@@ -2,8 +2,8 @@ Package: BioMM
 Type: Package
 Title: BioMM: Biological-informed Multi-stage Machine learning framework 
 	for phenotype prediction using omics data
-Version: 0.99.12
-Date: 2019-04-10 
+Version: 0.99.13
+Date: 2019-05-01 
 Author: Junfang Chen and Emanuel Schwarz
 Maintainer: Junfang Chen <junfang.chen33@gmail.com>
 Description: The identification of reproducible biological patterns from 
