@@ -6,19 +6,20 @@
 
 #' Return the data after feature selection 
 #'
-#' @description
-#' Get the new data set after performing feature selection on the input 
-#' training and test data.  
+#' @description 
+#' Identify and select a subset of outcome-associated or predictive features in 
+#' the training data. Return the same set of selected features for the test 
+#' data if it is available. 
 
 #' @param trainData The input training dataset. The first column is the label.  
 #' @param testData The input test dataset. The first column is the label.   
 #' @param FSmethod Feature selection methods. Available options are 
 #' c(NULL, 'positive', 'wilcox.test', 'cor.test', 'chisq.test', 'posWilcox', 
 #' or 'top10pCor'). 'positive' is the positively outcome-associated features
-#' using Pearson correlation method. 'posWilcox' is the positively 
+#' using the Pearson correlation method. 'posWilcox' is the positively 
 #' outcome-associated features using Pearson correlation method together 
 #' with 'wilcox.text' method. 'top10pCor' is the top 10% of   
-#' outcome-associcated features. This is useful when no features can be 
+#' outcome-associcated features. This is helpful when no features can be 
 #' picked during stringent feature selection procedure.
 #' @param cutP The cutoff used for p value thresholding. It can be any value 
 #' between 0 and 1. Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc.). 
@@ -29,9 +30,9 @@
 #' @param FScore The number of cores used for some feature selection methods.
 #' The default is 10.
 
-#' @return Both training and test data (if provided) with reduced number of 
-#' features in the data are returned if feature selection method is applied. 
-#' If no feature can be found during feature selection procedure, then the 
+#' @return Both training and test data (if provided) with pre-selected 
+#' features are returned if feature selection method is applied. 
+#' If no feature can be selected during feature selection procedure, then the 
 #' output is NULL. 
 #' @details Parallel computing is helpful if your input data is high  
 #' dimensional. For 'cutP', a soft thresholding of 0.1 may be favorable than 
@@ -39,8 +40,8 @@
 #' can be taken into consideration for downstream analysis. However, for high 
 #' dimensional (e.g. p > 10,000) data, many false positive features may 
 #' exist, thus, rigorous p value thresholding should be applied.  
-#' 'chisq.test' is suggested for GWAS data due to the binary/discrete input
-#'  and output.
+#' The choice of feature selection method depends on the characteristics of 
+#' the input data.
 #' @export 
 #' @import BiocParallel
 #' @author Junfang Chen
@@ -53,7 +54,8 @@
 #' testData = methylData[-trainIndex,]
 #' ## Feature selection
 #' library(BiocParallel)
-#' param <- MulticoreParam(workers = 2)
+#' param <- MulticoreParam(workers = 10)
+#' Select 
 #' datalist <- getDataAfterFS(trainData, testData, FSmethod=NULL, 
 #'                            cutP=0.1, fdr=NULL, FScore=param)
 #' trainDataSub <- datalist[[1]] 
@@ -120,15 +122,17 @@ getDataAfterFS <- function(trainData, testData, FSmethod, cutP = 0.1,
         }, BPPARAM = FScore))
         varTmp <- which(pvTrain < cutP)
         selFeature <- intersect(whPos, varTmp)
-    } else if (FSmethod == "top10pCor") {
-        corTrain <- cor(trainX, trainY)
-        ## Note, NA is ranked at bottom;
-        topN <- round(length(corTrain) * 0.1)
-        selFeature <- order(corTrain, decreasing = TRUE)[seq_len(topN)]
-        if (length(selFeature) <= 2) {
-            selFeature <- order(corTrain, decreasing = TRUE)[seq_len(2)]
-        }
-        message("top 10% correlated Features")
+    } else if (FSmethod == "top10pCor") { 
+        topN <- round(ncol(trainX)*0.1) 
+        featurelist <- as.list(seq_len(ncol(trainX)))
+        pvTrain <- unlist(mclapply(featurelist, function(i){
+                          wilcox.test(trainX[,i]~as.factor(trainY))$p.value}, 
+                          mc.cores=FScore))  
+        selFeature <- order(pvTrain, decreasing=FALSE)[seq_len(topN)]   
+        if (length(selFeature) <= 2){
+            selFeature <- order(pvTrain, decreasing=FALSE)[seq_len(2)]
+        }     
+        print("top 10% sigWil Features")
     }
     
     if (!is.null(fdr)) {
