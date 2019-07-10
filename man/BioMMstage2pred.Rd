@@ -7,7 +7,7 @@
 BioMMstage2pred(trainData, testData, resample = "CV", dataMode,
   repeatA = 1, repeatB = 1, nfolds, FSmethod, cutP, fdr,
   FScore = MulticoreParam(), classifier, predMode, paramlist,
-  innerCore = MulticoreParam(), outFileA = NULL, outFileB = NULL)
+  innerCore = MulticoreParam())
 }
 \arguments{
 \item{trainData}{The input training dataset (stage-2 data). The first column
@@ -54,14 +54,6 @@ c('probability', 'classification', 'regression').}
 \item{paramlist}{A set of model parameters defined in an R list object.}
 
 \item{innerCore}{The number of cores used for computation.}
-
-\item{outFileA}{The file name of prediction metrics based on resampling with 
-the '.csv' file extension. If it's provided, then the result will be saved.
-The default is NULL.}
-
-\item{outFileB}{The file name of independent test prediction metrics with 
-the '.csv' file extension. If it's provided, then the result will be saved.
-The default is NULL.}
 }
 \value{
 The CV or BS prediction performance for stage-2 training data and 

@@ -873,12 +873,6 @@ BioMMreconData <- function(trainDataList, testDataList, resample = "BS",
 #' c('probability', 'classification', 'regression').
 #' @param paramlist A set of model parameters defined in an R list object. 
 #' @param innerCore The number of cores used for computation. 
-#' @param outFileA The file name of prediction metrics based on resampling with 
-#' the '.csv' file extension. If it's provided, then the result will be saved.
-#' The default is NULL.
-#' @param outFileB The file name of independent test prediction metrics with 
-#' the '.csv' file extension. If it's provided, then the result will be saved.
-#' The default is NULL.
 
 #' @return The CV or BS prediction performance for stage-2 training data and 
 #' test set prediction performance for stage-2 test data if the test set is 
@@ -898,7 +892,7 @@ BioMMreconData <- function(trainDataList, testDataList, resample = "BS",
 
 BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode, 
     repeatA = 1, repeatB = 1, nfolds, FSmethod, cutP, fdr, FScore = MulticoreParam(), classifier, 
-    predMode, paramlist, innerCore = MulticoreParam(), outFileA = NULL, outFileB = NULL) {
+    predMode, paramlist, innerCore = MulticoreParam()) {
     
     resample <- match.arg(resample)
     if (!is.null(resample)) {
@@ -926,9 +920,6 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
         } else if (predMode == "regression") {
             metricCV <- cor(trainDataY, predY) 
         }
-        if (!is.null(outFileA)) {
-            write.csv2(metricCV, file = outFileA, quote = FALSE)
-        }
     }
     
     if (!is.null(testData)) {
@@ -949,9 +940,6 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
             metricTest <- getMetrics(dataY = testY, predTest)
         } else if (predMode == "regression") {
             metricTest <- cor(testY, predTest)
-        }
-        if (!is.null(outFileB)) {
-            write.csv2(metricTest, file = outFileB, quote = FALSE)
         }
         result <- list(metricCV, metricTest)
     } else {
@@ -1127,9 +1115,7 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' 0 and 1 are used to indicate the class member.
 #' @param testData The input test dataset. The first column
 #' is the label or the output. For binary classes, 
-#' 0 and 1 are used to indicate the class member.
-#' @param stratify The stratification method. 
-#' Valid options are c('gene', 'pathway', 'chromosome').
+#' 0 and 1 are used to indicate the class member. 
 #' @param pathlistDB A list of pathways with pathway IDs and their 
 #' corresponding genes ('entrezID' is used). This is only used for 
 #' pathway-based stratification (only \code{stratify} is 'pathway'). 
@@ -1153,51 +1139,36 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' resampling. The default is 'BS'.
 #' @param resample2 The resampling methods at stage-2. Valid options are 'CV' 
 #' and 'BS'. 'CV' for cross validation and 'BS' for bootstrapping resampling.
-#' The default is 'CV'.
-#' @param dataMode The mode of data used at stage-1. 'subTrain' or 'allTrain'. 
-#' This is only applicable for bootstrapping resampling. (Default: allTrain).
+#' The default is 'CV'. 
 #' @param repeatA1 The number of repeats N is used during resampling procedure.
 #' Repeated cross validation or multiple boostrapping is performed if N >=2. 
 #' One can choose 10 repeats for 'CV' and 100 repeats for 'BS'.
 #' @param repeatA2 The number of repeats N is used during resampling 
 #' prediction. The default is 1 for 'CV'.  
 #' @param repeatB1 The number of repeats N is used for generating stage-2 test 
-#' data prediction scores. 
+#' data prediction scores. The default is 20.
 #' @param repeatB2 The number of repeats N is used for test data prediction. 
 #' The default is 1. 
-#' @param nfolds The number of folds is defined for cross validation.
+#' @param nfolds The number of folds is defined for cross validation. 
+#' The default is 10.
 #' @param FSmethod1 Feature selection methods at stage-1. Available options 
 #' are c(NULL, 'positive', 'wilcox.test', 'cor.test', 'chisq.test', 
-#' 'posWilcox', or 'top10pCor').
+#' 'posWilcox'). 
 #' @param FSmethod2 Feature selection methods at stage-2. Available options  
 #' are c(NULL, 'positive', 'wilcox.test', 'cor.test', 'chisq.test', 
-#' 'posWilcox', or 'top10pCor').
+#' 'posWilcox').
 #' @param cutP1 The cutoff used for p value thresholding at stage-1.  
-#' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). The default is 0.05.
-#' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). The default is 0.05.
-#' @param cutP2 The cutoff used for p value thresholding at stage-2.  
-#' @param fdr1 Multiple testing correction method at stage-1. 
-#' Available options are c(NULL, 'fdr', 'BH', 'holm', etc). 
-#' See also \code{\link[stats]{p.adjust}}. The default is NULL.
+#' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). 
+#' @param cutP2 The cutoff used for p value thresholding at stage-2.   
 #' @param fdr2 Multiple testing correction method at stage-2. 
 #' Available options are c(NULL, 'fdr', 'BH', 'holm', etc). 
 #' See also \code{\link[stats]{p.adjust}}. The default is NULL.
 #' @param FScore The number of cores used for feature selection.
-#' @param classifier1 Machine learning classifiers at stage-1. 
-#' @param classifier2 Machine learning classifiers at stage-2. 
-#' @param predMode1 The prediction mode at stage-1. Available options are 
-#' c('probability', 'classification', 'regression').
-#' @param predMode2 The prediction mode at stage-2. Available options are 
-#' c('probability', 'classification', 'regression').
-#' @param paramlist1 A list of model parameters at stage-1.  
-#' @param paramlist2 A list of model parameters at stage-2. 
+#' @param classifier Machine learning classifiers at both stages.  
+#' @param predMode The prediction mode at both stages. Available options are 
+#' c('probability', 'classification', 'regression'). 
+#' @param paramlist A list of model parameters at both stages.  
 #' @param innerCore The number of cores used for computation.
-#' @param outFileA2 The file name of prediction metrics based on resampling 
-#' with the '.csv' file extension. If it's provided, then the result will be 
-#' saved. The default is NULL.
-#' @param outFileB2 The file name of independent test prediction metrics with 
-#' the '.csv' file extension. If it's provided, then the result will be saved.
-#' The default is NULL.
 
 #' @return The CV or BS prediction performance for the training data and 
 #' test set prediction performance if \code{testData} is given.
@@ -1224,65 +1195,44 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' probeAnnoFile <- system.file('extdata', 'cpgAnno.rds', package='BioMM')  
 #' probeAnno <- readRDS(file=probeAnnoFile)   
 #' supervisedStage1=TRUE
-#' classifier1=classifier2 <- 'randForest'
-#' predMode1=predMode2 <- 'classification'
-#' paramlist1=paramlist2 <- list(ntree=300, nthreads=30)   
+#' classifier <- 'randForest'
+#' predMode <- 'classification'
+#' paramlist <- list(ntree=300, nthreads=30)   
 #' library(BiocParallel)
 #' library(ranger)
 #' param1 <- MulticoreParam(workers = 2)
 #' param2 <- MulticoreParam(workers = 20)
 #' ## Not Run 
 #' ## result <- BioMM(trainData=methylData, testData=NULL,
-#' ##                 stratify='chromosome', pathlistDB, featureAnno=probeAnno, 
+#' ##                 pathlistDB, featureAnno=probeAnno, 
 #' ##                 restrictUp=10, restrictDown=200, minPathSize=10, 
 #' ##                 supervisedStage1, typePCA='regular', 
-#' ##                 resample1='BS', resample2='CV', dataMode='allTrain', 
+#' ##                 resample1='BS', resample2='CV', 
 #' ##                 repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
 #' ##                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
-#' ##                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=param1, 
-#' ##                 classifier1, classifier2, predMode1, predMode2, 
-#' ##                 paramlist1, paramlist2, innerCore=param2,  
-#' ##                 outFileA2=NULL, outFileB2=NULL)
+#' ##                 cutP1=0.1, cutP2=0.1, fdr2=NULL, FScore=param1, 
+#' ##                 classifier, predMode, paramlist, innerCore=param2,  
+#' ##                 outFileA1, outFileB1)
 
 
-BioMM <- function(trainData, testData, 
-    stratify = c("gene", "pathway", "chromosome"), pathlistDB, featureAnno, 
+BioMM <- function(trainData, testData, pathlistDB, featureAnno, 
     restrictUp, restrictDown, minPathSize, supervisedStage1 = TRUE, 
-    typePCA, resample1 = "BS", resample2 = "CV", dataMode = "allTrain", 
-    repeatA1, repeatA2, repeatB1, repeatB2, nfolds, FSmethod1, FSmethod2, 
-    cutP1, cutP2, fdr1, fdr2, FScore = MulticoreParam(), classifier1, classifier2, 
-    predMode1, predMode2, paramlist1, paramlist2, innerCore = MulticoreParam(), 
-    outFileA2 = NULL, outFileB2 = NULL) {
-    
-    stratify <- match.arg(stratify)
-    ## blocks of sub-datasets preparation
-    if (stratify == "gene") {
-        trainDataList <- omics2genelist(data = trainData, featureAnno, 
-            restrictUp, restrictDown)
-        if (!is.null(testData)) {
-            testDataList <- omics2genelist(data = testData, featureAnno, 
-                restrictUp, restrictDown)
-        } else {
-            testDataList <- NULL
-        }
-    } else if (stratify == "pathway") {
-        trainDataList <- omics2pathlist(data = trainData, pathlistDB, 
-            featureAnno, restrictUp, restrictDown, minPathSize)
-        if (!is.null(testData)) {
-            testDataList <- omics2pathlist(data = testData, pathlistDB, 
-                featureAnno, restrictUp, restrictDown, minPathSize)
-        } else {
-            testDataList <- NULL
-        }
-    } else if (stratify == "chromosome") {
-        trainDataList <- omics2chrlist(data = trainData, probeAnno = featureAnno)
-        if (!is.null(testData)) {
-            testDataList <- omics2chrlist(data = testData, probeAnno = featureAnno)
-        } else {
-            testDataList <- NULL
-        }
-    } else {
-        stop("Wrong stratification method used!")
+    typePCA, resample1 = "BS", resample2 = "CV",  
+    repeatA1 = 100, repeatA2 = 1, repeatB1 = 20, repeatB2 = 1, 
+    nfolds = 10, FSmethod1, FSmethod2, 
+    cutP1, cutP2, fdr2, FScore = MulticoreParam(), classifier, 
+    predMode, paramlist, innerCore = MulticoreParam(), 
+    outFileA1, outFileB1) {
+
+    trainDataList <- omics2pathlist(data=trainData, pathlistDB, 
+                                    featureAnno, restrictUp, 
+                                    restrictDown, minPathSize)  
+    if (!is.null(testData)){ 
+        testDataList <- omics2pathlist(data=testData, pathlistDB, 
+                                       featureAnno, restrictUp, 
+                                       restrictDown, minPathSize) 
+    } else{
+        testDataList <- NULL
     }
     
     ## generation of stage-2 data
@@ -1290,14 +1240,14 @@ BioMM <- function(trainData, testData,
         stage2data <- BioMMreconData(trainDataList = trainDataList, 
             testDataList = testDataList,  resample = resample1, dataMode, 
             repeatA = repeatA1, repeatB = repeatB1, nfolds, 
-            FSmethod = FSmethod1, cutP = cutP1, fdr = fdr1, FScore, 
-            classifier = classifier1, predMode = predMode1, 
-            paramlist = paramlist1, innerCore, 
-            outFileA = NULL, outFileB = NULL)
+            FSmethod = FSmethod1, cutP = cutP1, fdr = NULL, FScore, 
+            classifier = classifier, predMode = predMode, 
+            paramlist = paramlist, innerCore, 
+            outFileA = outFileA1, outFileB = outFileB1)
     } else {
         stage2data <- BioMMstage1pca(trainDataList = trainDataList, 
             testDataList = testDataList, typeMode = typePCA, topPC = 1, 
-            innerCore, outFileA = NULL, outFileB = NULL)
+            innerCore, outFileA = outFileA1, outFileB = outFileB1)
     }
     
     if (is.null(testDataList)) {
@@ -1329,9 +1279,8 @@ BioMM <- function(trainData, testData,
         result <- BioMMstage2pred(trainData = trainPos2, testData = testPos2, 
             resample = resample2, dataMode, repeatA = repeatA2, 
             repeatB = repeatB2, nfolds, FSmethod = FSmethod2, cutP = cutP2, 
-            fdr = fdr2, FScore, classifier = classifier2, 
-            predMode = predMode2, paramlist = paramlist2, 
-            innerCore, outFileA = outFileA2, outFileB = outFileB2)
+            fdr = fdr2, FScore, classifier = classifier, 
+            predMode = predMode, paramlist = paramlist, innerCore)
     }
     
 }

@@ -4,14 +4,12 @@
 \alias{BioMM}
 \title{BioMM end-to-end prediction}
 \usage{
-BioMM(trainData, testData, stratify = c("gene", "pathway", "chromosome"),
-  pathlistDB, featureAnno, restrictUp, restrictDown, minPathSize,
-  supervisedStage1 = TRUE, typePCA, resample1 = "BS",
-  resample2 = "CV", dataMode = "allTrain", repeatA1, repeatA2,
-  repeatB1, repeatB2, nfolds, FSmethod1, FSmethod2, cutP1, cutP2, fdr1,
-  fdr2, FScore = MulticoreParam(), classifier1, classifier2, predMode1,
-  predMode2, paramlist1, paramlist2, innerCore = MulticoreParam(),
-  outFileA2 = NULL, outFileB2 = NULL)
+BioMM(trainData, testData, pathlistDB, featureAnno, restrictUp,
+  restrictDown, minPathSize, supervisedStage1 = TRUE, typePCA,
+  resample1 = "BS", resample2 = "CV", repeatA1 = 100, repeatA2 = 1,
+  repeatB1 = 20, repeatB2 = 1, nfolds = 10, FSmethod1, FSmethod2,
+  cutP1, cutP2, fdr2, FScore = MulticoreParam(), classifier, predMode,
+  paramlist, innerCore = MulticoreParam(), outFileA1, outFileB1)
 }
 \arguments{
 \item{trainData}{The input training dataset. The first column
@@ -21,9 +19,6 @@ is the label or the output. For binary classes,
 \item{testData}{The input test dataset. The first column
 is the label or the output. For binary classes, 
 0 and 1 are used to indicate the class member.}
-
-\item{stratify}{The stratification method. 
-Valid options are c('gene', 'pathway', 'chromosome').}
 
 \item{pathlistDB}{A list of pathways with pathway IDs and their 
 corresponding genes ('entrezID' is used). This is only used for 
@@ -58,9 +53,6 @@ resampling. The default is 'BS'.}
 and 'BS'. 'CV' for cross validation and 'BS' for bootstrapping resampling.
 The default is 'CV'.}
 
-\item{dataMode}{The mode of data used at stage-1. 'subTrain' or 'allTrain'. 
-This is only applicable for bootstrapping resampling. (Default: allTrain).}
-
 \item{repeatA1}{The number of repeats N is used during resampling procedure.
 Repeated cross validation or multiple boostrapping is performed if N >=2. 
 One can choose 10 repeats for 'CV' and 100 repeats for 'BS'.}
@@ -69,30 +61,26 @@ One can choose 10 repeats for 'CV' and 100 repeats for 'BS'.}
 prediction. The default is 1 for 'CV'.}
 
 \item{repeatB1}{The number of repeats N is used for generating stage-2 test 
-data prediction scores.}
+data prediction scores. The default is 20.}
 
 \item{repeatB2}{The number of repeats N is used for test data prediction. 
 The default is 1.}
 
-\item{nfolds}{The number of folds is defined for cross validation.}
+\item{nfolds}{The number of folds is defined for cross validation. 
+The default is 10.}
 
 \item{FSmethod1}{Feature selection methods at stage-1. Available options 
 are c(NULL, 'positive', 'wilcox.test', 'cor.test', 'chisq.test', 
-'posWilcox', or 'top10pCor').}
+'posWilcox').}
 
 \item{FSmethod2}{Feature selection methods at stage-2. Available options
 are c(NULL, 'positive', 'wilcox.test', 'cor.test', 'chisq.test', 
-'posWilcox', or 'top10pCor').}
+'posWilcox').}
 
 \item{cutP1}{The cutoff used for p value thresholding at stage-1.
-Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). The default is 0.05.
-Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). The default is 0.05.}
+Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc).}
 
 \item{cutP2}{The cutoff used for p value thresholding at stage-2.}
-
-\item{fdr1}{Multiple testing correction method at stage-1. 
-Available options are c(NULL, 'fdr', 'BH', 'holm', etc). 
-See also \code{\link[stats]{p.adjust}}. The default is NULL.}
 
 \item{fdr2}{Multiple testing correction method at stage-2. 
 Available options are c(NULL, 'fdr', 'BH', 'holm', etc). 
@@ -100,29 +88,14 @@ See also \code{\link[stats]{p.adjust}}. The default is NULL.}
 
 \item{FScore}{The number of cores used for feature selection.}
 
-\item{classifier1}{Machine learning classifiers at stage-1.}
+\item{classifier}{Machine learning classifiers at both stages.}
 
-\item{classifier2}{Machine learning classifiers at stage-2.}
-
-\item{predMode1}{The prediction mode at stage-1. Available options are 
+\item{predMode}{The prediction mode at both stages. Available options are 
 c('probability', 'classification', 'regression').}
 
-\item{predMode2}{The prediction mode at stage-2. Available options are 
-c('probability', 'classification', 'regression').}
-
-\item{paramlist1}{A list of model parameters at stage-1.}
-
-\item{paramlist2}{A list of model parameters at stage-2.}
+\item{paramlist}{A list of model parameters at both stages.}
 
 \item{innerCore}{The number of cores used for computation.}
-
-\item{outFileA2}{The file name of prediction metrics based on resampling 
-with the '.csv' file extension. If it's provided, then the result will be 
-saved. The default is NULL.}
-
-\item{outFileB2}{The file name of independent test prediction metrics with 
-the '.csv' file extension. If it's provided, then the result will be saved.
-The default is NULL.}
 }
 \value{
 The CV or BS prediction performance for the training data and 
@@ -146,25 +119,24 @@ methylData <- readRDS(methylfile)
 probeAnnoFile <- system.file('extdata', 'cpgAnno.rds', package='BioMM')  
 probeAnno <- readRDS(file=probeAnnoFile)   
 supervisedStage1=TRUE
-classifier1=classifier2 <- 'randForest'
-predMode1=predMode2 <- 'classification'
-paramlist1=paramlist2 <- list(ntree=300, nthreads=30)   
+classifier <- 'randForest'
+predMode <- 'classification'
+paramlist <- list(ntree=300, nthreads=30)   
 library(BiocParallel)
 library(ranger)
 param1 <- MulticoreParam(workers = 2)
 param2 <- MulticoreParam(workers = 20)
 ## Not Run 
 ## result <- BioMM(trainData=methylData, testData=NULL,
-##                 stratify='chromosome', pathlistDB, featureAnno=probeAnno, 
+##                 pathlistDB, featureAnno=probeAnno, 
 ##                 restrictUp=10, restrictDown=200, minPathSize=10, 
 ##                 supervisedStage1, typePCA='regular', 
-##                 resample1='BS', resample2='CV', dataMode='allTrain', 
+##                 resample1='BS', resample2='CV', 
 ##                 repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
 ##                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
-##                 cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=param1, 
-##                 classifier1, classifier2, predMode1, predMode2, 
-##                 paramlist1, paramlist2, innerCore=param2,  
-##                 outFileA2=NULL, outFileB2=NULL)
+##                 cutP1=0.1, cutP2=0.1, fdr2=NULL, FScore=param1, 
+##                 classifier, predMode, paramlist, innerCore=param2,  
+##                 outFileA1, outFileB1)
 }
 \references{
 Chen, J., & Schwarz, E. (2017). BioMM: Biologically-informed 
