@@ -8,8 +8,8 @@
 #'
 #' @description 
 #' Identify and select a subset of outcome-associated or predictive features in 
-#' the training data. Return the same set of selected features for the test 
-#' data if it is available. 
+#' the training data based on filtering methods. Return the same set of selected 
+#' features for the test data if it is available. 
 
 #' @param trainData The input training dataset. The first column is the label.  
 #' @param testData The input test dataset. The first column is the label.   
@@ -55,8 +55,8 @@
 #' ## Feature selection
 #' library(BiocParallel)
 #' param <- MulticoreParam(workers = 10)
-#' Select 
-#' datalist <- getDataAfterFS(trainData, testData, FSmethod=NULL, 
+#' Select outcome-associated features based on the Wilcoxon test (P<0.1)
+#' datalist <- getDataAfterFS(trainData, testData, FSmethod="wilcox.test", 
 #'                            cutP=0.1, fdr=NULL, FScore=param)
 #' trainDataSub <- datalist[[1]] 
 #' testDataSub <- datalist[[2]] 
