@@ -1211,8 +1211,7 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' ##                 repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
 #' ##                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
 #' ##                 cutP1=0.1, cutP2=0.1, fdr2=NULL, FScore=param1, 
-#' ##                 classifier, predMode, paramlist, innerCore=param2,  
-#' ##                 outFileA1, outFileB1)
+#' ##                 classifier, predMode, paramlist, innerCore=param2)
 
 
 BioMM <- function(trainData, testData, pathlistDB, featureAnno, 
@@ -1221,8 +1220,7 @@ BioMM <- function(trainData, testData, pathlistDB, featureAnno,
     repeatA1 = 100, repeatA2 = 1, repeatB1 = 20, repeatB2 = 1, 
     nfolds = 10, FSmethod1, FSmethod2, 
     cutP1, cutP2, fdr2, FScore = MulticoreParam(), classifier, 
-    predMode, paramlist, innerCore = MulticoreParam(), 
-    outFileA1, outFileB1) {
+    predMode, paramlist, innerCore = MulticoreParam()) {
 
     trainDataList <- omics2pathlist(data=trainData, pathlistDB, 
                                     featureAnno, restrictUp, 
@@ -1243,11 +1241,11 @@ BioMM <- function(trainData, testData, pathlistDB, featureAnno,
             FSmethod = FSmethod1, cutP = cutP1, fdr = NULL, FScore, 
             classifier = classifier, predMode = predMode, 
             paramlist = paramlist, innerCore, 
-            outFileA = outFileA1, outFileB = outFileB1)
+            outFileA = NULL, outFileB = NULL)
     } else {
         stage2data <- BioMMstage1pca(trainDataList = trainDataList, 
             testDataList = testDataList, typeMode = typePCA, topPC = 1, 
-            innerCore, outFileA = outFileA1, outFileB = outFileB1)
+            innerCore, outFileA = NULL, outFileB = NULL)
     }
     
     if (is.null(testDataList)) {

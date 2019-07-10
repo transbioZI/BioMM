@@ -9,7 +9,7 @@ BioMM(trainData, testData, pathlistDB, featureAnno, restrictUp,
   resample1 = "BS", resample2 = "CV", repeatA1 = 100, repeatA2 = 1,
   repeatB1 = 20, repeatB2 = 1, nfolds = 10, FSmethod1, FSmethod2,
   cutP1, cutP2, fdr2, FScore = MulticoreParam(), classifier, predMode,
-  paramlist, innerCore = MulticoreParam(), outFileA1, outFileB1)
+  paramlist, innerCore = MulticoreParam())
 }
 \arguments{
 \item{trainData}{The input training dataset. The first column
@@ -135,8 +135,7 @@ param2 <- MulticoreParam(workers = 20)
 ##                 repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
 ##                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
 ##                 cutP1=0.1, cutP2=0.1, fdr2=NULL, FScore=param1, 
-##                 classifier, predMode, paramlist, innerCore=param2,  
-##                 outFileA1, outFileB1)
+##                 classifier, predMode, paramlist, innerCore=param2)
 }
 \references{
 Chen, J., & Schwarz, E. (2017). BioMM: Biologically-informed 
