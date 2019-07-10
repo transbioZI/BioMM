@@ -55,7 +55,7 @@
 #' ## Feature selection
 #' library(BiocParallel)
 #' param <- MulticoreParam(workers = 10)
-#' Select outcome-associated features based on the Wilcoxon test (P<0.1)
+#' ## Select outcome-associated features based on the Wilcoxon test (P<0.1)
 #' datalist <- getDataAfterFS(trainData, testData, FSmethod="wilcox.test", 
 #'                            cutP=0.1, fdr=NULL, FScore=param)
 #' trainDataSub <- datalist[[1]] 
