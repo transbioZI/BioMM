@@ -3,7 +3,7 @@ title: "BioMM: Biological-informed Multi-stage Machine learning framework for ph
 author:
  - name: Junfang Chen and Emanuel Schwarz
    affiliation: Central Institute of Mental Health, Heidelberg University, Germany  
-date: "Modified: 01 May 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
+date: "Modified: 10 July 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
 output: 
   BiocStyle::html_document: 
     toc_float: false
@@ -36,17 +36,16 @@ important step in advancing such research.
 ## Deliverables
 We have implemented a biologically informed multi-stage machine learing 
 framework termed __BioMM__ [1] specifically for phenotype prediction using 
-omics-scale data based on biological prior information.   
+omics-scale data based on biological prior information, for example, gene ontological pathways.   
 
 **Features of BioMM in a nutshell**:   
 
-1. Applicability for all omics data modalities.   
-2. Different biological stratification strategies.    
-3. Prioritizing outcome-associated functional patterns.   
-4. End-to-end prediction at the individual level based on biological 
-stratified patterns.   
-5. Possibility for extension to machine learning models of interest.   
-6. Parallel computing. 
+1. Applicability for all omics data modalities.      
+2. Prioritizing outcome-associated functional patterns.   
+3. End-to-end prediction at the individual level based on biological 
+pathway stratification.  
+4. Possibility for extension to machine learning models of interest.   
+5. Parallel computing. 
 
 # Getting started  
 
@@ -74,8 +73,7 @@ library(variancePartition)
 # Omics data 
 A wide range of genome-wide omics data is supported for the use of BioMM 
 including whole-genome DNA methylation, gene expression and genome-wide SNP 
-data. Other types of omics data that can map into genes, pathways or 
-chromosomes are also encouraging.  
+data. Other types of omics data that can map into pathways are also encouraging.  
 For better understanding of the framework, we used a preprocessed genome-wide 
 DNA methylation data with 26486 CpGs and 40 samples consisting of 20 controls 
 and 20 patients. (0: healthy control and 1: patient) for demonstration.  
@@ -89,11 +87,7 @@ dim(studyData)
 ``` 
 
 # Feature stratification
-Features like CpGs and SNPs can be mapped into genes, pathways and chromosomes 
-based on genomic location and gene ontology categories, as implemented in 
-three different functions `omics2genelist()`, `omics2pathlist()` and 
-`omics2chrlist()`. The choice of feature stratification method depends on the 
-research questions and objectives. 
+Features like CpGs, genes or SNPs can be mapped into pathways based on genomic location and pathway annotation, as implemented in the function `omics2pathlist()`. The examples of pathway databases are gene ontology (GO), Reactome and KEGG, which are widely used public pathway repositories. Gene ontological pathway is used in this tutorial.
 
 ```{r annotationFile, eval=TRUE}
 ## Load annotation data
@@ -103,30 +97,19 @@ head(featureAnno)
 str(pathlistDB[1:3])
 ``` 
 
-```{r chrlist, eval=TRUE} 
-## Map to chromosomes
-chrlist <- omics2chrlist(data=studyData, probeAnno=featureAnno) 
-``` 
-
 ```{r pathlist, eval=TRUE} 
-## Map to pathways (input 100 pathways only)
+## Map to pathways (only 100 pathways in order to reduce runtime)
 pathlistDBsub <- pathlistDB[1:100]
 pathlist <- omics2pathlist(data=studyData, pathlistDBsub, featureAnno, 
                            restrictUp=100, restrictDown=20, minPathSize=10) 
 ``` 
- 
-```{r genelist, eval=FALSE} 
-## Map to genes 
-studyDataSub <- studyData[,1:2000]
-genelist <- omics2genelist(data=studyDataSub, featureAnno, 
-                           restrictUp=200, restrictDown=2) 
-``` 
+
 # BioMM framework
 
 ## Introduction
 Briefly, the BioMM framework consists of two learning stages [1]. During the 
 first stage, biological meta-information is used to 'compress' the variables 
-of the original dataset into functional-level 'latent variables' (henceforth 
+of the original dataset into pathway-level 'latent variables' (henceforth 
 called stage-2 data) using either supervised or unsupervised learning models. 
 In the second stage, a supervised model is built using the stage-2 data with 
 non-negative outcome-associated features for prediction. 
@@ -147,12 +130,12 @@ either resampling methods during machine learning prediction or independent
 test set prediction if the argument `testData` is provided.
 
 #### Example  
-To apply random forest model, we use the argument `classifier1=randForest` and 
-`classifier2=randForest` in `BioMM()` with the classification mode at both 
-stages. `predMode1` and `predMode2` indicate the prediction type, here we use 
+To apply random forest model, we use the argument `classifier=randForest`
+in `BioMM()` with the classification mode at both 
+stages. `predMode` indicate the prediction type, here we use 
 classification for binary outcome prediction. A set of model hyper-parameters 
-are supplied by the argument `paramlist1` at stage 1 and `paramlist2` at 
-stage 2. Chromosome-based stratification is carried out in this example. We 
+are supplied by the argument `paramlist` at both stages. 
+Pathway-based stratification is carried out in this example. We 
 focused on the autosomal region to limit the potential influence of sex on 
 machine learning due to the phenomenon of X chromosome inactivation or the 
 existence of an additional X chromosome in female samples. Therefore it's 
@@ -162,24 +145,22 @@ file.
 ```{r BioMMrandForest, eval=TRUE}
 ## Parameters
 supervisedStage1=TRUE
-classifier1=classifier2 <- "randForest"
-predMode1=predMode2 <- "classification"
-paramlist1=paramlist2 <- list(ntree=300, nthreads=10)   
+classifier <- "randForest"
+predMode <- "classification"
+paramlist <- list(ntree=300, nthreads=10)   
 param1 <- MulticoreParam(workers = 1)
 param2 <- MulticoreParam(workers = 10)
 
-studyDataSub <- studyData[,1:2000] ## less computation
-result <- BioMM(trainData=studyDataSub, testData=NULL,
-                stratify="chromosome", pathlistDB, featureAnno, 
-                restrictUp=10, restrictDown=200, minPathSize=10, 
+studyDataSub <- studyData[,1:2000] ## reduce runtime
+result <- BioMM(trainData=studyDataSub, testData=NULL, pathlistDB, featureAnno, 
+                restrictUp=100, restrictDown=10, minPathSize=10, 
                 supervisedStage1, typePCA="regular", 
-                resample1="BS", resample2="CV", dataMode="allTrain", 
+                resample1="BS", resample2="CV",
                 repeatA1=50, repeatA2=1, repeatB1=20, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
-                cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=param1, 
-                classifier1, classifier2, predMode1, predMode2, 
-                paramlist1, paramlist2, innerCore=param2,  
-                outFileA2=NULL, outFileB2=NULL)
+                cutP1=0.1, cutP2=0.1, fdr2=NULL, FScore=param1, 
+                classifier, predMode, 
+                paramlist, innerCore=param2)
 print(result)
 ``` 
 
@@ -195,39 +176,32 @@ unsupervised learning `supervisedStage1=FALSE`, regular PCA
 ```{r BioMMpara, eval=TRUE}
 ## SVM 
 supervisedStage1=TRUE
-classifier1=classifier2 <- "SVM"
-predMode1=predMode2 <- "classification"
-paramlist1=paramlist2 <- list(tuneP=FALSE, kernel="radial", 
-                              gamma=10^(-3:-1), cost=10^(-3:1))
+classifier <- "SVM"
+predMode <- "classification"
+paramlist <- list(tuneP=FALSE, kernel="radial", 
+                  gamma=10^(-3:-1), cost=10^(-3:1))
 
 ## GLM with elastic-net
 supervisedStage1=TRUE
-classifier1=classifier2 <- "glmnet"
-predMode1=predMode2 <- "classification" 
-paramlist1=paramlist2 <- list(family="binomial", alpha=0.5, 
-                              typeMeasure="mse", typePred="class")
+classifier <- "glmnet"
+predMode <- "classification" 
+paramlist <- list(family="binomial", alpha=0.5, 
+                   ypeMeasure="mse", typePred="class")
 
 ## PCA + random forest
 supervisedStage1=FALSE
-classifier2 <- "randForest"
-predMode2 <- "classification"
-paramlist2 <- list(ntree=300, nthreads=10)  
+classifier <- "randForest"
+predMode <- "classification"
+paramlist <- list(ntree=300, nthreads=10)  
 ```
 
 
 ### Interface to biological stratification strategies
 For stratification of predictors using biological information, various 
-strategies can be applied. Currently, `BioMM()` integrates three different 
-ways of stratification. Gene-based prediction is defined by the argument 
-`stratify="gene"`, which can be used when multiple predictors exist within 
-one gene. For instance, DNA methylation or GWAS data, each gene might have 
-multiple CpGs or SNPs. But this is not applicable for gene expression data. 
-Pathway-based analysis is described by the argument `stratify="pathway"`, 
-which would account for epistasis between variables within the functional 
-category; therefore, this may provide better information on functional 
-insight. Chromosome-based analysis `stratify="chromosome"` might be helpful 
-to cover non-coding features residing on each chromosome apart from the 
-coding region probes.
+strategies can be applied. Currently, `BioMM()` integrates gene 
+ontological pathway based stratification, which not only accounts for epistasis 
+between first level variables within the functional category, but also considers
+the interaction between pathways. Therefore, this may provide better information on functional insight.  
 
 #### Example
 End-to-end prediction based on pathway-wide stratification on genome-wide DNA 
@@ -244,17 +218,15 @@ paramlist <- list(ntree=300, nthreads=10)
 param1 <- MulticoreParam(workers = 1)
 param2 <- MulticoreParam(workers = 10)
 
-result <- BioMM(trainData=studyData, testData=NULL,
-                stratify="pathway", pathlistDBsub, featureAnno, 
+result <- BioMM(trainData=studyData, testData=NULL, 
+                pathlistDBsub, featureAnno, 
                 restrictUp=100, restrictDown=10, minPathSize=10, 
                 supervisedStage1, typePCA="regular", 
-                resample1="BS", resample2="CV", dataMode="allTrain", 
+                resample1="BS", resample2="CV", 
                 repeatA1=40, repeatA2=1, repeatB1=40, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
-                cutP1=0.1, cutP2=0.1, fdr1=NULL, fdr2=NULL, FScore=param1, 
-                classifier1, classifier2, predMode1, predMode2, 
-                paramlist1, paramlist2, innerCore=param2,  
-                outFileA2=NULL, outFileB2=NULL)
+                cutP1=0.1, cutP2=0.1, fdr2=NULL, FScore=param1, 
+                classifier, predMode, paramlist, innerCore=param2)
 print(result)
 ``` 
 
