@@ -1,3 +1,17 @@
+Changes in version 1.1.1
+============= 
+	o updated functions getMetrics(), plotVarExplained() and plotRankedFeature(); to focus on pathway based result report.
+	o updated BioMMtutorial.Rmd  
+
+
+Changes in version 1.1.0
+=============
+	o removed gene and chromosome based stratification methods.
+	o updated feature selection method based on filtering getDataAfterFS().
+	o updated BioMM() function to focus on pathway based machine learning.
+	o updated BioMMtutorial.Rmd  
+
+
 Changes in version 0.99.13
 =============
 	o updated the format of NEWS
