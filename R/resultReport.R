@@ -49,16 +49,14 @@ classifiACC <- function(dataY, predY) {
 
 #' @description
 #' Compute the evaluation metrics in the classification setting: 
-#' P value based on chi-square test (pv), pearson correlation coefficient 
-#' (cor), area under curve (AUC), classification accuracy (ACC) and 
+#' area under curve (AUC), classification accuracy (ACC) and 
 #' the pseudo R square (R2).
 
 #' @param dataY The observed outcome.
 #' @param predY The predicted outcome.
-#' @details If all samples are predicted into one class, then we assign 
-#' R2=0, cor=0, and AUC=0.5.
+#' @details If all samples are predicted into one class, then R2 is 0.
 
-#' @return A set of metrics for model evaluation: pv, cor, AUC, ACC and R2.
+#' @return A set of metrics for model evaluation: AUC, ACC and R2.
 #' @export 
 #' @import rms
 #' @import glmnet   
@@ -113,8 +111,8 @@ getMetrics <- function(dataY, predY){
 #' the first column is the label (the outcome).
 #' @param posF A logical value indicating if only positively outcome-associated
 #' features should be used. (Default: TRUE)
-#' @param stratify A string. The applied stratification method to generate 
-#' \code{blocklist}. Valid options are c('gene', 'pathway', 'chromosome').
+#' @param stratify A string. Pathway based stratification method to generate 
+#' \code{blocklist}. 
 #' @param core The number of cores used for computation. (Default: 1)
 #' @param fileName The file name specified for the plot. If it is not NULL,
 #' then the plot will be generated. The plot will project the data on the 
@@ -133,8 +131,8 @@ getMetrics <- function(dataY, predY){
 #' @export  
 
 
-plotVarExplained <- function(data, posF = TRUE, stratify = c("gene", "pathway", 
-    "chromosome"), core = MulticoreParam(), fileName = NULL) {
+plotVarExplained <- function(data, posF = TRUE, stratify = c("pathway"), 
+    core = MulticoreParam(), fileName = NULL) {
     
     if (colnames(data)[1] != "label") {
         stop("The first column of the 'data' must be the 'label'!")
@@ -187,26 +185,24 @@ plotVarExplained <- function(data, posF = TRUE, stratify = c("gene", "pathway",
 #' The ranking criteria are based on metrics such as Nagelkerke pseudo 
 #' R-square. 
 #' @param data The input stage-2 data (either data.frame or matrix). 
-#' Rows are the samples, columns are gene IDs, or pathway names or chromosome 
-#' IDs, except that the first column is the label (the outcome).
+#' Rows are the samples, columns are pathway names,  
+#' except that the first column is the label (the outcome).
 #' @param posF A logical value indicating if only positively outcome-associated
 #' features should be used. (Default: TRUE)
 #' @param topF The top ranked number of features at stage-2 (\code{topF} >= 2).
 #' (Default: 10)
 #' @param blocklist A list of matrices with block IDs as the associated list 
-#' member names. The block IDs identical to the stage-2 feature names. 
-#' The block can be gene, pathway or chromosome. 
+#' member names. The block IDs identical to the stage-2 feature names.  
 #' For each matrix, rows are the samples and columns are the probe names,  
 #' except that the first column is named 'label'. See also 
-#' \code{\link{omics2genelist}}; \code{\link{omics2pathlist}}; 
-#' \code{\link{omics2chrlist}}
-#' @param stratify A string. The applied stratification method to generate 
-#' \code{blocklist}. Valid options are c('gene', 'pathway', 'chromosome'). 
+#' \code{\link{omics2pathlist}}.
+#' @param stratify A string. Pathway based stratification method to generate 
+#' \code{blocklist}. 
 #' @param rankMetric A string representing the metrics used for ranking. 
-#' Valid options are c('cor', 'AUC', 'ACC', 'R2', 'size').
+#' Valid options are c('AUC', 'ACC', 'R2', 'size').
 #' 'size' is the block size.
 #' @param colorMetric A string representing the metric used to color the plot. 
-#' Valid options are c('cor', 'AUC', 'ACC', 'R2', 'size').
+#' Valid options are c('AUC', 'ACC', 'R2', 'size').
 #' 'size' is the block size.
 #' @param core The number of cores used for computation. (Default: 10)
 #' @param fileName The plot file name. (Default: 'plottopF.png') 
@@ -226,38 +222,23 @@ plotVarExplained <- function(data, posF = TRUE, stratify = c("gene", "pathway",
 #' @import lattice  
 #' @import ggplot2 
 #' @export  
-#' @seealso \code{\link{omics2genelist}}; \code{\link{omics2pathlist}}; 
-#' \code{\link{omics2chrlist}}
+#' @seealso  \code{\link{omics2pathlist}}.
 
 
 plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist, 
-    stratify = c("gene", "pathway", "chromosome"), 
-    rankMetric = c("cor", "AUC", "ACC", "R2", "size"), 
-    colorMetric = c("cor", "AUC", "ACC", "R2", "size"), 
+    stratify = c("pathway"), 
+    rankMetric = c("AUC", "ACC", "R2", "size"), 
+    colorMetric = c("AUC", "ACC", "R2", "size"), 
     core = MulticoreParam(), fileName = NULL) {
     
-    .getBlockSize <- function(blocklist, 
-        stratify = c("gene", "pathway", "chromosome")) {
-        
+    .getBlockSize <- function(blocklist, stratify = c("pathway")) {
+    
         stratify <- match.arg(stratify)
-        ## blocks of sub-datasets preparation
-        if (stratify == "gene" || stratify == "chromosome") {
-            ID <- names(blocklist)
-            ## exclude the label (minus 1)
-            size <- unlist(lapply(blocklist, function(d) {
-                ncol(d) - 1
-            }))
-            blockSize <- data.frame(ID, size, stringsAsFactors = FALSE)
-        } else if (stratify == "pathway") {
-            ID <- gsub("\\:", ".", names(blocklist))
-            size <- unlist(lapply(blocklist, function(d) {
-                ncol(d) - 1
-            }))
-            blockSize <- data.frame(ID, size, stringsAsFactors = FALSE)
-        } else {
-            stop("Wrong stratification method.")
-        }
-        
+        ID <- gsub("\\:", ".", names(blocklist))
+        size <- unlist(lapply(blocklist, function(d) {
+            ncol(d) - 1
+        }))
+        blockSize <- data.frame(ID, size, stringsAsFactors = FALSE)        
         return(blockSize)
     }
     
@@ -300,7 +281,7 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
     }
     
     eMat <- matrix(unlist(metrics), nrow = ncol(dataXsub), byrow = TRUE)
-    colnames(eMat) <- c("pv", "cor", "AUC", "ACC", "R2")
+    colnames(eMat) <- c("AUC", "ACC", "R2")
     if (stratify == "pathway") {
         goID <- gsub("\\:", ".", colnames(dataXsub))
         rownames(eMat) <- goID
@@ -325,16 +306,10 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
     x <- "ID"
     y <- rankMetric 
     colorby <- match.arg(colorMetric)
-    stratify <- match.arg(stratify)
-    if (stratify == "gene") {
-        subtitle <- "Genes"
-    }
+    stratify <- match.arg(stratify) 
     if (stratify == "pathway") {
         subtitle <- "Pathways"
-    }
-    if (stratify == "chromosome") {
-        subtitle <- "Chromosomes"
-    }
+    } 
     title <- paste0("Top ", topF, " ", subtitle)
     if (is.null(fileName)) {
         fileName <- paste0("plotTopF", topF, "_", rankMetric, "_", stratify, 

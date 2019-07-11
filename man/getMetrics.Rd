@@ -12,17 +12,15 @@ getMetrics(dataY, predY)
 \item{predY}{The predicted outcome.}
 }
 \value{
-A set of metrics for model evaluation: pv, cor, AUC, ACC and R2.
+A set of metrics for model evaluation: AUC, ACC and R2.
 }
 \description{
 Compute the evaluation metrics in the classification setting: 
-P value based on chi-square test (pv), pearson correlation coefficient 
-(cor), area under curve (AUC), classification accuracy (ACC) and 
+area under curve (AUC), classification accuracy (ACC) and 
 the pseudo R square (R2).
 }
 \details{
-If all samples are predicted into one class, then we assign 
-R2=0, cor=0, and AUC=0.5.
+If all samples are predicted into one class, then R2 is 0.
 }
 \examples{
  

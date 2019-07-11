@@ -5,14 +5,14 @@
 \title{Plot top outcome-associated features}
 \usage{
 plotRankedFeature(data, posF = TRUE, topF = 10, blocklist,
-  stratify = c("gene", "pathway", "chromosome"), rankMetric = c("cor",
-  "AUC", "ACC", "R2", "size"), colorMetric = c("cor", "AUC", "ACC", "R2",
-  "size"), core = MulticoreParam(), fileName = NULL)
+  stratify = c("pathway"), rankMetric = c("AUC", "ACC", "R2", "size"),
+  colorMetric = c("AUC", "ACC", "R2", "size"), core = MulticoreParam(),
+  fileName = NULL)
 }
 \arguments{
 \item{data}{The input stage-2 data (either data.frame or matrix). 
-Rows are the samples, columns are gene IDs, or pathway names or chromosome 
-IDs, except that the first column is the label (the outcome).}
+Rows are the samples, columns are pathway names,  
+except that the first column is the label (the outcome).}
 
 \item{posF}{A logical value indicating if only positively outcome-associated
 features should be used. (Default: TRUE)}
@@ -21,22 +21,20 @@ features should be used. (Default: TRUE)}
 (Default: 10)}
 
 \item{blocklist}{A list of matrices with block IDs as the associated list 
-member names. The block IDs identical to the stage-2 feature names. 
-The block can be gene, pathway or chromosome. 
+member names. The block IDs identical to the stage-2 feature names.  
 For each matrix, rows are the samples and columns are the probe names,  
 except that the first column is named 'label'. See also 
-\code{\link{omics2genelist}}; \code{\link{omics2pathlist}}; 
-\code{\link{omics2chrlist}}}
+\code{\link{omics2pathlist}}.}
 
-\item{stratify}{A string. The applied stratification method to generate 
-\code{blocklist}. Valid options are c('gene', 'pathway', 'chromosome').}
+\item{stratify}{A string. Pathway based stratification method to generate 
+\code{blocklist}.}
 
 \item{rankMetric}{A string representing the metrics used for ranking. 
-Valid options are c('cor', 'AUC', 'ACC', 'R2', 'size').
+Valid options are c('AUC', 'ACC', 'R2', 'size').
 'size' is the block size.}
 
 \item{colorMetric}{A string representing the metric used to color the plot. 
-Valid options are c('cor', 'AUC', 'ACC', 'R2', 'size').
+Valid options are c('AUC', 'ACC', 'R2', 'size').
 'size' is the block size.}
 
 \item{core}{The number of cores used for computation. (Default: 10)}
@@ -63,6 +61,5 @@ stacking: Building seemingly predictive models on random data. ACM SIGKDD
 Explorations Newsletter, 12(2), 11-15.
 }
 \seealso{
-\code{\link{omics2genelist}}; \code{\link{omics2pathlist}}; 
-\code{\link{omics2chrlist}}
+\code{\link{omics2pathlist}}.
 }
