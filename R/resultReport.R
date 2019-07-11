@@ -84,25 +84,21 @@ classifiACC <- function(dataY, predY) {
 #' accuracy <- getMetrics(dataY=dataY, predY=predY)
 #' print(accuracy)  
 
-
-getMetrics <- function(dataY, predY) {
+getMetrics <- function(dataY, predY){
     
-    cat("\n Levels of predicted Y =", nlevels(factor(predY)), "\n\n")
-    ACC <- classifiACC(dataY, predY)
-    pv <- chisq.test(table(dataY, predY))$p.value
-    if (nlevels(factor(predY)) > 1) {
-        Cor <- cor(dataY, predY)
-        AUC <- auc(dataY, predY)
+    auc <- roc(dataY, predY)$auc      
+    predY <- ifelse(predY>=.5, 1, 0) 
+    cat("\n Levels of predicted Y =", nlevels(factor(predY)),"\n\n") 
+    ACC <- classifiACC(dataY, predY)  
+    if (nlevels(factor(predY)) > 1){
         R2 <- lrm(dataY ~ predY)$stats["R2"]
-        eMat <- data.frame(pv = pv, cor = round(Cor, 2), AUC = round(AUC, 2), 
-            ACC = round(ACC, 2), R2 = round(R2, 3))
     } else {
-        message("Warning: all predicted samples in one class!")
-        eMat <- data.frame(pv = pv, cor = 0, AUC = 0.5, ACC = round(ACC, 2), 
-            R2 = 0)
+        R2 <- 0
     }
-
-}
+    eMat <- data.frame(AUC=round(auc,3), ACC=round(ACC,3), R2 = round(R2, 3))  
+    print(eMat) 
+    return(eMat)
+} 
 
 
 ############################################################################### 
