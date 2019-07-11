@@ -301,10 +301,9 @@ plotRankedFeature(data=stage2dataA,
 ![](plotTopF10_R2_pathway.png)
 
 ## Computational consideration
-BioMM with supervised models at both stages and gene or pathway based 
-stratification methods will take longer to run than unsupervised
-approaches or chromosome based stratification. But the prediction
-is more powerful in many scenarios. Therefore, we suggest the former even
+BioMM with supervised models at both stages incorporating pathway based 
+stratification method will take longer to run than unsupervised
+approaches. But the prediction is more powerful. Therefore, we suggest the former even
 if the computation is more demanding, as the adoption of 5G is pushing advances 
 in computational storage and speed. Parallel computing is implemented and 
 recommended for such scenario. In this vignette, due to the runtime, we 
