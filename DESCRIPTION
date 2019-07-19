@@ -16,7 +16,7 @@ Description: The identification of reproducible biological patterns from
 	with prior biological meta information. 
 Imports:
     stats, utils, grDevices, lattice, BiocParallel, glmnet, rms, 
-    nsprcomp, ranger, e1071, variancePartition, ggplot2, pROC
+    nsprcomp, ranger, e1071, variancePartition, ggplot2, pROC, vioplot
 Depends: R (>= 3.6)
 Suggests: BiocStyle, knitr, RUnit, BiocGenerics
 VignetteBuilder: knitr

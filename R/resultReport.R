@@ -129,6 +129,7 @@ getMetrics <- function(dataY, predY){
 #' @import BiocParallel
 #' @import variancePartition
 #' @import grDevices
+#' @import vioplot
 #' @export  
 
 
