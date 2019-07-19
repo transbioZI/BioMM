@@ -5,9 +5,8 @@
 \title{Plot top outcome-associated features}
 \usage{
 plotRankedFeature(data, posF = TRUE, topF = 10, blocklist,
-  stratify = c("pathway"), rankMetric = c("AUC", "ACC", "R2", "size"),
-  colorMetric = c("AUC", "ACC", "R2", "size"), core = MulticoreParam(),
-  fileName = NULL)
+  rankMetric = c("AUC", "ACC", "R2", "size"), colorMetric = c("AUC",
+  "ACC", "R2", "size"), core = MulticoreParam(), fileName = NULL)
 }
 \arguments{
 \item{data}{The input stage-2 data (either data.frame or matrix). 
@@ -25,9 +24,6 @@ member names. The block IDs identical to the stage-2 feature names.
 For each matrix, rows are the samples and columns are the probe names,  
 except that the first column is named 'label'. See also 
 \code{\link{omics2pathlist}}.}
-
-\item{stratify}{A string. Pathway based stratification method to generate 
-\code{blocklist}.}
 
 \item{rankMetric}{A string representing the metrics used for ranking. 
 Valid options are c('AUC', 'ACC', 'R2', 'size').

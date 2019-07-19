@@ -47,11 +47,16 @@ component analysis (PCA).
 ## Load data  
 methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 methylData <- readRDS(methylfile)    
-## Annotation files for Mapping CpGs into chromosome  
+## Annotation file   
 probeAnnoFile <- system.file('extdata', 'cpgAnno.rds', package='BioMM')  
-probeAnno <- readRDS(file=probeAnnoFile)  
-## Mapping CpGs into Chromosome
-dataList <- omics2chrlist(data=methylData, probeAnno)
+## Mapping CpGs into Pathways
+featureAnno <- readRDS(file=probeAnnoFile)  
+## Mapping CpGs into Pathways
+featureAnno <- readRDS(system.file("extdata", "cpgAnno.rds", package="BioMM")) 
+pathlistDB <- readRDS(system.file("extdata", "goDB.rds", package="BioMM")) 
+head(featureAnno)   
+dataList <- omics2pathlist(data=methylData, pathlistDB, featureAnno, 
+                           restrictUp=100, restrictDown=10, minPathSize=10) 
 length(dataList) 
 library(BiocParallel)
 param <- MulticoreParam(workers = 10) 

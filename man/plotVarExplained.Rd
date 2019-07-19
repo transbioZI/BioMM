@@ -4,8 +4,8 @@
 \alias{plotVarExplained}
 \title{Plot data summary statistics}
 \usage{
-plotVarExplained(data, posF = TRUE, stratify = c("pathway"),
-  core = MulticoreParam(), fileName = NULL)
+plotVarExplained(data, posF = TRUE, core = MulticoreParam(),
+  horizontal = FALSE, fileName = NULL)
 }
 \arguments{
 \item{data}{The input dataset (either data.frame or matrix). 
@@ -15,10 +15,10 @@ the first column is the label (the outcome).}
 \item{posF}{A logical value indicating if only positively outcome-associated
 features should be used. (Default: TRUE)}
 
-\item{stratify}{A string. Pathway based stratification method to generate 
-\code{blocklist}.}
-
 \item{core}{The number of cores used for computation. (Default: 1)}
+
+\item{horizontal}{A logical value indicating if the plot should be horizontal 
+or not. The default is FALSE.}
 
 \item{fileName}{The file name specified for the plot. If it is not NULL,
 then the plot will be generated. The plot will project the data on the 

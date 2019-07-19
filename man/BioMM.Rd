@@ -6,10 +6,11 @@
 \usage{
 BioMM(trainData, testData, pathlistDB, featureAnno, restrictUp,
   restrictDown, minPathSize, supervisedStage1 = TRUE, typePCA,
-  resample1 = "BS", resample2 = "CV", repeatA1 = 100, repeatA2 = 1,
-  repeatB1 = 20, repeatB2 = 1, nfolds = 10, FSmethod1, FSmethod2,
-  cutP1, cutP2, fdr2, FScore = MulticoreParam(), classifier, predMode,
-  paramlist, innerCore = MulticoreParam())
+  resample1 = "BS", resample2 = "CV", dataMode = "allTrain",
+  repeatA1 = 100, repeatA2 = 1, repeatB1 = 20, repeatB2 = 1,
+  nfolds = 10, FSmethod1, FSmethod2, cutP1, cutP2, fdr2,
+  FScore = MulticoreParam(), classifier, predMode, paramlist,
+  innerCore = MulticoreParam())
 }
 \arguments{
 \item{trainData}{The input training dataset. The first column
@@ -52,6 +53,12 @@ resampling. The default is 'BS'.}
 \item{resample2}{The resampling methods at stage-2. Valid options are 'CV' 
 and 'BS'. 'CV' for cross validation and 'BS' for bootstrapping resampling.
 The default is 'CV'.}
+
+\item{dataMode}{The input training data mode for model training.
+It is used only if 'testData' is present. It can be a subset of 
+the whole training data or the entire training data. 'subTrain' 
+is the given for subsetting and 'allTrain' for the entire training
+dataset.}
 
 \item{repeatA1}{The number of repeats N is used during resampling procedure.
 Repeated cross validation or multiple boostrapping is performed if N >=2. 
@@ -115,7 +122,7 @@ Stage-2 test data is learned via independent test set prediction.
 ## Load data    
 methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 methylData <- readRDS(methylfile)    
-## Annotation files for Mapping CpGs into chromosome  
+## Annotation file
 probeAnnoFile <- system.file('extdata', 'cpgAnno.rds', package='BioMM')  
 probeAnno <- readRDS(file=probeAnnoFile)   
 supervisedStage1=TRUE
@@ -131,7 +138,7 @@ param2 <- MulticoreParam(workers = 20)
 ##                 pathlistDB, featureAnno=probeAnno, 
 ##                 restrictUp=10, restrictDown=200, minPathSize=10, 
 ##                 supervisedStage1, typePCA='regular', 
-##                 resample1='BS', resample2='CV', 
+##                 resample1='BS', resample2='CV', dataMode="allTrain",
 ##                 repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
 ##                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
 ##                 cutP1=0.1, cutP2=0.1, fdr2=NULL, FScore=param1, 

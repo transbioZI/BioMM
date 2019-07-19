@@ -30,6 +30,7 @@ methylData <- readRDS(methylfile)
 dataY <- methylData[,1]
 methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
 library(ranger) 
+library(pROC)
 library(rms)
 library(BiocParallel) 
 param1 <- MulticoreParam(workers = 1) 
