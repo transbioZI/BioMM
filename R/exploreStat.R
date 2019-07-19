@@ -125,9 +125,9 @@ getDataAfterFS <- function(trainData, testData, FSmethod, cutP = 0.1,
     } else if (FSmethod == "top10pCor") { 
         topN <- round(ncol(trainX)*0.1) 
         featurelist <- as.list(seq_len(ncol(trainX)))
-        pvTrain <- unlist(mclapply(featurelist, function(i){
-                          wilcox.test(trainX[,i]~as.factor(trainY))$p.value}, 
-                          mc.cores=FScore))  
+        pvTrain <- unlist(bplapply(featurelist, function(i){
+            wilcox.test(trainX[, i]~as.factor(trainY))$p.value
+        }, BPPARAM=FScore))  
         selFeature <- order(pvTrain, decreasing=FALSE)[seq_len(topN)]   
         if (length(selFeature) <= 2){
             selFeature <- order(pvTrain, decreasing=FALSE)[seq_len(2)]
