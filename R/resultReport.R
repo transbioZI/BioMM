@@ -59,7 +59,7 @@ classifiACC <- function(dataY, predY) {
 #' @return A set of metrics for model evaluation: AUC, ACC and R2.
 #' @export 
 #' @import rms
-#' @import glmnet   
+#' @import pROC
 #' @author Junfang Chen 
 #' @examples  
 #' ## Load data  
@@ -68,6 +68,7 @@ classifiACC <- function(dataY, predY) {
 #' dataY <- methylData[,1]
 #' methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
 #' library(ranger) 
+#' library(pROC)
 #' library(rms)
 #' library(BiocParallel) 
 #' param1 <- MulticoreParam(workers = 1) 
@@ -84,7 +85,7 @@ classifiACC <- function(dataY, predY) {
 
 getMetrics <- function(dataY, predY){
     
-    auc <- roc(dataY, predY)$auc      
+    auc <- pROC::roc(dataY, predY)$auc      
     predY <- ifelse(predY>=.5, 1, 0) 
     cat("\n Levels of predicted Y =", nlevels(factor(predY)),"\n\n") 
     ACC <- classifiACC(dataY, predY)  
@@ -110,10 +111,10 @@ getMetrics <- function(dataY, predY){
 #' Rows are the samples, columns are the probes/genes, except that 
 #' the first column is the label (the outcome).
 #' @param posF A logical value indicating if only positively outcome-associated
-#' features should be used. (Default: TRUE)
-#' @param stratify A string. Pathway based stratification method to generate 
-#' \code{blocklist}. 
+#' features should be used. (Default: TRUE) 
 #' @param core The number of cores used for computation. (Default: 1)
+#' @param horizontal A logical value indicating if the plot should be horizontal 
+#' or not. The default is FALSE.
 #' @param fileName The file name specified for the plot. If it is not NULL,
 #' then the plot will be generated. The plot will project the data on the 
 #' first two components. (Default: 'R2explained.png') 
@@ -131,8 +132,8 @@ getMetrics <- function(dataY, predY){
 #' @export  
 
 
-plotVarExplained <- function(data, posF = TRUE, stratify = c("pathway"), 
-    core = MulticoreParam(), fileName = NULL) {
+plotVarExplained <- function(data, posF = TRUE, 
+    core = MulticoreParam(), horizontal = FALSE, fileName = NULL) {
     
     if (colnames(data)[1] != "label") {
         stop("The first column of the 'data' must be the 'label'!")
@@ -162,20 +163,27 @@ plotVarExplained <- function(data, posF = TRUE, stratify = c("pathway"),
         r2 <- lrm(dataXsub[, i] ~ dataY)$stats["R2"]
     }, BPPARAM = core))
     
-    r2plot <- data.frame(Stage2data = r2mat)
-    stratify <- match.arg(stratify)
-    colnames(r2plot) <- paste0("Reconstructed ", stratify, "s")
+    r2plot <- data.frame(Stage2data = r2mat) 
+    colnames(r2plot) <- paste0("Reconstructed Pathway")
     rownames(r2plot) <- colnames(dataXsub)
     head(r2plot)
     if (is.null(fileName)) {
         fileName <- "R2explained.png"
     }
-    png(fileName, width = 5, height = 6, units = "in", res = 330)
-    print(plotVarPart(r2plot, label.angle = 10, ylab = "Variance explained (%)", 
-        convertToPercent = FALSE))
-    dev.off()
+    if (horizontal == FALSE){
+        png(fileName, width = 5, height = 6, units = "in", res = 330)
+        print(plotVarPart(r2plot, label.angle = 10, ylab = "Variance explained (%)", 
+            convertToPercent = FALSE))
+        dev.off()
+    } else if (horizontal == TRUE){
+        png(fileName, width = 8, height = 6, units = "in", res = 330)
+        vioplot(r2plot, names=c("Reconstructed pathway"), main = "", col="#F8766D", 
+            horizontal=TRUE, xlab="Variance explained (%)",  areaEqual=TRUE)
+        dev.off()
+    }
+    
 }
-
+    
 
 ############################################################################### 
 
@@ -196,8 +204,6 @@ plotVarExplained <- function(data, posF = TRUE, stratify = c("pathway"),
 #' For each matrix, rows are the samples and columns are the probe names,  
 #' except that the first column is named 'label'. See also 
 #' \code{\link{omics2pathlist}}.
-#' @param stratify A string. Pathway based stratification method to generate 
-#' \code{blocklist}. 
 #' @param rankMetric A string representing the metrics used for ranking. 
 #' Valid options are c('AUC', 'ACC', 'R2', 'size').
 #' 'size' is the block size.
@@ -225,15 +231,14 @@ plotVarExplained <- function(data, posF = TRUE, stratify = c("pathway"),
 #' @seealso  \code{\link{omics2pathlist}}.
 
 
+
 plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist, 
-    stratify = c("pathway"), 
     rankMetric = c("AUC", "ACC", "R2", "size"), 
     colorMetric = c("AUC", "ACC", "R2", "size"), 
     core = MulticoreParam(), fileName = NULL) {
     
-    .getBlockSize <- function(blocklist, stratify = c("pathway")) {
-    
-        stratify <- match.arg(stratify)
+    .getBlockSize <- function(blocklist) {
+     
         ID <- gsub("\\:", ".", names(blocklist))
         size <- unlist(lapply(blocklist, function(d) {
             ncol(d) - 1
@@ -281,15 +286,11 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
     }
     
     eMat <- matrix(unlist(metrics), nrow = ncol(dataXsub), byrow = TRUE)
-    colnames(eMat) <- c("AUC", "ACC", "R2")
-    if (stratify == "pathway") {
-        goID <- gsub("\\:", ".", colnames(dataXsub))
-        rownames(eMat) <- goID
-    } else {
-        rownames(eMat) <- colnames(dataXsub)
-    }
+    colnames(eMat) <- c("AUC", "ACC", "R2") 
+    goID <- gsub("\\:", ".", colnames(dataXsub))
+    rownames(eMat) <- goID 
     ## checking the 'blocklist'
-    blockSize <- .getBlockSize(blocklist, stratify)
+    blockSize <- .getBlockSize(blocklist)
     ## double check the overlapping IDs
     sharedID <- intersect(rownames(eMat), blockSize[, "ID"])
     eMatSub <- eMat[is.element(rownames(eMat), sharedID), ]
@@ -305,15 +306,11 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
     topPat$ID <- factor(topPat$ID, levels = rev(unique(topPat$ID))) 
     x <- "ID"
     y <- rankMetric 
-    colorby <- match.arg(colorMetric)
-    stratify <- match.arg(stratify) 
-    if (stratify == "pathway") {
-        subtitle <- "Pathways"
-    } 
+    colorby <- match.arg(colorMetric) 
+    subtitle <- "Pathways" 
     title <- paste0("Top ", topF, " ", subtitle)
     if (is.null(fileName)) {
-        fileName <- paste0("plotTopF", topF, "_", rankMetric, "_", stratify, 
-            ".png")
+        fileName <- paste0("plotTopF", topF, "_", rankMetric, "_pathway.png")
     }
     png(fileName, width = 5, height = 6, units = "in", res = 330)
     print(ggplot(topPat, aes_string(x = x, y = y, fill = colorby)) + 

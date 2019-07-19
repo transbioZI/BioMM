@@ -67,6 +67,7 @@ library(ranger)
 library(rms) 
 library(glmnet) 
 library(e1071) 
+library(pROC)
 library(variancePartition)  
 ```
 
@@ -155,7 +156,7 @@ studyDataSub <- studyData[,1:2000] ## reduce runtime
 result <- BioMM(trainData=studyDataSub, testData=NULL, pathlistDB, featureAnno, 
                 restrictUp=100, restrictDown=10, minPathSize=10, 
                 supervisedStage1, typePCA="regular", 
-                resample1="BS", resample2="CV",
+                resample1="BS", resample2="CV", dataMode="allTrain",
                 repeatA1=50, repeatA2=1, repeatB1=20, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
                 cutP1=0.1, cutP2=0.1, fdr2=NULL, FScore=param1, 
@@ -222,7 +223,7 @@ result <- BioMM(trainData=studyData, testData=NULL,
                 pathlistDBsub, featureAnno, 
                 restrictUp=100, restrictDown=10, minPathSize=10, 
                 supervisedStage1, typePCA="regular", 
-                resample1="BS", resample2="CV", 
+                resample1="BS", resample2="CV", dataMode="allTrain",
                 repeatA1=40, repeatA2=1, repeatB1=40, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
                 cutP1=0.1, cutP2=0.1, fdr2=NULL, FScore=param1, 
@@ -276,7 +277,7 @@ associations likely reflect random effects in the underlying data [6].
 ``` {r stage2dataViz, eval=TRUE}
 param <- MulticoreParam(workers = 1) 
 plotVarExplained(data=stage2dataA, posF=TRUE, 
-                 stratify="pathway", core=param, fileName=NULL)
+                 core=param, horizontal=FALSE, fileName=NULL)
 ``` 
 ![](R2explained.png)
 
@@ -292,8 +293,7 @@ investigated pathway is pictured as the argument `colorMetric="size"`.
 param <- MulticoreParam(workers = 1) 
 plotRankedFeature(data=stage2dataA, 
                   posF=TRUE, topF=10, 
-                  blocklist=pathlist, 
-                  stratify="pathway",
+                  blocklist=pathlist,
                   rankMetric="R2", 
                   colorMetric="size", 
                   core=param, fileName=NULL)
