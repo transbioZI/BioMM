@@ -58,7 +58,7 @@
 
 
 omics2pathlist <- function(data, pathlistDB, featureAnno = NULL, 
-    restrictUp = 200, restrictDown = 10, minPathSize = 2) {
+    restrictUp = 200, restrictDown = 10, minPathSize = 5) {
     
     if (colnames(data)[1] != "label") {
         stop("The first column of the 'data' must be the 'label'!")
