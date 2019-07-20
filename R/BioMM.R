@@ -431,7 +431,7 @@ baseModel <- function(trainData, testData,
 #' trainData = methylSub[trainIndex,]
 #' testData = methylSub[-trainIndex,]
 #' library(ranger) 
-#' library(BiocParallel)
+#' library(parallel)
 #' param <- MulticoreParam(workers = 10)
 #' predY <- predByFS(trainData, testData, 
 #'                   FSmethod='cor.test', cutP=0.1, 
@@ -517,7 +517,7 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr,
 
 #' @return The predicted output for the test data. 
 #' @export  
-#' @import BiocParallel 
+#' @import parallel 
 #' @examples  
 #' ## Load data  
 #' methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
@@ -529,7 +529,7 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr,
 #' trainData = methylSub[trainIndex,]
 #' testData = methylSub[-trainIndex,]
 #' library(ranger) 
-#' library(BiocParallel)
+#' library(parallel)
 #' param1 <- MulticoreParam(workers = 1)
 #' param2 <- MulticoreParam(workers = 20)
 #' predY <- predByBS(trainData, testData, 
@@ -554,7 +554,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
         data <- trainData
         predTmp <- rep(NA, nrow(data))
         replist <- seq_len(repeats)
-        predTmpList <- bplapply(replist, function(reps) {
+        predTmpList <- mclapply(replist, function(reps) {
             trainIndex <- unique(sample(nrow(data), replace = TRUE))
             testIndex <- setdiff(seq_len(nrow(data)), trainIndex)
             trainData <- data[trainIndex, ]
@@ -563,7 +563,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
             predTmp[testIndex] <- predByFS(trainData, testData, FSmethod, cutP, 
                 fdr, FScore, classifier, predMode, paramlist)
             predTmp
-        }, BPPARAM = innerCore)
+        }, mc.cores = innerCore)
         predTest <- round(rowMeans(do.call(cbind, predTmpList), na.rm = TRUE), 
             3)
         naCount <- sum(is.na(predTest))
@@ -578,22 +578,22 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
             data <- trainData
             predTmp <- rep(NA, nrow(data))
             replist <- seq_len(repeats)
-            predTmpList <- bplapply(replist, function(reps) {
+            predTmpList <- mclapply(replist, function(reps) {
                 trainIndex <- unique(sample(nrow(data), replace = TRUE))
                 trainData <- data[trainIndex, ]
                 predTmp <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                   FScore, classifier, predMode, paramlist)
                 predTmp
-            }, BPPARAM = innerCore)
+            }, mc.cores = innerCore)
             predTest <- round(rowMeans(do.call(cbind, predTmpList)), 3)
         } else if (dataMode == "allTrain") {
             predTmp <- rep(NA, nrow(testData))
             replist <- seq_len(repeats)
-            predTmpList <- bplapply(replist, function(reps) {
+            predTmpList <- mclapply(replist, function(reps) {
                 predTmp <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                   FScore, classifier, predMode, paramlist)
                 predTmp
-            }, BPPARAM = innerCore)
+            }, mc.cores = innerCore)
             predTest <- round(rowMeans(do.call(cbind, predTmpList)), 3)
         }
     } else {
@@ -640,7 +640,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
 
 #' @return The predicted cross validation output. 
 #' @export 
-#' @import BiocParallel 
+#' @import parallel 
 #' @examples  
 #' ## Load data  
 #' methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
@@ -649,7 +649,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
 #' ## select a subset of genome-wide methylation data at random
 #' methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
 #' library(ranger) 
-#' library(BiocParallel)
+#' library(parallel)
 #' param1 <- MulticoreParam(workers = 1)
 #' param2 <- MulticoreParam(workers = 20)
 #' predY <- predByCV(methylSub, repeats=1, nfolds=10,   
@@ -673,12 +673,12 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore = Multic
         foldlists <- split(sample(nrow(data)), rep(seq_len(nfolds), 
             length = nrow(data)))
         cvY <- rep(NA, nrow(data))
-        cvEstimate <- bplapply(foldlists, function(fold) {
+        cvEstimate <- mclapply(foldlists, function(fold) {
             trainData <- data[-fold, ]
             testData <- data[fold, ]
             predTest <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                 FScore, classifier, predMode, paramlist)
-        }, BPPARAM = innerCore)
+        }, mc.cores = innerCore)
         cvY[unlist(foldlists)] <- unlist(cvEstimate)
         cvMat <- cbind(cvMat, cvY)
     }
@@ -748,7 +748,7 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore = Multic
 #' independent test set prediction.
 #' @export  
 #' @import stats
-#' @import BiocParallel 
+#' @import parallel 
 #' @author Junfang Chen 
 #' @examples  
 #' ## Load data  
@@ -765,7 +765,7 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore = Multic
 #'                            restrictUp=100, restrictDown=10, minPathSize=10) 
 #' length(dataList)
 #' library(ranger) 
-#' library(BiocParallel)
+#' library(parallel)
 #' param1 <- MulticoreParam(workers = 1)
 #' param2 <- MulticoreParam(workers = 20)
 #' ## Not Run, this will take a bit long
@@ -988,7 +988,7 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
 #' @export 
 #' @import nsprcomp
 #' @import stats
-#' @import BiocParallel
+#' @import parallel
 
 #' @author Junfang Chen   
 #' @examples  
@@ -1006,7 +1006,7 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
 #' dataList <- omics2pathlist(data=methylData, pathlistDB, featureAnno, 
 #'                            restrictUp=100, restrictDown=10, minPathSize=10) 
 #' length(dataList) 
-#' library(BiocParallel)
+#' library(parallel)
 #' param <- MulticoreParam(workers = 10) 
 #' stage2data <- BioMMstage1pca(trainDataList=dataList, testDataList=NULL, 
 #'                              typeMode='regular', topPC=1,  
@@ -1028,7 +1028,7 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
     }
     
     numlist <- seq_along(trainDataList)
-    predMat <- bplapply(numlist, function(i) {
+    predMat <- mclapply(numlist, function(i) {
         trainData <- trainDataList[[i]]
         trainDataX = trainData[, -1]
         if (!is.null(testDataList)) {
@@ -1069,7 +1069,7 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
             pred <- list(predA, predB)
         }
         pred
-    }, BPPARAM = innerCore)
+    }, mc.cores = innerCore)
     
     if (!is.null(testDataList)) {
         ## PC1
@@ -1212,7 +1212,7 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' classifier <- 'randForest'
 #' predMode <- 'classification'
 #' paramlist <- list(ntree=300, nthreads=30)   
-#' library(BiocParallel)
+#' library(parallel)
 #' library(ranger)
 #' param1 <- MulticoreParam(workers = 2)
 #' param2 <- MulticoreParam(workers = 20)

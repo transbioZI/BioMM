@@ -22,7 +22,7 @@
 #' dataY <- methylData[,1]
 #' methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
 #' library(ranger)  
-#' library(BiocParallel)
+#' library(parallel)
 #' param1 <- MulticoreParam(workers = 1) 
 #' param2 <- MulticoreParam(workers = 10) 
 #' predY <- predByCV(methylSub, repeats=1, nfolds=10,   
@@ -70,7 +70,7 @@ classifiACC <- function(dataY, predY) {
 #' library(ranger) 
 #' library(pROC)
 #' library(rms)
-#' library(BiocParallel) 
+#' library(parallel) 
 #' param1 <- MulticoreParam(workers = 1) 
 #' param2 <- MulticoreParam(workers = 10)  
 #' predY <- predByCV(methylSub, repeats=1, nfolds=10,   
@@ -126,7 +126,7 @@ getMetrics <- function(dataY, predY){
 #' stacking: Building seemingly predictive models on random data. ACM SIGKDD    
 #' Explorations Newsletter, 12(2), 11-15. 
 
-#' @import BiocParallel
+#' @import parallel
 #' @import variancePartition
 #' @import grDevices
 #' @import vioplot
@@ -160,9 +160,9 @@ plotVarExplained <- function(data, posF = TRUE,
     }
     featurelist <- seq_len(ncol(dataXsub))
 
-    r2mat <- unlist(bplapply(featurelist, function(i) {
+    r2mat <- unlist(mclapply(featurelist, function(i) {
         r2 <- lrm(dataXsub[, i] ~ dataY)$stats["R2"]
-    }, BPPARAM = core))
+    }, mc.cores = core))
     
     r2plot <- data.frame(Stage2data = r2mat) 
     colnames(r2plot) <- paste0("Reconstructed Pathway")
@@ -225,10 +225,10 @@ plotVarExplained <- function(data, posF = TRUE,
 #' stacking: Building seemingly predictive models on random data. ACM SIGKDD    
 #' Explorations Newsletter, 12(2), 11-15. 
 
-#' @import BiocParallel 
+#' @import parallel
 #' @import lattice  
 #' @import ggplot2 
-#' @export  
+#' @export
 #' @seealso  \code{\link{omics2pathlist}}.
 
 
@@ -273,16 +273,16 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
         ## 'NA' may appear, use is.element to avoid NA.
         dataXsub <- dataX[, is.element(corr>0, TRUE)] 
         featurelist <- as.list(seq_len(ncol(dataXsub)))
-        metrics <- unlist(bplapply(featurelist, function(i) {
+        metrics <- unlist(mclapply(featurelist, function(i) {
             invisible(capture.output(eMat <- getMetrics(dataXsub[, i], dataY)))
             eMat
-        },  BPPARAM = core))
+        },  mc.cores = core))
     } else {
         featurelist <- as.list(seq_len(ncol(dataX)))
-        metrics <- unlist(bplapply(featurelist, function(i) {
+        metrics <- unlist(mclapply(featurelist, function(i) {
             invisible(capture.output(eMat <- getMetrics(dataX[, i], dataY)))
             eMat
-        }, BPPARAM = core))
+        }, mc.cores = core))
         dataXsub <- dataX
     }
     
