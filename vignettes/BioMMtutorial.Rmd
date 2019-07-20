@@ -1,1 +1,39 @@
+---
+title: "BioMM: Biological-informed Multi-stage Machine learning framework for phenotype prediction using omics data"
+author:
+ - name: Junfang Chen and Emanuel Schwarz
+   affiliation: Central Institute of Mental Health, Heidelberg University, Germany  
+date: "Modified: 17 July 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
+output: 
+  BiocStyle::html_document: 
+    toc_float: false
+    number_sections: true 
+    href: BioMMtutorial.html 
+
+vignette: >
+   %\VignetteIndexEntry{BioMMtutorial}
+   %\VignetteEngine{knitr::rmarkdown}
+   %\VignetteEncoding{UTF-8}
+---
+
+```{r style, echo = FALSE, results = 'asis'}
+BiocStyle::markdown()
+```
+```{r global_options, include=FALSE}  
+knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, fig.width=8, 
+fig.height=8)
+options(width=100) 
+```
+
+# Getting started  
+
+## Installation  
+*  Development version from Github (R 3.5):
+
+```{r eval=FALSE}
+install.packages("devtools")
+library("devtools")
+install_github("transbioZI/BioMM")
+```
+
 The detailed instructions on how to use this package are explained in this [vignette](https://bioconductor.org/packages/devel/bioc/vignettes/BioMM/inst/doc/BioMMtutorial.html). 
