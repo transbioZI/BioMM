@@ -419,7 +419,7 @@ baseModel <- function(trainData, testData,
 #' @export 
 
 #' @author Junfang Chen 
-#' @seealso \code{\link{getDataAfterFS}} 
+#' @seealso \code{\link{getDataByFilter}} 
 #' @examples  
 #' ## Load data  
 #' methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
@@ -445,16 +445,16 @@ baseModel <- function(trainData, testData,
 
 
 predByFS <- function(trainData, testData, FSmethod, cutP, fdr, 
-    FScore = MulticoreParam(), classifier, predMode, paramlist) {
+    FScore, classifier, predMode, paramlist) {
     
-    datalist <- getDataAfterFS(trainData, testData, FSmethod, cutP, fdr, FScore)
+    datalist <- getDataByFilter(trainData, testData, FSmethod, cutP, fdr, FScore)
     ## include the label
     trainDataSub <- datalist[[1]]
     testDataSub <- datalist[[2]]
     
     ## If no selected features or just one selected feature.
     if (is.null(trainDataSub) || ncol(trainDataSub) == 2) {
-        datalist <- getDataAfterFS(trainData, testData, FSmethod = "top10pCor", 
+        datalist <- getDataByFilter(trainData, testData, FSmethod = "top10pCor", 
             cutP, fdr, FScore)
         trainDataSub <- datalist[[1]]
         testDataSub <- datalist[[2]]
@@ -517,7 +517,7 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr,
 
 #' @return The predicted output for the test data. 
 #' @export  
-#' @import parallel 
+#' @import parallel
 #' @examples  
 #' ## Load data  
 #' methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
@@ -530,8 +530,8 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr,
 #' testData = methylSub[-trainIndex,]
 #' library(ranger) 
 #' library(parallel)
-#' param1 <- MulticoreParam(workers = 1)
-#' param2 <- MulticoreParam(workers = 20)
+#' param1 <- 1
+#' param2 <- 20
 #' predY <- predByBS(trainData, testData, 
 #'                   dataMode='allTrain', repeats=50,
 #'                   FSmethod=NULL, cutP=0.1, 
@@ -546,8 +546,8 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr,
 
 
 predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP, 
-    fdr, FScore = MulticoreParam(), classifier, predMode, paramlist, 
-    innerCore = MulticoreParam()) {
+    fdr, FScore, classifier, predMode, paramlist, 
+    innerCore) {
     
     if (is.null(testData)) {
         ## BS only applied for training data
@@ -640,7 +640,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
 
 #' @return The predicted cross validation output. 
 #' @export 
-#' @import parallel 
+#' @import parallel
 #' @examples  
 #' ## Load data  
 #' methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
@@ -650,8 +650,8 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
 #' methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
 #' library(ranger) 
 #' library(parallel)
-#' param1 <- MulticoreParam(workers = 1)
-#' param2 <- MulticoreParam(workers = 20)
+#' param1 <- 1
+#' param2 <- 20
 #' predY <- predByCV(methylSub, repeats=1, nfolds=10,   
 #'                   FSmethod=NULL, cutP=0.1, 
 #'                   fdr=NULL, FScore=param1, 
@@ -664,8 +664,8 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
 #' print(accuracy)  
 
 
-predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore = MulticoreParam(), 
-    classifier, predMode, paramlist, innerCore = MulticoreParam()) {
+predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore, 
+    classifier, predMode, paramlist, innerCore) {
     
     cvMat <- c()
     replist <- seq_len(repeats)
@@ -748,7 +748,7 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore = Multic
 #' independent test set prediction.
 #' @export  
 #' @import stats
-#' @import parallel 
+#' @import parallel
 #' @author Junfang Chen 
 #' @examples  
 #' ## Load data  
@@ -766,10 +766,10 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore = Multic
 #' length(dataList)
 #' library(ranger) 
 #' library(parallel)
-#' param1 <- MulticoreParam(workers = 1)
-#' param2 <- MulticoreParam(workers = 20)
+#' param1 <- 1
+#' param2 <- 20
 #' ## Not Run, this will take a bit long
-#' ## stage2data <- BioMMreconData(trainDataList=dataList, testDataList=NULL, 
+#' ## stage2data <- reconBySupervised(trainDataList=dataList, testDataList=NULL, 
 #' ##                             resample='CV', dataMode='allTrain', 
 #' ##                             repeatA=50, repeatB=20, nfolds=10, 
 #' ##                             FSmethod=NULL, cutP=0.1, 
@@ -782,16 +782,18 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore = Multic
 #' ## print(head(stage2data[,1:5]))
 
 
-BioMMreconData <- function(trainDataList, testDataList, resample = "BS", 
-    dataMode, repeatA, repeatB, nfolds, FSmethod, cutP, fdr, FScore = MulticoreParam(), classifier, 
-    predMode, paramlist, innerCore = MulticoreParam(), outFileA = NULL, outFileB = NULL) {
+reconBySupervised <- function(trainDataList, testDataList, resample = "BS", 
+    dataMode, repeatA, repeatB, nfolds, FSmethod, cutP, fdr, FScore, classifier, 
+    predMode, paramlist, innerCore, outFileA = NULL, outFileB = NULL) {
     
     reconDataAx <- c()
     reconDataBx <- c()
     for (i in seq_along(trainDataList)) {
         ## for each block
         trainData = trainDataList[[i]]
-        dataAy <- trainData[, 1]
+        dataAy <- trainData[, 1] 
+        message(paste0('Block:', i))  
+        message(paste0('Block_numFeature: ', c(ncol(trainData)-1))) 
         if (resample == "CV") {
             predA <- predByCV(data = trainData, repeats = repeatA, nfolds, 
                 FSmethod, cutP, fdr, FScore, classifier, predMode, paramlist, 
@@ -895,8 +897,8 @@ BioMMreconData <- function(trainDataList, testDataList, resample = "BS",
 
 
 BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode, 
-    repeatA = 1, repeatB = 1, nfolds, FSmethod, cutP, fdr, FScore = MulticoreParam(), classifier, 
-    predMode, paramlist, innerCore = MulticoreParam()) {
+    repeatA = 1, repeatB = 1, nfolds, FSmethod, cutP, fdr, FScore, classifier, 
+    predMode, paramlist, innerCore) {
     
     resample <- match.arg(resample)
     if (!is.null(resample)) {
@@ -988,7 +990,7 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
 #' @export 
 #' @import nsprcomp
 #' @import stats
-#' @import parallel
+#' @import BiocParallel
 
 #' @author Junfang Chen   
 #' @examples  
@@ -1008,15 +1010,15 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
 #' length(dataList) 
 #' library(parallel)
 #' param <- MulticoreParam(workers = 10) 
-#' stage2data <- BioMMstage1pca(trainDataList=dataList, testDataList=NULL, 
+#' stage2data <- reconByUnsupervised(trainDataList=dataList, testDataList=NULL, 
 #'                              typeMode='regular', topPC=1,  
 #'                              innerCore=param, outFileA=NULL, outFileB=NULL) 
 #' print(dim(stage2data))
 #' print(head(stage2data[,1:5]))
 
 
-BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular", 
-    topPC = 1, innerCore = MulticoreParam(), outFileA = NULL, outFileB = NULL) {
+reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular", 
+    topPC = 1, innerCore, outFileA = NULL, outFileB = NULL) {
     
     reconDataAx <- c()  ## for stage-2 training data   
     trainData <- trainDataList[[1]]
@@ -1168,9 +1170,8 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' @param FSmethod1 Feature selection methods at stage-1. Available options 
 #' are c(NULL, 'positive', 'wilcox.test', 'cor.test', 'chisq.test', 
 #' 'posWilcox'). 
-#' @param FSmethod2 Feature selection methods at stage-2. Available options  
-#' are c(NULL, 'positive', 'wilcox.test', 'cor.test', 'chisq.test', 
-#' 'posWilcox').
+#' @param FSmethod2 Feature selection methods at stage-2. Features that are 
+#' positively associated with the outcome will be used.
 #' @param cutP1 The cutoff used for p value thresholding at stage-1.  
 #' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). 
 #' @param cutP2 The cutoff used for p value thresholding at stage-2.   
@@ -1181,7 +1182,7 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' @param classifier Machine learning classifiers at both stages.  
 #' @param predMode The prediction mode at both stages. Available options are 
 #' c('probability', 'classification', 'regression'). 
-#' @param paramlist A list of model parameters at both stages.  
+#' @param paramlist A list of model parameters at both stages.
 #' @param innerCore The number of cores used for computation.
 
 #' @return The CV or BS prediction performance for the training data and 
@@ -1198,7 +1199,7 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' stacking: Building seemingly predictive models on random data. ACM SIGKDD    
 #' Explorations Newsletter, 12(2), 11-15. 
 
-#' @seealso \code{\link{BioMMreconData}}; \code{\link{BioMMstage1pca}}; 
+#' @seealso \code{\link{reconBySupervised}}; \code{\link{reconByUnsupervised}}; 
 #' \code{\link{BioMMstage2pred}}
 
 #' @examples  
@@ -1215,7 +1216,7 @@ BioMMstage1pca <- function(trainDataList, testDataList, typeMode = "regular",
 #' library(parallel)
 #' library(ranger)
 #' param1 <- MulticoreParam(workers = 2)
-#' param2 <- MulticoreParam(workers = 20)
+#' param2 <- 20
 #' ## Not Run 
 #' ## result <- BioMM(trainData=methylData, testData=NULL,
 #' ##                 pathlistDB, featureAnno=probeAnno, 
@@ -1233,8 +1234,8 @@ BioMM <- function(trainData, testData, pathlistDB, featureAnno,
     typePCA, resample1 = "BS", resample2 = "CV", dataMode = "allTrain", 
     repeatA1 = 100, repeatA2 = 1, repeatB1 = 20, repeatB2 = 1, 
     nfolds = 10, FSmethod1, FSmethod2, 
-    cutP1, cutP2, fdr2, FScore = MulticoreParam(), classifier, 
-    predMode, paramlist, innerCore = MulticoreParam()) {
+    cutP1, cutP2, fdr2, FScore, classifier, 
+    predMode, paramlist, innerCore) {
 
     trainDataList <- omics2pathlist(data=trainData, pathlistDB, 
                                     featureAnno, restrictUp, 
@@ -1243,56 +1244,55 @@ BioMM <- function(trainData, testData, pathlistDB, featureAnno,
         testDataList <- omics2pathlist(data=testData, pathlistDB, 
                                        featureAnno, restrictUp, 
                                        restrictDown, minPathSize) 
-    } else{
+    } else {
         testDataList <- NULL
     }
     
     ## generation of stage-2 data
     if (supervisedStage1 == TRUE) {
-        stage2data <- BioMMreconData(trainDataList = trainDataList, 
+        stage2data <- reconBySupervised(trainDataList = trainDataList, 
             testDataList = testDataList,  resample = resample1, dataMode, 
             repeatA = repeatA1, repeatB = repeatB1, nfolds, 
-            FSmethod = FSmethod1, cutP = cutP1, fdr = NULL, FScore, 
+            FSmethod = FSmethod1, cutP = cutP1, fdr = NULL, FScore = FScore, 
             classifier = classifier, predMode = predMode, 
-            paramlist = paramlist, innerCore, 
+            paramlist = paramlist, innerCore = innerCore, 
             outFileA = NULL, outFileB = NULL)
     } else {
-        stage2data <- BioMMstage1pca(trainDataList = trainDataList, 
+        stage2data <- reconByUnsupervised(trainDataList = trainDataList, 
             testDataList = testDataList, typeMode = typePCA, topPC = 1, 
-            innerCore, outFileA = NULL, outFileB = NULL)
+            innerCore = innerCore, outFileA = NULL, outFileB = NULL)
     }
     
     if (is.null(testDataList)) {
         trainData2 <- stage2data
+        testData2 <- NULL
         message("Stage-2: >>> ")
         message(paste0("Number of blocks: ", ncol(trainData2) - 1))
-        trainPos2 <- getDataAfterFS(trainData = trainData2, testData = NULL, 
-            FSmethod = "positive", cutP = 0.1, fdr = NULL, FScore)
-        message(paste0("Number of positive blocks: ", ncol(trainPos2) - 1))
-        testPos2 <- NULL
+        trainPos2 <- getDataByFilter(trainData = trainData2, testData = NULL, 
+            FSmethod = "positive", cutP = 0.1, fdr = NULL, FScore = FScore)
+        message(paste0("Number of positive blocks: ", ncol(trainPos2) - 1)) 
     } else {
         ## if testData provided
         trainData2 <- stage2data[[1]]
         testData2 <- stage2data[[2]]
-        datalist <- getDataAfterFS(trainData2, testData2, FSmethod = "positive", 
-            cutP = 0.1, fdr = NULL, FScore)
+        datalist <- getDataByFilter(trainData2, testData2, FSmethod = "positive", 
+            cutP = 0.1, fdr = NULL, FScore = FScore)
         ## include the label
-        trainPos2 <- datalist[[1]]
-        testPos2 <- datalist[[2]]
+        trainPos2 <- datalist[[1]] 
         message(paste0("Number of positive blocks: ", ncol(trainPos2) - 1))
     }
     
     ## If no positive features
     if (is.null(trainPos2)) {
-        message("Warning: no positive features!!")
-        result <- data.frame(pv = 1, cor = 0, AUC = 0.5, ACC = 0.5, R2 = 0)
-    } else {
-        ## make prediction
-        result <- BioMMstage2pred(trainData = trainPos2, testData = testPos2, 
+        message("Warning: No positive features!!")
+        result <- data.frame(AUC = 0.5, ACC = 0.5, R2 = 0)
+    } else if (!is.null(trainPos2)){
+        ## make prediction 
+        result <- BioMMstage2pred(trainData = trainData2, testData = testData2, 
             resample = resample2, dataMode, repeatA = repeatA2, 
             repeatB = repeatB2, nfolds, FSmethod = FSmethod2, cutP = cutP2, 
-            fdr = fdr2, FScore, classifier = classifier, 
-            predMode = predMode, paramlist = paramlist, innerCore)
+            fdr = fdr2, FScore = FScore, classifier = classifier, 
+            predMode = predMode, paramlist = paramlist, innerCore = innerCore)
     }
     
 }

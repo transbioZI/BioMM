@@ -134,7 +134,7 @@ getMetrics <- function(dataY, predY){
 
 
 plotVarExplained <- function(data, posF = TRUE, 
-    core = MulticoreParam(), horizontal = FALSE, fileName = NULL) {
+    core = 1, horizontal = FALSE, fileName = NULL) {
     
     if (colnames(data)[1] != "label") {
         stop("The first column of the 'data' must be the 'label'!")
@@ -236,7 +236,7 @@ plotVarExplained <- function(data, posF = TRUE,
 plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist, 
     rankMetric = c("AUC", "ACC", "R2", "size"), 
     colorMetric = c("AUC", "ACC", "R2", "size"), 
-    core = MulticoreParam(), fileName = NULL) {
+    core = 10, fileName = NULL) {
     
     .getBlockSize <- function(blocklist) {
      
