@@ -59,7 +59,7 @@ classifiACC <- function(dataY, predY) {
 #' @return A set of metrics for model evaluation: AUC, ACC and R2.
 #' @export 
 #' @import rms
-#' @import pROC
+#' @importFrom pROC roc
 #' @author Junfang Chen 
 #' @examples  
 #' ## Load data  
