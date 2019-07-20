@@ -58,7 +58,7 @@ dataList <- omics2pathlist(data=methylData, pathlistDB, featureAnno,
                            restrictUp=100, restrictDown=10, minPathSize=10) 
 length(dataList) 
 library(parallel)
-param <- MulticoreParam(workers = 10) 
+param <- 10 
 stage2data <- reconByUnsupervised(trainDataList=dataList, testDataList=NULL, 
                              typeMode='regular', topPC=1,  
                              innerCore=param, outFileA=NULL, outFileB=NULL) 

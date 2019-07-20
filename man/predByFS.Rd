@@ -60,7 +60,7 @@ trainData = methylSub[trainIndex,]
 testData = methylSub[-trainIndex,]
 library(ranger) 
 library(parallel)
-param <- MulticoreParam(workers = 10)
+param <- 10
 predY <- predByFS(trainData, testData, 
                   FSmethod='cor.test', cutP=0.1, 
                   fdr=NULL, FScore=param, 

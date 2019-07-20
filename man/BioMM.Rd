@@ -129,7 +129,7 @@ predMode <- 'classification'
 paramlist <- list(ntree=300, nthreads=30)   
 library(parallel)
 library(ranger)
-param1 <- MulticoreParam(workers = 2)
+param1 <- 2
 param2 <- 20
 ## Not Run 
 ## result <- BioMM(trainData=methylData, testData=NULL,

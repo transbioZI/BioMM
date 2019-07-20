@@ -432,7 +432,7 @@ baseModel <- function(trainData, testData,
 #' testData = methylSub[-trainIndex,]
 #' library(ranger) 
 #' library(parallel)
-#' param <- MulticoreParam(workers = 10)
+#' param <- 10
 #' predY <- predByFS(trainData, testData, 
 #'                   FSmethod='cor.test', cutP=0.1, 
 #'                   fdr=NULL, FScore=param, 
@@ -990,7 +990,7 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
 #' @export 
 #' @import nsprcomp
 #' @import stats
-#' @import BiocParallel
+#' @import parallel
 
 #' @author Junfang Chen   
 #' @examples  
@@ -1009,7 +1009,7 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
 #'                            restrictUp=100, restrictDown=10, minPathSize=10) 
 #' length(dataList) 
 #' library(parallel)
-#' param <- MulticoreParam(workers = 10) 
+#' param <- 10 
 #' stage2data <- reconByUnsupervised(trainDataList=dataList, testDataList=NULL, 
 #'                              typeMode='regular', topPC=1,  
 #'                              innerCore=param, outFileA=NULL, outFileB=NULL) 
@@ -1215,7 +1215,7 @@ reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular
 #' paramlist <- list(ntree=300, nthreads=30)   
 #' library(parallel)
 #' library(ranger)
-#' param1 <- MulticoreParam(workers = 2)
+#' param1 <- 2
 #' param2 <- 20
 #' ## Not Run 
 #' ## result <- BioMM(trainData=methylData, testData=NULL,
