@@ -6,8 +6,7 @@
 feature selection}
 \usage{
 predByBS(trainData, testData, dataMode, repeats, FSmethod, cutP, fdr,
-  FScore = MulticoreParam(), classifier, predMode, paramlist,
-  innerCore = MulticoreParam())
+  FScore, classifier, predMode, paramlist, innerCore)
 }
 \arguments{
 \item{trainData}{The input training dataset. The first column
@@ -68,9 +67,9 @@ trainIndex <- sample(nrow(methylSub), 30)
 trainData = methylSub[trainIndex,]
 testData = methylSub[-trainIndex,]
 library(ranger) 
-library(BiocParallel)
-param1 <- MulticoreParam(workers = 1)
-param2 <- MulticoreParam(workers = 20)
+library(parallel)
+param1 <- 1
+param2 <- 20
 predY <- predByBS(trainData, testData, 
                   dataMode='allTrain', repeats=50,
                   FSmethod=NULL, cutP=0.1, 

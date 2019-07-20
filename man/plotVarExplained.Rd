@@ -4,8 +4,8 @@
 \alias{plotVarExplained}
 \title{Plot data summary statistics}
 \usage{
-plotVarExplained(data, posF = TRUE, core = MulticoreParam(),
-  horizontal = FALSE, fileName = NULL)
+plotVarExplained(data, posF = TRUE, core = 1, horizontal = FALSE,
+  fileName = NULL)
 }
 \arguments{
 \item{data}{The input dataset (either data.frame or matrix). 

@@ -6,7 +6,7 @@
 \usage{
 plotRankedFeature(data, posF = TRUE, topF = 10, blocklist,
   rankMetric = c("AUC", "ACC", "R2", "size"), colorMetric = c("AUC",
-  "ACC", "R2", "size"), core = MulticoreParam(), fileName = NULL)
+  "ACC", "R2", "size"), core = 10, fileName = NULL)
 }
 \arguments{
 \item{data}{The input stage-2 data (either data.frame or matrix). 

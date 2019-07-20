@@ -4,8 +4,8 @@
 \alias{predByFS}
 \title{Prediction by supervised machine learning along with feature selection}
 \usage{
-predByFS(trainData, testData, FSmethod, cutP, fdr,
-  FScore = MulticoreParam(), classifier, predMode, paramlist)
+predByFS(trainData, testData, FSmethod, cutP, fdr, FScore, classifier,
+  predMode, paramlist)
 }
 \arguments{
 \item{trainData}{The input training dataset. The first column
@@ -59,7 +59,7 @@ trainIndex <- sample(nrow(methylSub), 30)
 trainData = methylSub[trainIndex,]
 testData = methylSub[-trainIndex,]
 library(ranger) 
-library(BiocParallel)
+library(parallel)
 param <- MulticoreParam(workers = 10)
 predY <- predByFS(trainData, testData, 
                   FSmethod='cor.test', cutP=0.1, 
@@ -72,7 +72,7 @@ accuracy <- classifiACC(dataY=testY, predY=predY)
 print(accuracy)  
 }
 \seealso{
-\code{\link{getDataAfterFS}}
+\code{\link{getDataByFilter}}
 }
 \author{
 Junfang Chen
