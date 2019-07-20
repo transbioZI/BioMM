@@ -50,13 +50,21 @@ pathway stratification.
 # Getting started  
 
 ## Installation 
-Development version from Github:
+*  Development version from Github:
 
-*  Install BioMM in R
+```{r eval=FALSE}
+install.packages("devtools")
+library("devtools")
+install_github("transbioZI/BioMM")
+```
+
+*  Install BioMM from Bioconductor:
 ```{r eval=FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install("transbioZI/BioMM") 
+# The following initializes usage of Bioc devel
+BiocManager::install(version='devel')
+BiocManager::install("BioMM")
 ```
  
 * Load required libraries
