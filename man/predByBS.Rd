@@ -56,7 +56,6 @@ Prediction via supervised machine learning using bootstrap resampling
 along with feature selection methods.
 }
 \examples{
- 
 ## Load data  
 methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 methylData <- readRDS(methylfile)  

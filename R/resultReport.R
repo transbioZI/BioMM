@@ -23,8 +23,8 @@
 #' methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
 #' library(ranger)  
 #' library(parallel)
-#' param1 <- MulticoreParam(workers = 1) 
-#' param2 <- MulticoreParam(workers = 10) 
+#' param1 <- 1
+#' param2 <- 10
 #' predY <- predByCV(methylSub, repeats=1, nfolds=10,   
 #'                   FSmethod=NULL, cutP=0.1, 
 #'                   fdr=NULL, FScore=param1, 
@@ -71,8 +71,8 @@ classifiACC <- function(dataY, predY) {
 #' library(pROC)
 #' library(rms)
 #' library(parallel) 
-#' param1 <- MulticoreParam(workers = 1) 
-#' param2 <- MulticoreParam(workers = 10)  
+#' param1 <- 1
+#' param2 <- 10 
 #' predY <- predByCV(methylSub, repeats=1, nfolds=10,   
 #'                   FSmethod=NULL, cutP=0.1, 
 #'                   fdr=NULL, FScore=param1, 

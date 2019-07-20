@@ -518,7 +518,7 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr,
 #' @return The predicted output for the test data. 
 #' @export  
 #' @import parallel
-#' @examples  
+#' @examples
 #' ## Load data  
 #' methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 #' methylData <- readRDS(methylfile)  
