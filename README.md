@@ -22,7 +22,7 @@ install_github("transbioZI/BioMM")
 
 ## Tutorial 
 
-BioMM has been incorporated into the [Bioconductor (version 3.10; R 3.6)](http://www.bioconductor.org/packages/devel/bioc//html/BioMM.html). The detailed instructions on how to use this package are explained in this [vignette](https://bioconductor.org/packages/devel/bioc/vignettes/BioMM/inst/doc/BioMMtutorial.html). 
+BioMM has been incorporated into the [Bioconductor](http://www.bioconductor.org/packages/devel/bioc//html/BioMM.html) (version 3.10; R 3.6). The detailed instructions on how to use this package are explained in this [vignette](https://bioconductor.org/packages/devel/bioc/vignettes/BioMM/inst/doc/BioMMtutorial.html). 
 
 ## Citation
 
