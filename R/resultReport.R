@@ -214,7 +214,7 @@ plotVarExplained <- function(data, posF = TRUE,
 #' @param core The number of cores used for computation. (Default: 10)
 #' @param fileName The plot file name. (Default: 'plottopF.png') 
 
-#' @return An output image file. 
+#' @return An output image file and the summary statistics of the top pathways.
 
 #' @details If the argument \code{posF} is TRUE, 
 #' and no positively outcome-associated features are present in stage-2 data 
@@ -230,7 +230,6 @@ plotVarExplained <- function(data, posF = TRUE,
 #' @import ggplot2 
 #' @export
 #' @seealso  \code{\link{omics2pathlist}}.
-
 
 
 plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist, 
@@ -320,6 +319,8 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
         geom_bar(stat = "identity") + coord_flip() + ggtitle(title) + 
         xlab(NULL) + ylab(y))
     dev.off()
+
+    return(topPat)
 }
 
 

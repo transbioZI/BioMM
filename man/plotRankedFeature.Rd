@@ -38,7 +38,7 @@ Valid options are c('AUC', 'ACC', 'R2', 'size').
 \item{fileName}{The plot file name. (Default: 'plottopF.png')}
 }
 \value{
-An output image file.
+An output image file and the summary statistics of the top pathways.
 }
 \description{
 Plot top ranked outcome-associated features from stage-2 data. 
