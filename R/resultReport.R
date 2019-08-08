@@ -165,7 +165,7 @@ plotVarExplained <- function(data, posF = TRUE,
     }, mc.cores = core))
     
     r2plot <- data.frame(Stage2data = r2mat) 
-    colnames(r2plot) <- paste0("Reconstructed Pathway")
+    colnames(r2plot) <- paste0("Biological Pathway")
     rownames(r2plot) <- colnames(dataXsub)
     head(r2plot)
     if (is.null(fileName)) {
@@ -178,7 +178,7 @@ plotVarExplained <- function(data, posF = TRUE,
         dev.off()
     } else if (horizontal == TRUE){
         png(fileName, width = 8, height = 6, units = "in", res = 330)
-        vioplot(r2plot, names=c("Reconstructed pathway"), main = "", col="#F8766D", 
+        vioplot(r2plot, names=c("Biological pathway"), main = "", col="#F8766D", 
             horizontal=TRUE, xlab="Variance explained (%)",  areaEqual=TRUE)
         dev.off()
     }
@@ -321,3 +321,76 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist,
         xlab(NULL) + ylab(y))
     dev.off()
 }
+
+
+############################################################################### 
+
+#' Circular plot for a set of pathways
+
+#' @description Plot the individual CpGs within a given set of pathways.
+#' The significance of the CpGs are illustrated by the negative log P value.
+
+#' @param datalist The input data list containing ordered 
+#' collections of matrices.
+#' @param topPathID A predefined pathway IDs.  
+#' @param core The number of cores used for computation. (Default: 10)
+#' @param fileName The plot file name. (Default: 'cpgTopGOplot.png') 
+
+#' @return An output image file. 
+
+#' @details Top 10 or 20 pathways are usually suggested to be visualized.
+
+#' @import parallel
+#' @import CMplot
+#' @export
+#' @seealso  \code{\link{omics2pathlist}}.
+
+
+cirPlot4pathway <- function(datalist, topPathID, core, fileName = NULL){
+  
+    sublistV0 <- datalist[is.element(names(datalist), topPathID)]  
+    sublist <- sublistV0[match(topPathID, names(sublistV0))]   
+    message(paste0("Check top ", length(sublist), " pathways >> "))
+
+    cpgPvByGO <- list()
+    cpg <- c()
+    pathway <- c()
+    pos <- c()
+    pval <- c()
+
+    for (i in seq_along(sublist)){
+        print(i)
+        data <- sublist[[i]] 
+        dataX <- data[,-1]
+        dataY <- data[,1]
+        cpgTmp <- colnames(dataX)
+        pathwayTmp <- rep(i, ncol(dataX))
+        posTmp <- seq_len(ncol(dataX)) 
+
+        featurelist <- as.list(seq_len(ncol(dataX)))
+        pvalTmp <- unlist(mclapply(featurelist, function(i){ 
+            wilcox.test(dataX[,i] ~ dataY)$p.value 
+        }, mc.cores = core))    
+        names(pvalTmp)  = colnames(dataX) 
+
+        cpgPvByGO[[i]] <- pvalTmp
+        cpg <- c(cpg, cpgTmp)
+        pathway <- c(pathway, pathwayTmp)
+        pos <- c(pos, posTmp)
+        pval <- c(pval, pvalTmp)   
+    } 
+ 
+    cpgResults <- data.frame(cpg, pathway, pos, pval, stringsAsFactors=FALSE)
+    if (is.null(fileName)) {
+        fileName <- "cpgTopGOplot.png"
+    }
+    png(fileName, res=300, width=800, height=800)
+    CMplot(cpgResults, plot.type="c", r=1.6, 
+            cir.legend=TRUE, cex.axis=0.8,
+            outward=TRUE, cir.legend.col="black", cir.chr.h=.1,
+            chr.den.col="orange", file="jpg",
+            memo="", dpi=300, chr.labels=names(sublist))
+    dev.off()
+
+ }
+
