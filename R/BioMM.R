@@ -555,6 +555,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
         predTmp <- rep(NA, nrow(data))
         replist <- seq_len(repeats)
         predTmpList <- mclapply(replist, function(reps) {
+            set.seed(reps)
             trainIndex <- unique(sample(nrow(data), replace = TRUE))
             testIndex <- setdiff(seq_len(nrow(data)), trainIndex)
             trainData <- data[trainIndex, ]
@@ -579,6 +580,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
             predTmp <- rep(NA, nrow(data))
             replist <- seq_len(repeats)
             predTmpList <- mclapply(replist, function(reps) {
+                set.seed(reps)
                 trainIndex <- unique(sample(nrow(data), replace = TRUE))
                 trainData <- data[trainIndex, ]
                 predTmp <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
@@ -590,6 +592,7 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
             predTmp <- rep(NA, nrow(testData))
             replist <- seq_len(repeats)
             predTmpList <- mclapply(replist, function(reps) {
+                set.seed(reps)
                 predTmp <- predByFS(trainData, testData, FSmethod, cutP, fdr, 
                   FScore, classifier, predMode, paramlist)
                 predTmp
@@ -670,6 +673,7 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore,
     cvMat <- c()
     replist <- seq_len(repeats)
     for (reps in replist) {
+        set.seed(reps)
         foldlists <- split(sample(nrow(data)), rep(seq_len(nfolds), 
             length = nrow(data)))
         cvY <- rep(NA, nrow(data))
