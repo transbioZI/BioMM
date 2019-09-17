@@ -884,13 +884,13 @@ reconBySupervised <- function(trainDataList, testDataList, resample = "BS",
 #' @param paramlist A set of model parameters defined in an R list object. 
 #' @param innerCore The number of cores used for computation. 
 
-#' @return The CV or BS prediction performance for stage-2 training data and 
-#' test set prediction performance for stage-2 test data if the test set is 
+#' @return The CV or BS prediction performance for stage-2 training data. 
+#' Test prediction performance for stage-2 test data if the test set is 
 #' given.
 
 #' @details Stage-2 prediction is performed typically using positively  
-#' correlated features. Since negative associations likely reflect random 
-#' effects in the underlying data
+#' outcome-correlated features. Since negative associations are indicative of random 
+#' effects in the underlying data.
 #' @export  
 #' @import stats
 #' @import utils  
@@ -900,7 +900,7 @@ reconBySupervised <- function(trainDataList, testDataList, resample = "BS",
 #' @author Junfang Chen 
 
 
-BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode, 
+BioMMstage2pred <- function(trainData, testData, resample = c("CV", "BS"), dataMode, 
     repeatA = 1, repeatB = 1, nfolds, FSmethod, cutP, fdr, FScore, classifier, 
     predMode, paramlist, innerCore) {
     
