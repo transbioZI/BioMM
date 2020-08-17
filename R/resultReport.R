@@ -45,21 +45,21 @@ classifiACC <- function(dataY, predY) {
 }
 
 
-#' Compute the evaluation metrics
+#' Compute the machine learning evaluation metrics
 
 #' @description
 #' Compute the evaluation metrics in the classification setting: 
-#' area under curve (AUC), classification accuracy (ACC) and 
-#' the pseudo R square (R2).
+#' area under curve (AUC), the area under the Precision-Recall curve, 
+#' classification accuracy (ACC) and the pseudo R square (R2).
 
 #' @param dataY The observed outcome.
 #' @param predY The predicted outcome.
 #' @details If all samples are predicted into one class, then R2 is 0.
 
-#' @return A set of metrics for model evaluation: AUC, ACC and R2.
+#' @return A set of metrics for model evaluation: AUC, AUCPR, ACC and R2.
 #' @export 
 #' @import rms
-#' @importFrom pROC roc
+#' @import MLmetrics
 #' @author Junfang Chen 
 #' @examples  
 #' ## Load data  
@@ -68,11 +68,11 @@ classifiACC <- function(dataY, predY) {
 #' dataY <- methylData[,1]
 #' methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
 #' library(ranger) 
-#' library(pROC)
+#' library(MLmetrics)
 #' library(rms)
-#' library(parallel) 
-#' param1 <- 1
-#' param2 <- 10 
+#' library(BiocParallel) 
+#' param1 <- MulticoreParam(workers = 1) 
+#' param2 <- MulticoreParam(workers = 10)  
 #' predY <- predByCV(methylSub, repeats=1, nfolds=10,   
 #'                   FSmethod=NULL, cutP=0.1, 
 #'                   fdr=NULL, FScore=param1, 
@@ -80,12 +80,14 @@ classifiACC <- function(dataY, predY) {
 #'                   predMode='classification', 
 #'                   paramlist=list(ntree=300, nthreads=20),
 #'                   innerCore=param2)   
-#' accuracy <- getMetrics(dataY=dataY, predY=predY)
-#' print(accuracy)  
+#' metrics <- getMetrics(dataY=dataY, predY=predY)
+#' print(metrics)  
+
 
 getMetrics <- function(dataY, predY){
     
-    auc <- pROC::roc(dataY, predY)$auc      
+    AUC <- AUC(predY, dataY)
+    AUCPR <- PRAUC(predY, dataY)
     predY <- ifelse(predY>=.5, 1, 0) 
     cat("\n Levels of predicted Y =", nlevels(factor(predY)),"\n\n") 
     ACC <- classifiACC(dataY, predY)  
@@ -94,7 +96,8 @@ getMetrics <- function(dataY, predY){
     } else {
         R2 <- 0
     }
-    eMat <- data.frame(AUC=round(auc,3), ACC=round(ACC,3), R2 = round(R2, 3))  
+    eMat <- data.frame(AUC=round(AUC,3), AUCPR=round(AUCPR,3), 
+                       ACC=round(ACC,3), R2 = round(R2, 3))  
     print(eMat) 
     return(eMat)
 } 
