@@ -15,7 +15,7 @@ Description: The identification of reproducible biological patterns from
 	omics-scale data where we can evaluate different machine learning models 
 	with prior biological meta information. 
 Imports:
-    stats, utils, grDevices, lattice, parallel, glmnet, rms, 
+    stats, utils, grDevices, lattice, parallel, glmnet, rms, MLmetrics, 
     nsprcomp, ranger, e1071, variancePartition, ggplot2, pROC, vioplot, CMplot
 Depends: R (>= 3.5)
 Suggests: BiocStyle, knitr, RUnit, BiocGenerics
