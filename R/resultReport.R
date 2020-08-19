@@ -59,7 +59,7 @@ classifiACC <- function(dataY, predY) {
 #' @return A set of metrics for model evaluation: AUC, AUCPR, ACC and R2.
 #' @export 
 #' @import rms
-#' @import MLmetrics
+#' @import precrec
 #' @author Junfang Chen 
 #' @examples  
 #' ## Load data  
@@ -68,7 +68,7 @@ classifiACC <- function(dataY, predY) {
 #' dataY <- methylData[,1]
 #' methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
 #' library(ranger) 
-#' library(MLmetrics)
+#' library(precrec)
 #' library(rms)
 #' library(BiocParallel) 
 #' param1 <- MulticoreParam(workers = 1) 
@@ -83,11 +83,13 @@ classifiACC <- function(dataY, predY) {
 #' metrics <- getMetrics(dataY=dataY, predY=predY)
 #' print(metrics)  
 
+ 
 
 getMetrics <- function(dataY, predY){
     
-    AUC <- AUC(predY, dataY)
-    AUCPR <- PRAUC(predY, dataY)
+    sscurves <- evalmod(scores=predY, labels=dataY)  
+    AUC <- attr(sscurves[[1]][[1]], "auc")
+    AUCPR <- attr(sscurves[[2]][[1]], "auc") 
     predY <- ifelse(predY>=.5, 1, 0) 
     cat("\n Levels of predicted Y =", nlevels(factor(predY)),"\n\n") 
     ACC <- classifiACC(dataY, predY)  
