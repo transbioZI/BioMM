@@ -8,7 +8,7 @@ test_BaseModels <- function() {
     dataY <- methylData[,1]
     ## test a subset of genome-wide methylation data at random
     methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
-    trainIndex <- sample(nrow(methylSub), 30)
+    trainIndex <- sample(nrow(methylSub), 12)
     trainData = methylSub[trainIndex,]
     testData = methylSub[-trainIndex,]
     library(ranger)
