@@ -4,9 +4,13 @@
 \alias{baseGLMnet}
 \title{Prediction by generalized linear regression models}
 \usage{
-baseGLMnet(trainData, testData, predMode = c("classification",
-  "probability", "regression"), paramlist = list(family = "binomial",
-  alpha = 0.5, typeMeasure = "mse", typePred = "class"))
+baseGLMnet(
+  trainData,
+  testData,
+  predMode = c("classification", "probability", "regression"),
+  paramlist = list(family = "binomial", alpha = 0.5, typeMeasure = "mse", typePred =
+    "class")
+)
 }
 \arguments{
 \item{trainData}{The input training dataset. The first column is named 
@@ -50,7 +54,7 @@ methylData <- readRDS(methylfile)
 dataY <- methylData[,1]
 ## select a subset of genome-wide methylation data at random
 methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
-trainIndex <- sample(nrow(methylSub), 30)
+trainIndex <- sample(nrow(methylSub), 16)
 trainData = methylSub[trainIndex,]
 testData = methylSub[-trainIndex,]
 library(glmnet)

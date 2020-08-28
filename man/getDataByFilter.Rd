@@ -4,8 +4,14 @@
 \alias{getDataByFilter}
 \title{Return the data by feature filtering}
 \usage{
-getDataByFilter(trainData, testData, FSmethod, cutP = 0.1, fdr = NULL,
-  FScore = 10)
+getDataByFilter(
+  trainData,
+  testData,
+  FSmethod,
+  cutP = 0.1,
+  fdr = NULL,
+  FScore = MulticoreParam()
+)
 }
 \arguments{
 \item{trainData}{The input training dataset. The first column is the label.}
@@ -30,7 +36,7 @@ c(NULL, 'fdr', 'BH', 'holm' etc).
 See also \code{\link[stats]{p.adjust}}. The default is NULL.}
 
 \item{FScore}{The number of cores used for some feature selection methods.
-The default is 10.}
+If it's NULL, then no parallel computing is applied.}
 }
 \value{
 Both training and test data (if provided) with pre-selected 
@@ -54,16 +60,19 @@ The choice of feature selection method depends on the characteristics of
 the input data.
 }
 \examples{
+ 
 ## Load data  
 methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 methylData <- readRDS(methylfile)  
 trainIndex <- sample(nrow(methylData), 20)
 trainData = methylData[trainIndex,]
 testData = methylData[-trainIndex,]
-## Feature selection  
+## Feature selection
+library(BiocParallel)
+param <- MulticoreParam(workers = 10)
 ## Select outcome-associated features based on the Wilcoxon test (P<0.1)
 datalist <- getDataByFilter(trainData, testData, FSmethod="wilcox.test", 
-                           cutP=0.1, fdr=NULL, FScore=10)
+                           cutP=0.1, fdr=NULL, FScore=param)
 trainDataSub <- datalist[[1]] 
 testDataSub <- datalist[[2]] 
 print(dim(trainData))

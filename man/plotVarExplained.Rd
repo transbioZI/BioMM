@@ -4,8 +4,14 @@
 \alias{plotVarExplained}
 \title{Plot data summary statistics}
 \usage{
-plotVarExplained(data, posF = TRUE, core = 1, horizontal = FALSE,
-  fileName = NULL)
+plotVarExplained(
+  data,
+  posF = TRUE,
+  binarize = FALSE,
+  core = MulticoreParam(),
+  pathTitle = "GO pathways",
+  fileName = NULL
+)
 }
 \arguments{
 \item{data}{The input dataset (either data.frame or matrix). 
@@ -15,10 +21,15 @@ the first column is the label (the outcome).}
 \item{posF}{A logical value indicating if only positively outcome-associated
 features should be used. (Default: TRUE)}
 
+\item{binarize}{A logical value indicating if the individual features under
+investigation should be binarized. The default is FALSE, which provides the 
+estimated class probabilities for each pathway-level feature. If TRUE, then
+the binary output is given for each feature.}
+
 \item{core}{The number of cores used for computation. (Default: 1)}
 
-\item{horizontal}{A logical value indicating if the plot should be horizontal 
-or not. The default is FALSE.}
+\item{pathTitle}{A string indicating the name of pathway under investigation.
+This will be displayed as the name of y-axis.}
 
 \item{fileName}{The file name specified for the plot. If it is not NULL,
 then the plot will be generated. The plot will project the data on the 

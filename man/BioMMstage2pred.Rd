@@ -4,9 +4,23 @@
 \alias{BioMMstage2pred}
 \title{Prediction performance for stage-2 data using supervised machine learning}
 \usage{
-BioMMstage2pred(trainData, testData, resample = "CV", dataMode,
-  repeatA = 1, repeatB = 1, nfolds, FSmethod, cutP, fdr, FScore,
-  classifier, predMode, paramlist, innerCore)
+BioMMstage2pred(
+  trainData,
+  testData,
+  resample = "CV",
+  dataMode,
+  repeatA = 1,
+  repeatB = 1,
+  nfolds,
+  FSmethod,
+  cutP,
+  fdr,
+  FScore = MulticoreParam(),
+  classifier,
+  predMode,
+  paramlist,
+  innerCore = MulticoreParam()
+)
 }
 \arguments{
 \item{trainData}{The input training dataset (stage-2 data). The first column

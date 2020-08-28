@@ -4,8 +4,15 @@
 \alias{reconByUnsupervised}
 \title{Reconstruct stage-2 data by PCA}
 \usage{
-reconByUnsupervised(trainDataList, testDataList, typeMode = "regular",
-  topPC = 1, innerCore, outFileA = NULL, outFileB = NULL)
+reconByUnsupervised(
+  trainDataList,
+  testDataList,
+  typeMode = "regular",
+  topPC = 1,
+  innerCore = MulticoreParam(),
+  outFileA = NULL,
+  outFileB = NULL
+)
 }
 \arguments{
 \item{trainDataList}{The input training data list containing ordered 
@@ -57,8 +64,8 @@ head(featureAnno)
 dataList <- omics2pathlist(data=methylData, pathlistDB, featureAnno, 
                            restrictUp=100, restrictDown=10, minPathSize=10) 
 length(dataList) 
-library(parallel)
-param <- 10 
+library(BiocParallel)
+param <- MulticoreParam(workers = 10) 
 stage2data <- reconByUnsupervised(trainDataList=dataList, testDataList=NULL, 
                              typeMode='regular', topPC=1,  
                              innerCore=param, outFileA=NULL, outFileB=NULL) 

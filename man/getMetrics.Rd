@@ -2,7 +2,7 @@
 % Please edit documentation in R/resultReport.R
 \name{getMetrics}
 \alias{getMetrics}
-\title{Compute the evaluation metrics}
+\title{Compute the machine learning evaluation metrics}
 \usage{
 getMetrics(dataY, predY)
 }
@@ -12,12 +12,12 @@ getMetrics(dataY, predY)
 \item{predY}{The predicted outcome.}
 }
 \value{
-A set of metrics for model evaluation: AUC, ACC and R2.
+A set of metrics for model evaluation: AUC, AUCPR, ACC and R2.
 }
 \description{
 Compute the evaluation metrics in the classification setting: 
-area under curve (AUC), classification accuracy (ACC) and 
-the pseudo R square (R2).
+area under curve (AUC), the area under the Precision-Recall curve, 
+classification accuracy (ACC) and the pseudo R square (R2).
 }
 \details{
 If all samples are predicted into one class, then R2 is 0.
@@ -30,11 +30,11 @@ methylData <- readRDS(methylfile)
 dataY <- methylData[,1]
 methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
 library(ranger) 
-library(pROC)
+library(precrec)
 library(rms)
-library(parallel) 
-param1 <- 1
-param2 <- 10 
+library(BiocParallel) 
+param1 <- MulticoreParam(workers = 1) 
+param2 <- MulticoreParam(workers = 10)  
 predY <- predByCV(methylSub, repeats=1, nfolds=10,   
                   FSmethod=NULL, cutP=0.1, 
                   fdr=NULL, FScore=param1, 
@@ -42,8 +42,8 @@ predY <- predByCV(methylSub, repeats=1, nfolds=10,
                   predMode='classification', 
                   paramlist=list(ntree=300, nthreads=20),
                   innerCore=param2)   
-accuracy <- getMetrics(dataY=dataY, predY=predY)
-print(accuracy)  
+metrics <- getMetrics(dataY=dataY, predY=predY)
+print(metrics)  
 }
 \author{
 Junfang Chen

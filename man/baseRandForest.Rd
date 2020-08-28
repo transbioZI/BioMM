@@ -4,9 +4,12 @@
 \alias{baseRandForest}
 \title{Prediction by random forest}
 \usage{
-baseRandForest(trainData, testData, predMode = c("classification",
-  "probability", "regression"), paramlist = list(ntree = 2000, nthreads =
-  20))
+baseRandForest(
+  trainData,
+  testData,
+  predMode = c("classification", "probability", "regression"),
+  paramlist = list(ntree = 2000, nthreads = 20)
+)
 }
 \arguments{
 \item{trainData}{The input training dataset. The first column
@@ -40,7 +43,7 @@ methylData <- readRDS(methylfile)
 dataY <- methylData[,1]
 ## test a subset of genome-wide methylation data at random
 methylSub <- data.frame(label=dataY, methylData[,c(2:2001)])  
-trainIndex <- sample(nrow(methylSub), 30)
+trainIndex <- sample(nrow(methylSub), 12)
 trainData = methylSub[trainIndex,]
 testData = methylSub[-trainIndex,]
 library(ranger)

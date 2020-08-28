@@ -25,9 +25,9 @@ methylData <- readRDS(methylfile)
 dataY <- methylData[,1]
 methylSub <- data.frame(label=dataY, methylData[,c(2:1001)])  
 library(ranger)  
-library(parallel)
-param1 <- 1
-param2 <- 10
+library(BiocParallel)
+param1 <- MulticoreParam(workers = 1) 
+param2 <- MulticoreParam(workers = 10) 
 predY <- predByCV(methylSub, repeats=1, nfolds=10,   
                   FSmethod=NULL, cutP=0.1, 
                   fdr=NULL, FScore=param1, 

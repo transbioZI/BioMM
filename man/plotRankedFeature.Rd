@@ -4,9 +4,18 @@
 \alias{plotRankedFeature}
 \title{Plot top outcome-associated features}
 \usage{
-plotRankedFeature(data, posF = TRUE, topF = 10, blocklist,
-  rankMetric = c("AUC", "ACC", "R2", "size"), colorMetric = c("AUC",
-  "ACC", "R2", "size"), core = 10, fileName = NULL)
+plotRankedFeature(
+  data,
+  posF = TRUE,
+  topF = 10,
+  blocklist,
+  binarize = FALSE,
+  rankMetric = c("AUC", "R2", "Zscore", "negPlogit", "negPwilcox", "size"),
+  colorMetric = c("AUC", "R2", "Zscore", "negPlogit", "negPwilcox", "size"),
+  core = MulticoreParam(),
+  pathTitle = "GO pathways",
+  fileName = NULL
+)
 }
 \arguments{
 \item{data}{The input stage-2 data (either data.frame or matrix). 
@@ -25,15 +34,26 @@ For each matrix, rows are the samples and columns are the probe names,
 except that the first column is named 'label'. See also 
 \code{\link{omics2pathlist}}.}
 
+\item{binarize}{A logical value indicating if the individual features under
+investigation should be binarized. The default is FALSE, which provides the 
+estimated class probabilities for each pathway-level feature. If TRUE, then
+the binary output is given for each feature.}
+
 \item{rankMetric}{A string representing the metrics used for ranking. 
-Valid options are c('AUC', 'ACC', 'R2', 'size').
-'size' is the block size.}
+Valid options are c("AUC", "R2", "Zscore", "negPlogit", "negPwilcox").
+"negPlogit" denotes the negative log P value from the logistic regression 
+and "negPwilcox" means the negative log P value based on the Wilcoxon test. 
+"size" is the block size.}
 
 \item{colorMetric}{A string representing the metric used to color the plot. 
-Valid options are c('AUC', 'ACC', 'R2', 'size').
-'size' is the block size.}
+Valid options are c("AUC", "R2", "Zscore", "negPlogit", "negPwilcox").
+"negPlogit" denotes the negative log P value from the logistic regression 
+and "negPwilcox" means the negative log P value based on wilcoxon test. 
+"size" is the block size.}
 
 \item{core}{The number of cores used for computation. (Default: 10)}
+
+\item{pathTitle}{A string indicating the name of pathway under investigation.}
 
 \item{fileName}{The plot file name. (Default: 'plottopF.png')}
 }

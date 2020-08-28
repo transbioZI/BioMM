@@ -4,8 +4,14 @@
 \alias{omics2pathlist}
 \title{Map individual probes into pathway}
 \usage{
-omics2pathlist(data, pathlistDB, featureAnno = NULL, restrictUp = 200,
-  restrictDown = 10, minPathSize = 5)
+omics2pathlist(
+  data,
+  pathlistDB,
+  featureAnno = NULL,
+  restrictUp = 200,
+  restrictDown = 10,
+  minPathSize = 5
+)
 }
 \arguments{
 \item{data}{The input dataset (either data.frame or matrix). 

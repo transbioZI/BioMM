@@ -4,9 +4,25 @@
 \alias{reconBySupervised}
 \title{Reconstruct stage-2 data by supervised machine learning prediction}
 \usage{
-reconBySupervised(trainDataList, testDataList, resample = "BS", dataMode,
-  repeatA, repeatB, nfolds, FSmethod, cutP, fdr, FScore, classifier,
-  predMode, paramlist, innerCore, outFileA = NULL, outFileB = NULL)
+reconBySupervised(
+  trainDataList,
+  testDataList,
+  resample = "BS",
+  dataMode,
+  repeatA,
+  repeatB,
+  nfolds,
+  FSmethod,
+  cutP,
+  fdr,
+  FScore = MulticoreParam(),
+  classifier,
+  predMode,
+  paramlist,
+  innerCore = MulticoreParam(),
+  outFileA = NULL,
+  outFileB = NULL
+)
 }
 \arguments{
 \item{trainDataList}{The input training data list containing ordered 
@@ -90,9 +106,9 @@ dataList <- omics2pathlist(data=methylData, pathlistDB, featureAnno,
                            restrictUp=100, restrictDown=10, minPathSize=10) 
 length(dataList)
 library(ranger) 
-library(parallel)
-param1 <- 1
-param2 <- 20
+library(BiocParallel)
+param1 <- MulticoreParam(workers = 1)
+param2 <- MulticoreParam(workers = 20)
 ## Not Run, this will take a bit long
 ## stage2data <- reconBySupervised(trainDataList=dataList, testDataList=NULL, 
 ##                             resample='CV', dataMode='allTrain', 

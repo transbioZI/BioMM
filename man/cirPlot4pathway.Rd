@@ -4,7 +4,7 @@
 \alias{cirPlot4pathway}
 \title{Circular plot for a set of pathways}
 \usage{
-cirPlot4pathway(datalist, topPathID, core, fileName = NULL)
+cirPlot4pathway(datalist, topPathID, core = MulticoreParam(), fileName = NULL)
 }
 \arguments{
 \item{datalist}{The input data list containing ordered 
@@ -14,17 +14,21 @@ collections of matrices.}
 
 \item{core}{The number of cores used for computation. (Default: 10)}
 
-\item{fileName}{The plot file name. (Default: 'cpgTopGOplot.png')}
+\item{fileName}{Add a character to the output file name. 
+(Default: 'Circular-Manhattan.pval.jpeg')}
 }
 \value{
 An output image file.
 }
 \description{
-Plot the individual CpGs within a given set of pathways.
-The significance of the CpGs are illustrated by the negative log P value.
+The individual CpGs or genes within a given set of pathways are  
+displayed as the dots in the resulting plot. The significance of the CpGs or genes   
+are illustrated by the negative log P value.
 }
 \details{
 Top 10 or 20 pathways are usually suggested to be visualized.
+The significant features (if any) are highlighted using filled diamond. 
+The significance line is set as 0.05 marked as dashed red line.
 }
 \seealso{
 \code{\link{omics2pathlist}}.
