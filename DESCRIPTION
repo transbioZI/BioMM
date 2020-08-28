@@ -1,9 +1,9 @@
-Package: BioMM
+Package: BioMMex
 Type: Package
 Title: BioMM: Biological-informed Multi-stage Machine learning framework 
 	for phenotype prediction using omics data
-Version: 1.1.10
-Date: 2019-08-08
+Version: 1.5.2
+Date: 2020-08-28
 Author: Junfang Chen and Emanuel Schwarz
 Maintainer: Junfang Chen <junfang.chen33@gmail.com>
 Description: The identification of reproducible biological patterns from 
@@ -15,13 +15,13 @@ Description: The identification of reproducible biological patterns from
 	omics-scale data where we can evaluate different machine learning models 
 	with prior biological meta information. 
 Imports:
-    stats, utils, grDevices, lattice, parallel, glmnet, rms, MLmetrics, 
-    nsprcomp, ranger, e1071, variancePartition, ggplot2, pROC, vioplot, CMplot
-Depends: R (>= 3.5)
+    stats, utils, grDevices, lattice, BiocParallel, glmnet, rms, precrec,
+    nsprcomp, ranger, e1071, ggplot2, vioplot, CMplot
+Depends: R (>= 3.6)
 Suggests: BiocStyle, knitr, RUnit, BiocGenerics
 VignetteBuilder: knitr
 biocViews: Genetics, Classification, Regression, Pathways, GO, Software
 Encoding: UTF-8
-LazyData: true 
+LazyData: true
 License: GPL-3
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
