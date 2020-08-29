@@ -1,3 +1,9 @@
+Changes in version 1.5.2
+============= 
+	o updated R functions for reporting results and plotting.
+	o added another omics data (gene expression) and KEGG pathway. 
+	o updated tutorial by demonstrating BioMM with another omics data (gene expression) and KEGG pathway annotation. 
+	
 Changes in version 1.1.10
 ============= 
 	o updated tutorial: added circular plot
