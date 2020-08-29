@@ -22,7 +22,7 @@ BiocStyle::markdown()
 ```{r global_options, include=FALSE}  
 knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, fig.width=8, 
 fig.height=8)
-options(width=123) 
+options(width=133) 
 ```
 
 
@@ -68,6 +68,8 @@ library(precrec)
 library(vioplot)
 library(CMplot)
 library(imager)
+library(topGO)
+library(xlsx)
 ```
 
 # Omics data 
@@ -231,7 +233,7 @@ Here we use BioMM with the Random Forest method on gene expression data incorpor
 # omicsType <- "methylation"
 omicsType <- "expression"
 pathType <- "GO"
-# pathType <- "KEGG"
+pathType <- "KEGG"
 if (omicsType == "methylation" & pathType == "GO"){
     studylist <- methylGOlist
 } else if (omicsType == "methylation" & pathType == "KEGG"){
@@ -268,7 +270,7 @@ head(stage2dataA[,1:4])
 
 ``` 
 
-### Visualization
+### Feature Visualization
 #### Explained variation of stage-2 data
 The distribution of the proportion of variance explained for the individual generated feature of stage-2 data for the classification task is illustrated `plotVarExplained()` below. Nagelkerke pseudo R-squared measure is used to compute the explained variance. The argument `posF=TRUE` indicates that only positively outcome-associated features are plotted since negative associations likely reflect random effects in the underlying data [6].
 
@@ -288,16 +290,41 @@ plot(load.image(fileName))
 ``` {r topPathFeatures, eval=TRUE, fig.show="hold"} 
 core <- MulticoreParam(workers = 1)   
 rankMetric <- "negPlogit" 
-fileName <- paste0(omicsType, "_", pathType, "_topPath_", rankMetric, ".png")
+filePrefix <- paste0(omicsType, "_", pathType, "_topPath_", rankMetric)
 topPath <- plotRankedFeature(data=stage2dataA, 
                              posF=TRUE, topF=10, binarize=FALSE, 
                              blocklist=studylist,  
                              rankMetric=rankMetric, 
                              colorMetric="size",  core, 
                              pathTitle=paste0(pathType, " pathways"), 
-                             fileName=fileName)
+                             fileName=paste0(filePrefix, ".png"))
 
-plot(load.image(fileName))  
+plot(load.image(paste0(filePrefix, ".png")))   
+
+``` 
+
+
+``` {r reportTopPath, eval=TRUE} 
+## Report the top pathways
+if (pathType == "GO"){
+    
+  goterms = unlist(Term(GOTERM))  
+  topGOID = gsub("\\.", ":", rownames(topPath))
+  subTerm = goterms[is.element(names(goterms), topGOID)] 
+  topIDmatch = subTerm[match(topGOID, names(subTerm))]   
+  topPath$Description <- topIDmatch
+  
+} else if (pathType == "KEGG"){
+  ## A matching list between KEGG ID and names. Data freezes on Aug 2020
+  keggID2name <- readRDS(system.file("extdata", "/keggID2name202008.rds", 
+                                     package="BioMM"))  
+  keggSub <- keggID2name[is.element(keggID2name[,"ID"], rownames(topPath)),]
+  topIDmatch <- keggSub[match(rownames(topPath), keggSub[,"ID"]),]
+  topPath$Description <- topIDmatch[,"name"]
+}
+
+print(topPath) 
+write.xlsx(topPath,file=paste0(filePrefix, ".xlsx"))
 
 ``` 
 
@@ -313,6 +340,7 @@ pathMatch <- pathSet[match(pathID, names(pathSet))]
 fileName <- paste0(omicsType, "_", pathType, "_SigRankBy_", rankMetric)
 
 cirPlot4pathway(datalist=pathMatch, topPathID=names(pathMatch), core, fileName)
+
 
 ``` 
 
