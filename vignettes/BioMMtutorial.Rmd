@@ -152,7 +152,7 @@ The end-to-end prediction is performed using `BioMM()` function. Both supervised
 #### BioMM with Random Forest  
 To apply BioMM with the Random Forest model, we use the argument `supervisedStage1=TRUE` and `classifier=randForest` in `BioMM()`. DNA methylation data mapping to GO pathways is used.
 
-```{r BioMMrandForest, eval=TRUE}
+```{r BioMMrandForest4methylGO, eval=TRUE}
 ## to reduce the runtime, only use a subset of DNA methylation data
 ## However, if possible, subsetting the data is not suggested.
 trainData <- methylData[,1:3000]  
@@ -186,7 +186,7 @@ For stratification of predictors using biological information, various strategie
 
 To apply BioMM with the random forest model, we use the argument `supervisedStage1=TRUE` and `classifier=randForest` in `BioMM()`. Gene expression data mapping to KEGG pathways is demonstrated.
 
-```{r BioMMrandForest, eval=TRUE}
+```{r BioMMrandForest4expKEGG, eval=TRUE}
 ## to reduce the runtime, only use a subset of gene expression data
 ## However, if possible, subsetting the data is not suggested.
 trainData <- expData[,1:3000]  
@@ -215,7 +215,7 @@ print(result)
 ### Generation of stage-2 data
 Here we use BioMM with the Random Forest method on gene expression data incorporating GO pathways to create stage-2 pathway-level data.
 
-```{r stage2dataAprepare, eval=TRUE} 
+```{r stage2dataAprep, eval=TRUE} 
 ## Define the omics type 
 # omicsType <- "methylation"
 omicsType <- "expression"
@@ -273,7 +273,7 @@ plotVarExplained(data=stage2dataA, posF=TRUE, binarize=FALSE, core=core,
 #### Prioritization of outcome-associated functional patterns 
 `plotRankedFeature()` is employed to rank and visualize the outcome-associated features from stage-2 data. The argument `topF=10` and `posF=TRUE` are used to define the top 10 positively outcome-associated features. The negative log P value using logistic regression is utilized to evaluate the importance of the ranked features as indicated by the argument `rankMetric="negPlogit"`. Other metrics including Nagelkerke pseudo R-squared "R2", and Z score "Zscore" measure are also available (see `plotRankedFeature` in the manual for details). The size of the respective pathway is pictured as the argument `colorMetric="size"`. 
 
-``` {r topFstage2data, eval=TRUE} 
+``` {r topPathFeatures, eval=TRUE} 
 core <- MulticoreParam(workers = 1)   
 rankMetric <- "negPlogit" 
 fileName <- paste0(omicsType, "_", pathType, "_topPath_", rankMetric, ".png")
