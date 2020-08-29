@@ -313,9 +313,6 @@ fileName <- paste0(omicsType, "_", pathType, "_SigRankBy_", rankMetric)
 
 cirPlot4pathway(datalist=pathMatch, topPathID=names(pathMatch), core, fileName)
 
-## Alternative view
-plot(load.image(fileName)) 
-
 ``` 
 
 ## Computational consideration
