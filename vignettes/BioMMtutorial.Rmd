@@ -22,7 +22,7 @@ BiocStyle::markdown()
 ```{r global_options, include=FALSE}  
 knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, fig.width=8, 
 fig.height=8)
-options(width=120) 
+options(width=123) 
 ```
 
 
@@ -31,23 +31,23 @@ options(width=120)
 The identification of reproducible biological patterns from high-dimensional omics data is a key factor in understanding the biology of complex disease or traits. Incorporating prior biological knowledge into machine learning is an important step in advancing such research.
 
 ## Deliverables
-We have implemented a biologically informed multi-stage machine learing framework termed __BioMM__ [1] specifically for phenotype prediction using omics-scale data based on biological prior information including gene ontological (GO) and KEGG pathways.   
+We have implemented a biologically informed multi-stage machine learning framework termed __BioMM__ [1] specifically for phenotype prediction using omics-scale data based on prior biological information including gene ontological (GO) and KEGG pathways.   
 
 **Features of BioMM in a nutshell**:   
 
 1. Applicability for various omics data modalities (e.g. methylome, transcriptomics, genomics).      
 2. Prioritizing outcome-associated functional patterns.   
 3. End-to-end prediction at the individual level based on biological pathway stratification.  
-4. Possibility for extension to machine learning models of interest.   
+4. Possibility for an extension to machine learning models of interest.   
 5. Parallel computing. 
 
 # Getting started  
 
-## Installation   
+## Installation and dependencies
 
-*  Install BioMM from Bioconductor (R 3.6):
+*  Install BioMM from Bioconductor (R 4.0):
 ```{r eval=FALSE}
-## Do not excute if you have already installed BioMM.
+## Do not execute if you have already installed BioMM.
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 # The following initializes usage of Bioc devel
@@ -66,11 +66,12 @@ library(e1071)
 library(precrec)
 library(vioplot)
 library(CMplot)
+library(imager)
 ```
 
 # Omics data 
-A wide range of omics data is supported for the use of BioMM including whole-genome DNA methylation, transcriptome-wide gene expression and genome-wide SNP data. Other types of omics data that can map into pathways are also encouraging.  
-For better understanding of the BioMM framework, we used two small examplar datasets: one genome-wide DNA methylation data consisting of 20 subjects and 26486 CpGs, and one genome-wide gene expression data comprising of 20 subjects and  15924 genes for demonstration.  
+A wide range of omics data is supported for BioMM including whole-genome DNA methylation, transcriptome-wide gene expression and genome-wide SNP data. Other types of omics data that can map into pathways are also encouraging.  
+For a better understanding of the BioMM framework, we used two small examplar datasets: one genome-wide DNA methylation data consisting of 20 subjects and 26486 CpGs, and one genome-wide gene expression data comprising of 20 subjects and  15924 genes for demonstration.  
 
 ```{r studyData, eval=TRUE}
 ## DNA methylation data 
@@ -115,7 +116,7 @@ str(kegglist[1:3])
 
 ``` 
 
-To create stage-1 data, we demonstrate the usage of `omics2pathlist()` function based on two different pathway annotation and two data modalities as followings.
+To annotate pathways, we demonstrate the usage of `omics2pathlist()` function based on two different pathway databases and two data modalities as follows.
 
 ```{r pathlist, eval=TRUE} 
 ## Feature annotation to pathways 
@@ -124,20 +125,24 @@ numPath <- 100
 
 # GO pathway mapping using DNA methylation data
 golistSub <- golist[seq_len(numPath)]
-methylGOlist <- omics2pathlist(data=methylData, pathlistDB=golistSub, featureAnno=featureAnno, 
+methylGOlist <- omics2pathlist(data=methylData, pathlistDB=golistSub, 
+                               featureAnno=featureAnno, 
                                restrictUp=200, restrictDown=10, minPathSize=10) 
 # KEGG pathway mapping using DNA methylation data
 kegglistSub <- kegglist[seq_len(numPath)]
-methylKEGGlist <- omics2pathlist(data=methylData, pathlistDB=kegglistSub, featureAnno=featureAnno, 
+methylKEGGlist <- omics2pathlist(data=methylData, pathlistDB=kegglistSub, 
+                                 featureAnno=featureAnno, 
                                  restrictUp=200, restrictDown=10, minPathSize=10) 
 
 # GO pathway mapping using gene expression data
 golistSub <- golist[seq_len(numPath)]
-expGOlist <- omics2pathlist(data=expData, pathlistDB=golistSub, featureAnno=NULL, 
+expGOlist <- omics2pathlist(data=expData, pathlistDB=golistSub, 
+                            featureAnno=NULL, 
                             restrictUp=200, restrictDown=10, minPathSize=10) 
 # KEGG pathway mapping using gene expression data
 kegglistSub <- kegglist[seq_len(numPath)]
-expKEGGlist <- omics2pathlist(data=expData, pathlistDB=kegglistSub, featureAnno=NULL, 
+expKEGGlist <- omics2pathlist(data=expData, pathlistDB=kegglistSub, 
+                              featureAnno=NULL, 
                               restrictUp=200, restrictDown=10, minPathSize=10) 
 
 ``` 
@@ -147,13 +152,13 @@ expKEGGlist <- omics2pathlist(data=expData, pathlistDB=kegglistSub, featureAnno=
 Briefly, the BioMM framework consists of two learning stages [1]. During the first stage, biological meta-information is used to 'compress' the variables of the original dataset into pathway-level 'latent variables' (henceforth called stage-2 data) using either supervised or unsupervised learning models (stage-1 models). In the second stage, a supervised model (stage-2 model) is built using the stage-2 data with non-negative outcome-associated features for final prediction. 
 
 ### Interface to machine learning models 
-The end-to-end prediction is performed using `BioMM()` function. Both supervised and unsupervised learning are implemented in the BioMM framework, which are indicated by the argument `supervisedStage1=TRUE` or `supervisedStage1=FALSE`. Commonly used supervised classifiers: generalized regression models with lasso, ridge or elastic net regularization (GLM) [4], support vector machine (SVM) [3] and random forest [2] are included. For the unsupervised method, regular or sparse constrained principal component  analysis (PCA) [5] is used. `predMode` indicates the prediction type. In case of classification setting, the "probability" or "classification" mode can be used. Generic resampling methods include cross-validation (CV) and bootstrapping (BS) procedures as the argument `resample1="CV"` or `resample1="BS"`. Stage-2 data is reconstructed using either resampling methods during machine learning prediction or independent test set prediction if the argument `testData` is provided. For more details, please check `BioMM()` in the manual.
+The end-to-end prediction is performed using `BioMM()` function. Both supervised and unsupervised learning are implemented in the BioMM framework, which is indicated by the argument `supervisedStage1=TRUE` or `supervisedStage1=FALSE`. Commonly used supervised classifiers: generalized regression models with lasso, ridge or elastic net regularization (GLM) [4], support vector machine (SVM) [3] and random forest [2] are included. For the unsupervised method, regular or sparse constrained principal component analysis (PCA) [5] is used. `predMode` indicates the prediction type. In the case of classification setting, the "probability" or "classification" mode can be used. Generic resampling methods include cross-validation (CV) and bootstrapping (BS) procedures as the argument `resample1="CV"` or `resample1="BS"`. Stage-2 data is reconstructed using either resampling methods during machine learning prediction or independent test set prediction if the argument `testData` is provided. For more details, please check `BioMM()` in the manual.
 
 #### BioMM with Random Forest  
 To apply BioMM with the Random Forest model, we use the argument `supervisedStage1=TRUE` and `classifier=randForest` in `BioMM()`. DNA methylation data mapping to GO pathways is used.
 
 ```{r BioMMrandForest4methylGO, eval=TRUE}
-## to reduce the runtime, only use a subset of DNA methylation data
+## To reduce the runtime, only use a subset of DNA methylation data
 ## However, if possible, subsetting the data is not suggested.
 trainData <- methylData[,1:3000]  
 
@@ -165,22 +170,24 @@ paramlist <- list(ntree=100, nthreads=20)
 core <- MulticoreParam(workers = 10) 
 
 set.seed(123)
-result <- BioMM(trainData=trainData, testData=NULL, pathlistDB=golistSub, featureAnno, 
+result <- BioMM(trainData=trainData, testData=NULL, 
+                pathlistDB=golistSub, featureAnno, 
                 restrictUp=200, restrictDown=10, minPathSize=10, 
                 supervisedStage1, typePCA="regular", 
                 resample1="BS", resample2="CV", dataMode="allTrain",
                 repeatA1=50, repeatA2=1, repeatB1=10, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
-                cutP1=0.05, cutP2=0.05, fdr2=NULL, FScore=MulticoreParam(workers = 1), 
+                cutP1=0.05, cutP2=0.05, fdr2=NULL, 
+                FScore=MulticoreParam(workers = 1), 
                 classifier, predMode, paramlist, innerCore=core)
 print(result)
 ``` 
 
-Other machine learning models can be employed with the following respective parameter settings. For the classifier `"SVM"`, parameters can be tuned using an internal cross validation if `tuneP=TRUE`. For generalized regression model `glmnet`, elastic net is specified by the input argument `alpha=0.5`. Alternatively, `alpha=1` is for the lasso and `alpha=0` is the ridge. For the unsupervised learning `supervisedStage1=FALSE`, regular PCA `typePCA="regular"` is applied and followed with random forest classification `classifier2=TRUE`.
+Other machine learning models can be employed with the following respective parameter settings. For the classifier `"SVM"`, parameters can be tuned using an internal cross-validation if `tuneP=TRUE`. For generalized regression model `glmnet`, elastic net is specified by the input argument `alpha=0.5`. Alternatively, `alpha=1` is for the lasso and `alpha=0` is the ridge. For the unsupervised learning `supervisedStage1=FALSE`, regular PCA `typePCA="regular"` is applied and followed with random forest classification `classifier2=TRUE`.
 
 ### Interface to biological stratification
 
-For stratification of predictors using biological information, various strategies can be applied. In this tutorial, `BioMM()` integrates GO and KEGG pathway based stratification, which not only accounts for epistasis between stage-1 features within the functional category, but also considers the interaction between pathway-level features. Therefore, this may provide more value-relevant information on biological insight into the underlying phenotype.  
+For the stratification of predictors using biological information, various strategies can be applied. In this tutorial, `BioMM()` integrates GO and KEGG pathway based stratification, which not only accounts for epistasis between stage-1 features within the functional category, but also considers the interaction between pathway-level features. Therefore, this may provide more value-relevant information on biological insight into the underlying phenotype.  
  
 #### BioMM with KEGG pathways
 
@@ -200,13 +207,15 @@ paramlist <- list(ntree=100, nthreads=20)
 core <- MulticoreParam(workers = 10) 
 
 set.seed(123)
-result <- BioMM(trainData=trainData, testData=NULL, pathlistDB=kegglistSub, featureAnno, 
+result <- BioMM(trainData=trainData, testData=NULL, 
+                pathlistDB=kegglistSub, featureAnno, 
                 restrictUp=200, restrictDown=10, minPathSize=10, 
                 supervisedStage1, typePCA="regular", 
                 resample1="BS", resample2="CV", dataMode="allTrain",
                 repeatA1=50, repeatA2=1, repeatB1=10, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
-                cutP1=0.05, cutP2=0.05, fdr2=NULL, FScore=MulticoreParam(workers = 1), 
+                cutP1=0.05, cutP2=0.05, fdr2=NULL, 
+                FScore=MulticoreParam(workers = 1), 
                 classifier, predMode, paramlist, innerCore=core)
 print(result)
 ``` 
@@ -234,7 +243,6 @@ if (omicsType == "methylation" || pathType == "GO"){
     stop("Wrong specified omicsType and pathType!")
 } 
 
-str(studylist[1:2])
 length(studylist)
 
 ## Model parameters 
@@ -244,13 +252,14 @@ paramlist <- list(ntree=100, nthreads=20)
 core <- MulticoreParam(workers = 10) 
 
 set.seed(123)
-stage2dataA <- reconBySupervised(trainDataList=studylist, testDataList=NULL,
-                                 resample="BS", dataMode="allTrain",
-                                 repeatA=50, repeatB=1, nfolds=10,
-                                 FSmethod=NULL, cutP=0.05, fdr=NULL, 
-                                 FScore=MulticoreParam(workers = 1),
-                                 classifier, predMode, paramlist,
-                                 innerCore=core, outFileA=NULL, outFileB=NULL)
+stage2dataA <- reconBySupervised(trainDataList=studylist, 
+                   testDataList=NULL,
+                   resample="BS", dataMode="allTrain",
+                   repeatA=50, repeatB=1, nfolds=10,
+                   FSmethod=NULL, cutP=0.05, fdr=NULL, 
+                   FScore=MulticoreParam(workers = 1),
+                   classifier, predMode, paramlist,
+                   innerCore=core, outFileA=NULL, outFileB=NULL)
 ## Check stage-2 data
 dim(stage2dataA)
 print(table(stage2dataA[,1]))
@@ -260,14 +269,15 @@ head(stage2dataA[,1:4])
 
 ### Visualization
 #### Explained variation of stage-2 data
-The distribution of the proportion of variance explained for the individual generated feature of stage-2 data for the classification task is illustrated `plotVarExplained()` below. Nagelkerke pseudo R-squared measure is used to compute the explained variance. The argument `posF=TRUE` indicates that only 
-positively outcome-associated features are plotted, since negative associations likely reflect random effects in the underlying data [6].
+The distribution of the proportion of variance explained for the individual generated feature of stage-2 data for the classification task is illustrated `plotVarExplained()` below. Nagelkerke pseudo R-squared measure is used to compute the explained variance. The argument `posF=TRUE` indicates that only positively outcome-associated features are plotted since negative associations likely reflect random effects in the underlying data [6].
 
 ``` {r stage2dataViz, eval=TRUE}
 core <- MulticoreParam(workers = 10)   
 fileName <- paste0(omicsType,"_", pathType, "_featuresVarExplained.png")
 plotVarExplained(data=stage2dataA, posF=TRUE, binarize=FALSE, core=core, 
                  pathTitle=paste0(pathType, " pathways"), fileName)
+
+plot(load.image(fileName)) 
 
 ``` 
 
@@ -279,10 +289,14 @@ core <- MulticoreParam(workers = 1)
 rankMetric <- "negPlogit" 
 fileName <- paste0(omicsType, "_", pathType, "_topPath_", rankMetric, ".png")
 topPath <- plotRankedFeature(data=stage2dataA, 
-                             posF=TRUE, topF=10, binarize=FALSE, blocklist=studylist,  
-                             rankMetric=rankMetric, colorMetric="size",  core, 
-                             pathTitle=paste0(pathType, " pathways"), fileName=fileName) 
+                             posF=TRUE, topF=10, binarize=FALSE, 
+                             blocklist=studylist,  
+                             rankMetric=rankMetric, 
+                             colorMetric="size",  core, 
+                             pathTitle=paste0(pathType, " pathways"), 
+                             fileName=fileName)
 
+plot(load.image(fileName))  
 
 ``` 
 
@@ -298,12 +312,15 @@ fileName <- paste0(omicsType, "_", pathType, "_SigRankBy_", rankMetric)
 
 cirPlot4pathway(datalist=pathMatch, topPathID=names(pathMatch), core, fileName)
 
+## Alternative view
+plot(load.image(fileName)) 
+
 ``` 
 
 ## Computational consideration
-BioMM with supervised models at both stages incorporating pathway based stratification method will take longer to run than unsupervised approaches. But the prediction is more powerful. Therefore, we suggest the former even if the computation is more demanding, as the adoption of the next generation technology (e.g., 5G) is pushing advances in computational storage and speed. 
+BioMM with supervised models at both stages incorporating pathway based stratification method will take longer to run than unsupervised approaches. But the prediction is more powerful. Therefore, we suggest the former even if the computation is more demanding, as the adoption of the next-generation technology (e.g., 5G) is pushing advances in computational storage and speed. 
 
-Furthermore, the stability of BioMM prediction is often facilitated with the increasing number of resampling repetitions and some other related model parameters such as the number of trees used in the Random Forest model. Finally, parallel computing is implemented and recommended for such scenario. In this vignette, due to the runtime, we only showcased the smaller examples and models with less computation. 
+Furthermore, the stability of BioMM prediction is often facilitated with the increasing number of resampling repetitions and some other related model parameters such as the number of trees used in the Random Forest model. Finally, parallel computing is implemented and recommended for such a scenario. In this vignette, due to the runtime, we only showcased the smaller examples and models with less computation. 
 
 
 # Session information
