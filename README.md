@@ -12,8 +12,15 @@ BioMM: Biological-informed Multi-stage Machine learning framework for phenotype 
 
 ## Installation 
 
+BioMM installation from Github
+```{r eval=FALSE}
+install.packages("devtools")
+library("devtools")
+install_github("transbioZI/BioMM", build_vignettes=TRUE)
+``` 
+
 BioMM has been incorporated into the [Bioconductor](http://www.bioconductor.org/packages/devel/bioc//html/BioMM.html).
-To install this package, start R (version "4.0") and enter:
+To install this package from BioConductor, start R (version "4.0") and enter:
 
 ```{r eval=FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -23,7 +30,7 @@ BiocManager::install("BioMM", version = "4.0")
 
 ## Tutorial 
 
-The detailed instructions on how to use this package are explained in this [vignette](https://bioconductor.org/packages/devel/bioc/vignettes/BioMM/inst/doc/BioMMtutorial.html). 
+The detailed instructions on how to use this package are explained in the most updated [vignette](https://bioconductor.org/packages/devel/bioc/vignettes/BioMM/inst/doc/BioMMtutorial.html). 
 
 ## Citation
 
