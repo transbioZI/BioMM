@@ -35,11 +35,12 @@ We have implemented a biologically informed multi-stage machine learning framewo
 
 **Features of BioMM in a nutshell**:   
 
-1. Applicability for various omics data modalities (e.g. methylome, transcriptomics, genomics).      
-2. Prioritizing outcome-associated functional patterns.   
-3. End-to-end prediction at the individual level based on biological pathway stratification.  
+1. Applicability for various omics data modalities (e.g. methylome, transcriptomics, genomics).   
+2. Various biological stratification strategies.    
+3. Prioritizing outcome-associated functional patterns.   
+4. End-to-end prediction at the individual level based on biological stratified patterns.   
 4. Possibility for an extension to machine learning models of interest.   
-5. Parallel computing. 
+6. Parallel computing. 
 
 # Getting started  
 
