@@ -224,7 +224,7 @@ print(result)
 
 ## Stage-2 data exploration 
 ### Generation of stage-2 data
-Here we use BioMM with the Random Forest method on gene expression data incorporating GO pathways to create stage-2 pathway-level data.
+Here we use BioMM with the Random Forest method on gene expression data incorporating KEGG pathways to create stage-2 pathway-level data.
 
 ```{r stage2dataAprep, eval=TRUE} 
 ## Define the omics type 
@@ -232,13 +232,13 @@ Here we use BioMM with the Random Forest method on gene expression data incorpor
 omicsType <- "expression"
 pathType <- "GO"
 # pathType <- "KEGG"
-if (omicsType == "methylation" || pathType == "GO"){
+if (omicsType == "methylation" & pathType == "GO"){
     studylist <- methylGOlist
-} else if (omicsType == "methylation" || pathType == "KEGG"){
+} else if (omicsType == "methylation" & pathType == "KEGG"){
     studylist <- methylKEGGlist
-} else if (omicsType == "expression" || pathType == "GO"){
+} else if (omicsType == "expression" & pathType == "GO"){
     studylist <- expGOlist
-} else if (omicsType == "expression" || pathType == "KEGG"){
+} else if (omicsType == "expression" & pathType == "KEGG"){
     studylist <- expKEGGlist
 } else {
     stop("Wrong specified omicsType and pathType!")
@@ -285,7 +285,7 @@ plot(load.image(fileName))
 #### Prioritization of outcome-associated functional patterns 
 `plotRankedFeature()` is employed to rank and visualize the outcome-associated features from stage-2 data. The argument `topF=10` and `posF=TRUE` are used to define the top 10 positively outcome-associated features. The negative log P value using logistic regression is utilized to evaluate the importance of the ranked features as indicated by the argument `rankMetric="negPlogit"`. Other metrics including Nagelkerke pseudo R-squared "R2", and Z score "Zscore" measure are also available (see `plotRankedFeature` in the manual for details). The size of the respective pathway is pictured as the argument `colorMetric="size"`. 
 
-``` {r topPathFeatures, eval=TRUE} 
+``` {r topPathFeatures, eval=TRUE, fig.show="hold"} 
 core <- MulticoreParam(workers = 1)   
 rankMetric <- "negPlogit" 
 fileName <- paste0(omicsType, "_", pathType, "_topPath_", rankMetric, ".png")
@@ -304,9 +304,10 @@ plot(load.image(fileName))
 #### The significance of CpGs in pathways of interest
 `cirPlot4pathway()` illustrates the significance of the individual CpGs (for DNA methylation data) or genes (for gene expression data) falling into a set of pathways. Here the top 10 outcome-associated pathways are investigated. Negative log P value is used to define the significance of each CpG or genes within these pathways.
 
-``` {r cirPlot, eval=TRUE}  
+``` {r cirPlot, eval=TRUE, fig.show="hold"}  
 core <- MulticoreParam(workers = 10)   
 pathID <- gsub("\\.", ":", rownames(topPath))
+## The number of top pathways must be bigger than overall investigated pathways
 pathSet <- studylist[is.element(names(studylist), pathID)]
 pathMatch <- pathSet[match(pathID, names(pathSet))]
 fileName <- paste0(omicsType, "_", pathType, "_SigRankBy_", rankMetric)
