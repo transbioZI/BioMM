@@ -12,8 +12,8 @@
 #' @name methylData
 #' @usage methylData
 #' @format A data.frame with 26487 variables (26486 autosomal CpG probes and 
-#' one label indicating case control status) and 40 samples (20 controls, 
-#' 20 bipolar disorder patients). 
+#' one label indicating case control status) and 20 samples (10 controls, 
+#' 10 bipolar disorder patients). 
 #' @source \url{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE38873}
 #' @keywords datasets
 NULL 
@@ -27,8 +27,8 @@ NULL
 #' @docType data
 #' @name goDB
 #' @usage goDB
-#' @format A list with 4350 pathways with bigger than 10 genes and less than 
-#' 300 genes in each pathway. 
+#' @format A list of pathways with bigger than 10 genes and less than 
+#' 200 genes in each pathway. 
 #' @source library(org.Hs.eg.db)
 #' @keywords datasets
 NULL 
