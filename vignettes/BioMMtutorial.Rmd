@@ -190,7 +190,8 @@ To apply BioMM with the random forest model, we use the argument `supervisedStag
 ## to reduce the runtime, only use a subset of gene expression data
 ## However, if possible, subsetting the data is not suggested.
 trainData <- expData[,1:3000]  
-
+## Only for gene expression data
+featureAnno=NULL
 ## Model parameters
 supervisedStage1=TRUE
 classifier <- "randForest"
