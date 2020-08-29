@@ -106,32 +106,41 @@ are c(NULL, 'positive', 'wilcox.test', 'cor.test', 'chisq.test',
 positively associated with the outcome will be used.}
 
 \item{cutP1}{The cutoff used for p value thresholding at stage-1.
-Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc).}
+Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). If "FSmethod1" is NULL,
+Then no cutoff is applied.}
 
-\item{cutP2}{The cutoff used for p value thresholding at stage-2.}
+\item{cutP2}{The cutoff used for p value thresholding at stage-2. 
+Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). If "FSmethod2" is NULL,
+Then no cutoff is applied.}
 
 \item{fdr2}{Multiple testing correction method at stage-2. 
 Available options are c(NULL, 'fdr', 'BH', 'holm', etc). 
-See also \code{\link[stats]{p.adjust}}. The default is NULL.}
+See also \code{\link[stats]{p.adjust}}. The default is NULL.
+This option is useful particularly when large sets of pathways are investigated.}
 
 \item{FScore}{The number of cores used for feature selection.}
 
-\item{classifier}{Machine learning classifiers at both stages.}
+\item{classifier}{Machine learning classifiers at both stages.
+Available options are c('randForest', 'SVM', 'glmnet').}
 
 \item{predMode}{The prediction mode at both stages. Available options are 
 c('probability', 'classification', 'regression').}
 
-\item{paramlist}{A list of model parameters at both stages.}
+\item{paramlist}{A list of model parameters at both stages. The set of parameters 
+are different for each classifier. Please see the detailed parameters are 
+implemented for each individual classifier, e.g., 'baseRandForest()', 'baseSVM()',
+and 'baseGLMnet()'.}
 
-\item{innerCore}{The number of cores used for computation.}
+\item{innerCore}{The number of cores used for computation. It needs to be reconciled
+with "FScore" depending on the number of cores available.}
 }
 \value{
 The CV or BS prediction performance for the training data and 
 test set prediction performance if \code{testData} is given.
 }
 \description{
-End-to-end prediction by BioMM framework using either supervised or 
-unsupervised learning at stage-1, then supervised learning at stage-2.
+The BioMM framework uses two-stage machine learning models that can allow us 
+to integrate prior biological knowledge for end-to-end phenotype prediction.
 }
 \details{
 Stage-2 training data can be learned either using bootstrapping 

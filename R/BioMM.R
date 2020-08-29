@@ -341,7 +341,8 @@ baseGLMnet <- function(trainData, testData,
 #' @param paramlist A set of model parameters defined in an R list object. 
 #' See more details for each individual model. 
 
-#' @return The predicted output for the test data.
+#' @return Based on a given machine learning, the predicted score/output will be 
+#' estimated for the test data.
 #' @export 
 
 #' @author Junfang Chen 
@@ -1128,8 +1129,8 @@ reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular
 #' BioMM end-to-end prediction 
 
 #' @description
-#' End-to-end prediction by BioMM framework using either supervised or 
-#' unsupervised learning at stage-1, then supervised learning at stage-2. 
+#' The BioMM framework uses two-stage machine learning models that can allow us 
+#' to integrate prior biological knowledge for end-to-end phenotype prediction.
 
 #' @param trainData The input training dataset. The first column
 #' is the label or the output. For binary classes, 
@@ -1183,17 +1184,26 @@ reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular
 #' @param FSmethod2 Feature selection methods at stage-2. Features that are 
 #' positively associated with the outcome will be used.
 #' @param cutP1 The cutoff used for p value thresholding at stage-1.  
-#' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). 
-#' @param cutP2 The cutoff used for p value thresholding at stage-2.   
+#' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). If "FSmethod1" is NULL,
+#' Then no cutoff is applied.
+#' @param cutP2 The cutoff used for p value thresholding at stage-2. 
+#' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). If "FSmethod2" is NULL,
+#' Then no cutoff is applied.
 #' @param fdr2 Multiple testing correction method at stage-2. 
 #' Available options are c(NULL, 'fdr', 'BH', 'holm', etc). 
 #' See also \code{\link[stats]{p.adjust}}. The default is NULL.
+#' This option is useful particularly when large sets of pathways are investigated.
 #' @param FScore The number of cores used for feature selection.
 #' @param classifier Machine learning classifiers at both stages.  
+#' Available options are c('randForest', 'SVM', 'glmnet').
 #' @param predMode The prediction mode at both stages. Available options are 
 #' c('probability', 'classification', 'regression'). 
-#' @param paramlist A list of model parameters at both stages.
-#' @param innerCore The number of cores used for computation.
+#' @param paramlist A list of model parameters at both stages. The set of parameters 
+#' are different for each classifier. Please see the detailed parameters are 
+#' implemented for each individual classifier, e.g., 'baseRandForest()', 'baseSVM()',
+#' and 'baseGLMnet()'. 
+#' @param innerCore The number of cores used for computation. It needs to be reconciled
+#' with "FScore" depending on the number of cores available.
 
 #' @return The CV or BS prediction performance for the training data and 
 #' test set prediction performance if \code{testData} is given.

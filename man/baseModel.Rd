@@ -32,7 +32,8 @@ c('classification', 'probability', 'regression').
 See more details for each individual model.}
 }
 \value{
-The predicted output for the test data.
+Based on a given machine learning, the predicted score/output will be 
+estimated for the test data.
 }
 \description{
 Prediction using different supervised machine learning models.
