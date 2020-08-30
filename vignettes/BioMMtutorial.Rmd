@@ -298,7 +298,6 @@ topPath <- plotRankedFeature(data=stage2dataA,
                              colorMetric="size",  core, 
                              pathTitle=paste0(pathType, " pathways"), 
                              fileName=paste0(filePrefix, ".png"))
-
 plot(load.image(paste0(filePrefix, ".png")))   
 
 ``` 
@@ -311,16 +310,16 @@ if (pathType == "GO"){
   goterms = unlist(Term(GOTERM))  
   topGOID = gsub("\\.", ":", rownames(topPath))
   subTerm = goterms[is.element(names(goterms), topGOID)] 
-  topIDmatch = subTerm[match(topGOID, names(subTerm))]   
-  topPath$Description <- topIDmatch
+  topIDmatch = subTerm[match(topGOID, names(subTerm))]  
+  topPath <- data.frame(Description=topIDmatch,topPath)
   
 } else if (pathType == "KEGG"){
   ## A matching list between KEGG ID and names. Data freezes on Aug 2020
   keggID2name <- readRDS(system.file("extdata", "/keggID2name202008.rds", 
                                      package="BioMM"))  
   keggSub <- keggID2name[is.element(keggID2name[,"ID"], rownames(topPath)),]
-  topIDmatch <- keggSub[match(rownames(topPath), keggSub[,"ID"]),]
-  topPath$Description <- topIDmatch[,"name"]
+  topIDmatch <- keggSub[match(rownames(topPath), keggSub[,"ID"]),] 
+  topPath <- data.frame(Description=topIDmatch[,"name"],topPath)
 }
 
 print(topPath) 
