@@ -56,6 +56,13 @@ BiocManager::install(version='devel')
 BiocManager::install("BioMM")
 ```
 
+BioMM installation from Github
+```{r eval=FALSE}
+install.packages("devtools")
+library("devtools")
+install_github("transbioZI/BioMM", build_vignettes=TRUE)
+``` 
+
 * Load required libraries
 ```{r loadPkg, eval=TRUE, results="hide"}
 library(BioMM)
@@ -302,6 +309,7 @@ plot(load.image(paste0(filePrefix, ".png")))
 
 ``` 
 
+The statistical metrics and descriptions of these above top pathways are shown below:
 
 ``` {r reportTopPath, eval=TRUE} 
 ## Report the top pathways
@@ -311,7 +319,7 @@ if (pathType == "GO"){
   topGOID = gsub("\\.", ":", rownames(topPath))
   subTerm = goterms[is.element(names(goterms), topGOID)] 
   topIDmatch = subTerm[match(topGOID, names(subTerm))]  
-  topPath <- data.frame(Description=topIDmatch,topPath)
+  topPath <- data.frame(topPath, Description=topIDmatch)
   
 } else if (pathType == "KEGG"){
   ## A matching list between KEGG ID and names. Data freezes on Aug 2020
@@ -319,7 +327,7 @@ if (pathType == "GO"){
                                      package="BioMM"))  
   keggSub <- keggID2name[is.element(keggID2name[,"ID"], rownames(topPath)),]
   topIDmatch <- keggSub[match(rownames(topPath), keggSub[,"ID"]),] 
-  topPath <- data.frame(Description=topIDmatch[,"name"],topPath)
+  topPath <- data.frame(topPath, Description=topIDmatch[,"name"])
 }
 
 print(topPath) 
