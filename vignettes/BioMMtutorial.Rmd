@@ -171,6 +171,8 @@ To apply BioMM with the Random Forest model, we use the argument `supervisedStag
 ## To reduce the runtime, only use a subset of DNA methylation data
 ## However, if possible, subsetting the data is not suggested.
 trainData <- methylData[,1:3000]  
+trainDataY <- trainData[,1]
+testData <- NULL
 
 ## Model parameters
 supervisedStage1=TRUE
@@ -190,7 +192,21 @@ result <- BioMM(trainData=trainData, testData=NULL,
                 cutP1=0.05, cutP2=0.05, fdr2=NULL, 
                 FScore=MulticoreParam(workers = 1), 
                 classifier, predMode, paramlist, innerCore=core)
-print(result)
+
+if (is.null(testData)) {
+    metricCV <- getMetrics(dataY = trainDataY, predY = result)
+    message("Cross-validation prediction performance:")
+    print(metricCV)
+} else if (!is.null(testData)){
+    testDataY <- testData[,1]  
+    metricCV <- getMetrics(dataY = trainDataY, cvYscore = result[[1]])
+    metricTest <- getMetrics(dataY = testDataY, testYscore = result[[2]])
+    message("Cross-validation performance:")
+    print(metricCV)
+    message("Test set prediction performance:")
+    print(metricTest)
+}
+
 ``` 
 
 Other machine learning models can be employed with the following respective parameter settings. For the classifier `"SVM"`, parameters can be tuned using an internal cross-validation if `tuneP=TRUE`. For generalized regression model `glmnet`, elastic net is specified by the input argument `alpha=0.5`. Alternatively, `alpha=1` is for the lasso and `alpha=0` is the ridge. For the unsupervised learning `supervisedStage1=FALSE`, regular PCA `typePCA="regular"` is applied and followed with random forest classification `classifier2=TRUE`.
@@ -206,7 +222,9 @@ To apply BioMM with the random forest model, we use the argument `supervisedStag
 ```{r BioMMrandForest4expKEGG, eval=TRUE}
 ## to reduce the runtime, only use a subset of gene expression data
 ## However, if possible, subsetting the data is not suggested.
-trainData <- expData[,1:3000]  
+trainData <- expData[,1:3000] 
+trainDataY <- trainData[,1] 
+testData <- NULL 
 ## Only for gene expression data
 featureAnno=NULL
 ## Model parameters
@@ -227,7 +245,11 @@ result <- BioMM(trainData=trainData, testData=NULL,
                 cutP1=0.05, cutP2=0.05, fdr2=NULL, 
                 FScore=MulticoreParam(workers = 1), 
                 classifier, predMode, paramlist, innerCore=core)
-print(result)
+
+## Cross-validation is applied on the training data, therefore 'result' only returns the CV predicted score.
+metricCV <- getMetrics(dataY = trainDataY, predY = result)
+message("Cross-validation prediction performance:")
+print(metricCV)
 ``` 
 
 
