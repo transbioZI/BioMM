@@ -1,3 +1,13 @@
+Changes in version 1.5.7
+============= 
+	o Improved description in the tutorial (BioMM() function returns the prediction scores instead of metrics)
+	o Updated BioMMstage2pred() and BioMM() functions to get prediction scores instead of performance metrics
+	o Updated getMetrics() to cope with the 'probability' predicted score as well.
+
+Changes in version 1.5.4
+============= 
+	o Improved description in the tutorial
+
 Changes in version 1.5.2
 ============= 
 	o updated R functions for reporting results and plotting.
