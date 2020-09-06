@@ -90,9 +90,8 @@ getMetrics <- function(dataY, predY){
     sscurves <- evalmod(scores=predY, labels=dataY)  
     AUC <- attr(sscurves[[1]][[1]], "auc")
     AUCPR <- attr(sscurves[[2]][[1]], "auc") 
-    # predY <- ifelse(predY>=.5, 1, 0) 
-
-    ACC <- classifiACC(dataY, predY)  
+    predYbinary <- ifelse(predY>=.5, 1, 0) 
+    ACC <- classifiACC(dataY, predYbinary)  
     if (nlevels(factor(predY)) > 1){
         R2 <- lrm(dataY ~ predY)$stats["R2"]
     } else {
