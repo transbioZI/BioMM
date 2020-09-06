@@ -135,8 +135,8 @@ and 'baseGLMnet()'.}
 with "FScore" depending on the number of cores available.}
 }
 \value{
-The CV or BS prediction performance for the training data and 
-test set prediction performance if \code{testData} is given.
+The CV or BS predicted score for the training data and 
+test set predicted score if \code{testData} is given.
 }
 \description{
 The BioMM framework uses two-stage machine learning models that can allow us 
@@ -152,6 +152,7 @@ Stage-2 test data is learned via independent test set prediction.
 ## Load data    
 methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 methylData <- readRDS(methylfile)    
+testData <- NULL
 ## Annotation file
 probeAnnoFile <- system.file('extdata', 'cpgAnno.rds', package='BioMM')  
 probeAnno <- readRDS(file=probeAnnoFile)   
@@ -173,6 +174,22 @@ param2 <- MulticoreParam(workers = 20)
 ##                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
 ##                 cutP1=0.1, cutP2=0.1, fdr2=NULL, FScore=param1, 
 ##                 classifier, predMode, paramlist, innerCore=param2)
+## if (is.null(testData)) {
+##     predY <- result 
+##     metricCV <- getMetrics(dataY = trainDataY, predY)
+##     message("Cross-validation prediction performance:")
+##     print(metricCV)
+## } else if (!is.null(testData)){
+##     testDataY <- testData[,1]
+##     cvYscore <- result[[1]]
+##     testYscore <- result[[2]] 
+##     metricCV <- getMetrics(dataY = trainDataY, cvYscore)
+##     metricTest <- getMetrics(dataY = testDataY, testYscore)
+##     message("Cross-validation performance:")
+##     print(metricCV)
+##     message("Test set prediction performance:")
+##     print(metricTest)
+## }
 }
 \references{
 Chen, J., & Schwarz, E. (2017). BioMM: Biologically-informed 

@@ -69,8 +69,8 @@ c('probability', 'classification', 'regression').}
 \item{innerCore}{The number of cores used for computation.}
 }
 \value{
-The CV or BS prediction performance for stage-2 training data and 
-test set prediction performance for stage-2 test data if the test set is 
+The CV or BS predicted score for stage-2 training data and 
+test set predicted score for stage-2 test data if the test set is 
 given.
 }
 \description{

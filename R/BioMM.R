@@ -889,9 +889,9 @@ reconBySupervised <- function(trainDataList, testDataList, resample = "BS",
 #' @param paramlist A set of model parameters defined in an R list object. 
 #' @param innerCore The number of cores used for computation. 
 
-#' @return The CV or BS prediction performance for stage-2 training data and 
-#' test set prediction performance for stage-2 test data if the test set is 
-#' given.
+#' @return The CV or BS predicted score for stage-2 training data and 
+#' test set predicted score for stage-2 test data if the test set is 
+#' given. 
 
 #' @details Stage-2 prediction is performed typically using positively  
 #' correlated features. Since negative associations likely reflect random 
@@ -907,7 +907,7 @@ reconBySupervised <- function(trainDataList, testDataList, resample = "BS",
 
 BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode, 
     repeatA = 1, repeatB = 1, nfolds, FSmethod, cutP, fdr, FScore = MulticoreParam(), classifier, 
-    predMode, paramlist, innerCore = MulticoreParam()) {
+    predMode, paramlist, innerCore = MulticoreParam() ) {
     
     resample <- match.arg(resample)
     if (!is.null(resample)) {
@@ -927,14 +927,17 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
             message("Bootstrapping >>> ")
         }
         
-        if (predMode == "probability") {
-            predY <- ifelse(predY >= 0.5, 1, 0)
-            metricCV <- getMetrics(dataY = trainDataY, predY)
-        } else if (predMode == "classification") {
-            metricCV <- getMetrics(dataY = trainDataY, predY)
-        } else if (predMode == "regression") {
-            metricCV <- cor(trainDataY, predY) 
-        }
+        cvYscore <- predY
+        # if (predMode == "probability") {
+        #     predY <- ifelse(predY >= 0.5, 1, 0)
+        #     metricCV <- getMetrics(dataY = trainDataY, predY)
+        # } else if (predMode == "classification") {
+        #     metricCV <- getMetrics(dataY = trainDataY, predY)
+        # } else if (predMode == "regression") {
+        #     metricCV <- cor(trainDataY, predY) 
+        # }
+        # print(metricCV)
+
     }
     
     if (!is.null(testData)) {
@@ -946,19 +949,23 @@ BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode,
         predY <- predByBS(trainData, testData, dataMode, repeats = repeatB, 
             FSmethod, cutP, fdr, FScore, classifier, predMode, paramlist, 
             innerCore)
+        testYscore <- predY
         ## Prediction performance for the ind. test performance
-        message(paste0("Test set performance: "))
-        if (predMode == "probability") {
-            predY <- ifelse(predY >= 0.5, 1, 0)
-            metricTest <- getMetrics(dataY = testY, predY)
-        } else if (predMode == "classification") {
-            metricTest <- getMetrics(dataY = testY, predY)
-        } else if (predMode == "regression") {
-            metricTest <- cor(testY, predY)
-        }
-        result <- list(metricCV, metricTest)
+        # message(paste0("Test set performance: "))
+        # if (predMode == "probability") {
+        #     predY <- ifelse(predY >= 0.5, 1, 0)
+        #     metricTest <- getMetrics(dataY = testY, predY)
+        # } else if (predMode == "classification") {
+        #     metricTest <- getMetrics(dataY = testY, predY)
+        # } else if (predMode == "regression") {
+        #     metricTest <- cor(testY, predY)
+        # }        
+        # print(metricTest)
+        # result <- list(metricCV, metricTest)
+        result <- list(cvYscore, testYscore)
     } else {
-        result <- metricCV
+        # result <- metricCV
+        result <- cvYscore
     }
 
     return(result)
@@ -1205,8 +1212,8 @@ reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular
 #' @param innerCore The number of cores used for computation. It needs to be reconciled
 #' with "FScore" depending on the number of cores available.
 
-#' @return The CV or BS prediction performance for the training data and 
-#' test set prediction performance if \code{testData} is given.
+#' @return The CV or BS predicted score for the training data and 
+#' test set predicted score if \code{testData} is given.
 #' @details Stage-2 training data can be learned either using bootstrapping 
 #' or cross validation resampling methods in the supervised learning settting.
 #' Stage-2 test data is learned via independent test set prediction.
@@ -1226,6 +1233,7 @@ reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular
 #' ## Load data    
 #' methylfile <- system.file('extdata', 'methylData.rds', package='BioMM')  
 #' methylData <- readRDS(methylfile)    
+#' testData <- NULL
 #' ## Annotation file
 #' probeAnnoFile <- system.file('extdata', 'cpgAnno.rds', package='BioMM')  
 #' probeAnno <- readRDS(file=probeAnnoFile)   
@@ -1247,6 +1255,24 @@ reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular
 #' ##                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
 #' ##                 cutP1=0.1, cutP2=0.1, fdr2=NULL, FScore=param1, 
 #' ##                 classifier, predMode, paramlist, innerCore=param2)
+
+#' ## if (is.null(testData)) {
+#' ##     predY <- result 
+#' ##     metricCV <- getMetrics(dataY = trainDataY, predY)
+#' ##     message("Cross-validation prediction performance:")
+#' ##     print(metricCV)
+#' ## } else if (!is.null(testData)){
+#' ##     testDataY <- testData[,1]
+#' ##     cvYscore <- result[[1]]
+#' ##     testYscore <- result[[2]] 
+#' ##     metricCV <- getMetrics(dataY = trainDataY, cvYscore)
+#' ##     metricTest <- getMetrics(dataY = testDataY, testYscore)
+#' ##     message("Cross-validation performance:")
+#' ##     print(metricCV)
+#' ##     message("Test set prediction performance:")
+#' ##     print(metricTest)
+#' ## }
+
 
 
 BioMM <- function(trainData, testData, pathlistDB, featureAnno, 
@@ -1314,6 +1340,6 @@ BioMM <- function(trainData, testData, pathlistDB, featureAnno,
             fdr = fdr2, FScore = FScore, classifier = classifier, 
             predMode = predMode, paramlist = paramlist, innerCore = innerCore)
     }
-    
+
     return(result)
 }
