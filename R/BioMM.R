@@ -1236,7 +1236,9 @@ reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular
 #' testData <- NULL
 #' ## Annotation file
 #' probeAnnoFile <- system.file('extdata', 'cpgAnno.rds', package='BioMM')  
-#' probeAnno <- readRDS(file=probeAnnoFile)   
+#' probeAnno <- readRDS(file=probeAnnoFile)     
+#' golist <- readRDS(system.file("extdata", "goDB.rds", package="BioMM")) 
+#' pathlistDB <- golist[1:100]
 #' supervisedStage1=TRUE
 #' classifier <- 'randForest'
 #' predMode <- 'classification'
@@ -1248,7 +1250,7 @@ reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular
 #' ## Not Run 
 #' ## result <- BioMM(trainData=methylData, testData=NULL,
 #' ##                 pathlistDB, featureAnno=probeAnno, 
-#' ##                 restrictUp=10, restrictDown=200, minPathSize=10, 
+#' ##                 restrictUp=200, restrictDown=10, minPathSize=10, 
 #' ##                 supervisedStage1, typePCA='regular', 
 #' ##                 resample1='BS', resample2='CV', dataMode="allTrain",
 #' ##                 repeatA1=20, repeatA2=1, repeatB1=20, repeatB2=1, 
@@ -1258,10 +1260,12 @@ reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular
 
 #' ## if (is.null(testData)) {
 #' ##     predY <- result 
+#' ##     trainDataY <- methylData[,1]
 #' ##     metricCV <- getMetrics(dataY = trainDataY, predY)
 #' ##     message("Cross-validation prediction performance:")
 #' ##     print(metricCV)
 #' ## } else if (!is.null(testData)){
+#' ##     trainDataY <- methylData[,1]
 #' ##     testDataY <- testData[,1]
 #' ##     cvYscore <- result[[1]]
 #' ##     testYscore <- result[[2]] 
