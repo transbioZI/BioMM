@@ -254,7 +254,8 @@ plotRankedFeature <- function(data, posF = TRUE, topF = 10, blocklist, binarize=
      
         ID <- gsub("\\:", ".", names(blocklist))
         size <- unlist(lapply(blocklist, function(d) {
-            ncol(d) - 1
+            ## ncol(d) - 1
+            length(d) ## one doesn't have to use the raw list
         }))
         blockSize <- data.frame(ID, size, stringsAsFactors = FALSE)        
         return(blockSize)
