@@ -173,8 +173,8 @@ To apply BioMM with the Random Forest model, we use the argument `supervisedStag
 ## random split the data into training and test
 set.seed(123)
 trainIndex <- sample(nrow(methylData), nrow(methylData)*0.7)
-trainData <- methylData[trainIndex,1:3000]
-testData <- methylData[-trainIndex, 1:3000]
+trainData <- methylData[trainIndex,1:10000]
+testData <- methylData[-trainIndex, 1:10000]
 trainDataY <- trainData[,1]
 testDataY <- testData[,1]
 table(trainDataY)
