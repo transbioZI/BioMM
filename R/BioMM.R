@@ -409,6 +409,8 @@ baseModel <- function(trainData, testData,
 #' or 'top10pCor').
 #' @param cutP The cutoff used for p value thresholding.  
 #' Commonly used cutoffs are c(0.5, 0.1, 0.05, etc.). The default is 0.05.
+#' If FSmethod = "posTopCor", cutP is defined as the number of most 
+#' correlated features with 'fdr' = NULL.
 #' @param fdr Multiple testing correction method. Available options are 
 #' c(NULL, 'fdr', 'BH', 'holm', etc.). 
 #' See also \code{\link[stats]{p.adjust}}. The default is NULL.
@@ -513,6 +515,8 @@ predByFS <- function(trainData, testData, FSmethod, cutP, fdr,
 #' @param fdr Multiple testing correction method. Available options are 
 #' c(NULL, 'fdr', 'BH', 'holm', etc). 
 #' See also \code{\link[stats]{p.adjust}}. The default is NULL.
+#' If FSmethod = "posTopCor", cutP is defined as the number of most 
+#' correlated features with 'fdr' = NULL.
 #' @param FScore The number of cores used for feature selection 
 #' if parallel computing needed.
 #' @param classifier Machine learning classifiers. 
@@ -633,6 +637,8 @@ predByBS <- function(trainData, testData, dataMode, repeats, FSmethod, cutP,
 #' or 'top10pCor').
 #' @param cutP The cutoff used for p value thresholding.  
 #' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). The default is 0.05.
+#' If FSmethod = "posTopCor", cutP is defined as the number of most 
+#' correlated features with 'fdr' = NULL.
 #' @param fdr Multiple testing correction method. Available options are 
 #' c(NULL, 'fdr', 'BH', 'holm', etc). 
 #' See also \code{\link[stats]{p.adjust}}. The default is NULL.
@@ -730,6 +736,8 @@ predByCV <- function(data, repeats, nfolds, FSmethod, cutP, fdr, FScore = Multic
 #' or 'top10pCor').
 #' @param cutP The cutoff used for p value thresholding.  
 #' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). The default is 0.05.
+#' If FSmethod = "posTopCor", cutP is defined as the number of most 
+#' correlated features with 'fdr' = NULL.
 #' @param fdr Multiple testing correction method. Available options are 
 #' c(NULL, 'fdr', 'BH', 'holm', etc). 
 #' See also \code{\link[stats]{p.adjust}}. The default is NULL.
@@ -864,9 +872,6 @@ reconBySupervised <- function(trainDataList, testDataList, resample = "BS",
 #' @param testData The input test dataset (stage-2 data). The first column
 #' is the label or the output. For binary classes, 
 #' 0 and 1 are used to indicate the class member.
-#' @param resample The resampling methods. Valid options are 'CV' and 'BS'. 
-#' 'CV' for cross validation and 'BS' for bootstrapping resampling.
-#' The default is 'CV'.
 #' @param dataMode The mode of data used. 'subTrain' or 'allTrain'.
 #' @param repeatA The number of repeats N is used during resampling prediction. 
 #' The default is 1.
@@ -875,9 +880,11 @@ reconBySupervised <- function(trainDataList, testDataList, resample = "BS",
 #' @param nfolds The number of folds is defined for cross validation.
 #' @param FSmethod Feature selection methods. Available options are 
 #' c(NULL, 'positive', 'wilcox.test', 'cor.test', 'chisq.test', 'posWilcox', 
-#' or 'top10pCor').
+#' 'top10pCor', 'posTopCor').
 #' @param cutP The cutoff used for p value thresholding.  
 #' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). The default is 0.05.
+#' If FSmethod = "posTopCor", cutP is then defined as the number of most 
+#' correlated features with 'fdr' = NULL.
 #' @param fdr Multiple testing correction method. Available options are 
 #' c(NULL, 'fdr', 'BH', 'holm', etc). 
 #' See also \code{\link[stats]{p.adjust}}. The default is NULL.
@@ -905,68 +912,19 @@ reconBySupervised <- function(trainDataList, testDataList, resample = "BS",
 #' @author Junfang Chen 
 
 
-BioMMstage2pred <- function(trainData, testData, resample = "CV", dataMode, 
-    repeatA = 1, repeatB = 1, nfolds, FSmethod, cutP, fdr, FScore = MulticoreParam(), classifier, 
+BioMMstage2pred <- function(trainData, testData, dataMode, 
+    repeatA = 1, repeatB = 1, nfolds, FSmethod, cutP, fdr, 
+    FScore = MulticoreParam(), classifier, 
     predMode, paramlist, innerCore = MulticoreParam() ) {
-    
-    resample <- match.arg(resample)
-    if (!is.null(resample)) {
-        if (is.factor(trainData$label)) {
-            trainData$label <- as.numeric(trainData$label) - 1
-        }
-        trainDataY <- trainData$label
-        if (resample == "CV") {
-            predY <- predByCV(data = trainData, repeats = repeatA, nfolds, 
-                FSmethod, cutP, fdr, FScore, classifier, predMode, paramlist, 
-                innerCore)
-            message("CrossValidation >>> ")
-        } else if (resample == "BS") {
-            predY <- predByBS(trainData, testData = NULL, dataMode, 
-                repeats = repeatA, FSmethod, cutP, fdr, FScore, classifier, 
-                predMode, paramlist, innerCore)
-            message("Bootstrapping >>> ")
-        }
-        
-        cvYscore <- predY
-        # if (predMode == "probability") {
-        #     predY <- ifelse(predY >= 0.5, 1, 0)
-        #     metricCV <- getMetrics(dataY = trainDataY, predY)
-        # } else if (predMode == "classification") {
-        #     metricCV <- getMetrics(dataY = trainDataY, predY)
-        # } else if (predMode == "regression") {
-        #     metricCV <- cor(trainDataY, predY) 
-        # }
-        # print(metricCV)
 
+    if (is.factor(testData$label)) {
+        testData$label <- as.numeric(testData$label) - 1
     }
-    
-    if (!is.null(testData)) {
-        ## ind. prediction
-        if (is.factor(testData$label)) {
-            testData$label <- as.numeric(testData$label) - 1
-        }
-        testY <- testData$label
-        predY <- predByBS(trainData, testData, dataMode, repeats = repeatB, 
-            FSmethod, cutP, fdr, FScore, classifier, predMode, paramlist, 
-            innerCore)
-        testYscore <- predY
-        ## Prediction performance for the ind. test performance
-        # message(paste0("Test set performance: "))
-        # if (predMode == "probability") {
-        #     predY <- ifelse(predY >= 0.5, 1, 0)
-        #     metricTest <- getMetrics(dataY = testY, predY)
-        # } else if (predMode == "classification") {
-        #     metricTest <- getMetrics(dataY = testY, predY)
-        # } else if (predMode == "regression") {
-        #     metricTest <- cor(testY, predY)
-        # }        
-        # print(metricTest)
-        # result <- list(metricCV, metricTest)
-        result <- list(cvYscore, testYscore)
-    } else {
-        # result <- metricCV
-        result <- cvYscore
-    }
+    testY <- testData$label
+    predY <- predByBS(trainData, testData, dataMode, repeats = repeatB, 
+        FSmethod, cutP, fdr, FScore, classifier, predMode, paramlist, 
+        innerCore)
+    result <- predY
 
     return(result)
 }
@@ -1166,9 +1124,6 @@ reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular
 #' @param resample1 The resampling methods at stage-1. Valid options are 
 #' 'CV' and 'BS'. 'CV' for cross validation and 'BS' for bootstrapping 
 #' resampling. The default is 'BS'.
-#' @param resample2 The resampling methods at stage-2. Valid options are 'CV' 
-#' and 'BS'. 'CV' for cross validation and 'BS' for bootstrapping resampling.
-#' The default is 'CV'. 
 #' @param dataMode The input training data mode for model training.
 #' It is used only if 'testData' is present. It can be a subset of 
 #' the whole training data or the entire training data. 'subTrain' 
@@ -1192,10 +1147,14 @@ reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular
 #' positively associated with the outcome will be used.
 #' @param cutP1 The cutoff used for p value thresholding at stage-1.  
 #' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). If "FSmethod1" is NULL,
-#' Then no cutoff is applied.
+#' Then no cutoff is applied. 
+#' If FSmethod = "posTopCor", cutP is defined as the number of most 
+#' correlated features with 'fdr' = NULL.
 #' @param cutP2 The cutoff used for p value thresholding at stage-2. 
 #' Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). If "FSmethod2" is NULL,
 #' Then no cutoff is applied.
+#' If FSmethod = "posTopCor", cutP is defined as the number of most 
+#' correlated features with 'fdr' = NULL.
 #' @param fdr2 Multiple testing correction method at stage-2. 
 #' Available options are c(NULL, 'fdr', 'BH', 'holm', etc). 
 #' See also \code{\link[stats]{p.adjust}}. The default is NULL.
@@ -1278,10 +1237,9 @@ reconByUnsupervised <- function(trainDataList, testDataList, typeMode = "regular
 #' ## }
 
 
-
 BioMM <- function(trainData, testData, pathlistDB, featureAnno, 
     restrictUp, restrictDown, minPathSize, supervisedStage1 = TRUE, 
-    typePCA, resample1 = "BS", resample2 = "CV", dataMode = "allTrain", 
+    typePCA, resample1 = "BS", dataMode = "allTrain", 
     repeatA1 = 100, repeatA2 = 1, repeatB1 = 20, repeatB2 = 1, 
     nfolds = 10, FSmethod1, FSmethod2, 
     cutP1, cutP2, fdr2, FScore = MulticoreParam(), classifier, 
@@ -1290,14 +1248,11 @@ BioMM <- function(trainData, testData, pathlistDB, featureAnno,
     trainDataList <- omics2pathlist(data=trainData, pathlistDB, 
                                     featureAnno, restrictUp, 
                                     restrictDown, minPathSize)  
-    if (!is.null(testData)){ 
-        testDataList <- omics2pathlist(data=testData, pathlistDB, 
-                                       featureAnno, restrictUp, 
-                                       restrictDown, minPathSize) 
-    } else {
-        testDataList <- NULL
-    }
-    
+
+    testDataList <- omics2pathlist(data=testData, pathlistDB, 
+                                   featureAnno, restrictUp, 
+                                   restrictDown, minPathSize) 
+
     ## generation of stage-2 data
     if (supervisedStage1 == TRUE) {
         stage2data <- reconBySupervised(trainDataList = trainDataList, 
@@ -1313,37 +1268,27 @@ BioMM <- function(trainData, testData, pathlistDB, featureAnno,
             innerCore = innerCore, outFileA = NULL, outFileB = NULL)
     }
     
-    if (is.null(testDataList)) {
-        trainData2 <- stage2data
-        testData2 <- NULL
-        message("Stage-2: >>> ")
-        message(paste0("Number of blocks: ", ncol(trainData2) - 1))
-        trainPos2 <- getDataByFilter(trainData = trainData2, testData = NULL, 
-            FSmethod = "positive", cutP = 0.1, fdr = NULL, FScore = FScore)
-        message(paste0("Number of positive blocks: ", ncol(trainPos2) - 1)) 
-    } else {
-        ## if testData provided
-        trainData2 <- stage2data[[1]]
-        testData2 <- stage2data[[2]]
-        datalist <- getDataByFilter(trainData2, testData2, FSmethod = "positive", 
-            cutP = 0.1, fdr = NULL, FScore = FScore)
-        ## include the label
-        trainPos2 <- datalist[[1]] 
-        message(paste0("Number of positive blocks: ", ncol(trainPos2) - 1))
-    }
+    ## if testData provided
+    trainData2 <- stage2data[[1]]
+    testData2 <- stage2data[[2]]
+    datalist <- getDataByFilter(trainData2, testData2, FSmethod = "positive", 
+        cutP = 0.1, fdr = NULL, FScore = FScore)
+    ## include the label
+    trainPos2 <- datalist[[1]] 
+    message(paste0("Number of positive blocks: ", ncol(trainPos2) - 1))
     
     ## If no positive features
     if (is.null(trainPos2)) {
-        message("Warning: No positive features!!")
+        message("Warning: No positive/useful stage-2 features!!")
         result <- data.frame(AUC = 0.5, ACC = 0.5, R2 = 0)
     } else if (!is.null(trainPos2)){
         ## make prediction 
         result <- BioMMstage2pred(trainData = trainData2, testData = testData2, 
-            resample = resample2, dataMode, repeatA = repeatA2, 
+            dataMode, repeatA = repeatA2, 
             repeatB = repeatB2, nfolds, FSmethod = FSmethod2, cutP = cutP2, 
             fdr = fdr2, FScore = FScore, classifier = classifier, 
             predMode = predMode, paramlist = paramlist, innerCore = innerCore)
     }
-
+    
     return(result)
 }
