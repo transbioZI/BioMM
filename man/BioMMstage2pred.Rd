@@ -7,7 +7,6 @@
 BioMMstage2pred(
   trainData,
   testData,
-  resample = "CV",
   dataMode,
   repeatA = 1,
   repeatB = 1,
@@ -31,10 +30,6 @@ is the label or the output. For binary classes,
 is the label or the output. For binary classes, 
 0 and 1 are used to indicate the class member.}
 
-\item{resample}{The resampling methods. Valid options are 'CV' and 'BS'. 
-'CV' for cross validation and 'BS' for bootstrapping resampling.
-The default is 'CV'.}
-
 \item{dataMode}{The mode of data used. 'subTrain' or 'allTrain'.}
 
 \item{repeatA}{The number of repeats N is used during resampling prediction. 
@@ -47,10 +42,12 @@ The default is 1.}
 
 \item{FSmethod}{Feature selection methods. Available options are 
 c(NULL, 'positive', 'wilcox.test', 'cor.test', 'chisq.test', 'posWilcox', 
-or 'top10pCor').}
+'top10pCor', 'posTopCor').}
 
 \item{cutP}{The cutoff used for p value thresholding.
-Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). The default is 0.05.}
+Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). The default is 0.05.
+If FSmethod = "posTopCor", cutP is then defined as the number of most 
+correlated features with 'fdr' = NULL.}
 
 \item{fdr}{Multiple testing correction method. Available options are 
 c(NULL, 'fdr', 'BH', 'holm', etc). 
