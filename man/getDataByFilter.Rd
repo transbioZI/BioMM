@@ -25,11 +25,13 @@ using the Pearson correlation method. 'posWilcox' is the positively
 outcome-associated features using Pearson correlation method together 
 with 'wilcox.text' method. 'top10pCor' is the top 10% of   
 outcome-associcated features. This is helpful when no features can be 
-picked during stringent feature selection procedure.}
+picked during stringent feature selection procedure.
+'posTopCor' selects the number of most correlated features.}
 
 \item{cutP}{The cutoff used for p value thresholding. It can be any value 
 between 0 and 1. Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc.). 
-The default is 0.1.}
+The default is 0.1. If FSmethod = "posTopCor", cutP is then defined as 
+the number of most correlated features.}
 
 \item{fdr}{Multiple testing correction method. Available options are 
 c(NULL, 'fdr', 'BH', 'holm' etc). 

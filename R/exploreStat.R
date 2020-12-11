@@ -21,9 +21,11 @@
 #' with 'wilcox.text' method. 'top10pCor' is the top 10% of   
 #' outcome-associcated features. This is helpful when no features can be 
 #' picked during stringent feature selection procedure.
+#' 'posTopCor' selects the number of most correlated features.
 #' @param cutP The cutoff used for p value thresholding. It can be any value 
 #' between 0 and 1. Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc.). 
-#' The default is 0.1. 
+#' The default is 0.1. If FSmethod = "posTopCor", cutP is then defined as 
+#' the number of most correlated features.
 #' @param fdr Multiple testing correction method. Available options are 
 #' c(NULL, 'fdr', 'BH', 'holm' etc). 
 #' See also \code{\link[stats]{p.adjust}}. The default is NULL.
@@ -150,7 +152,12 @@ getDataByFilter <- function(trainData, testData, FSmethod, cutP = 0.1,
         } 
         varTmp <- which(pvTrain < cutP)
         selFeature <- intersect(whPos, varTmp)
-    } else if (FSmethod == "top10pCor") { 
+    } else if (FSmethod == "posTopCor"){ ## top number of features
+        corVal <- cor(trainX, trainY)
+        whPos <- which(corVal > 0)  
+        varTmp <- head(order(corVal, decreasing=TRUE), cutP)   
+        selFeature <- intersect(whPos, varTmp)  
+     } else if (FSmethod == "top10pCor") { 
         topN <- round(ncol(trainX)*0.1) 
         featurelist <- as.list(seq_len(ncol(trainX)))
         if (!is.null(FScore)){ 
