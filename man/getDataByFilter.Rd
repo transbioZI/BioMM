@@ -31,7 +31,7 @@ picked during stringent feature selection procedure.
 \item{cutP}{The cutoff used for p value thresholding. It can be any value 
 between 0 and 1. Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc.). 
 The default is 0.1. If FSmethod = "posTopCor", cutP is then defined as 
-the number of most correlated features.}
+the number of most correlated features with 'fdr' = NULL.}
 
 \item{fdr}{Multiple testing correction method. Available options are 
 c(NULL, 'fdr', 'BH', 'holm' etc). 

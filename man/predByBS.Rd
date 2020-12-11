@@ -46,7 +46,9 @@ Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). The default is 0.05.}
 
 \item{fdr}{Multiple testing correction method. Available options are 
 c(NULL, 'fdr', 'BH', 'holm', etc). 
-See also \code{\link[stats]{p.adjust}}. The default is NULL.}
+See also \code{\link[stats]{p.adjust}}. The default is NULL.
+If FSmethod = "posTopCor", cutP is defined as the number of most 
+correlated features with 'fdr' = NULL.}
 
 \item{FScore}{The number of cores used for feature selection 
 if parallel computing needed.}

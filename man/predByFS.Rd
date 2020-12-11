@@ -30,7 +30,9 @@ c(NULL, 'positive', 'wilcox.test', 'cor.test', 'chisq.test', 'posWilcox',
 or 'top10pCor').}
 
 \item{cutP}{The cutoff used for p value thresholding.
-Commonly used cutoffs are c(0.5, 0.1, 0.05, etc.). The default is 0.05.}
+Commonly used cutoffs are c(0.5, 0.1, 0.05, etc.). The default is 0.05.
+If FSmethod = "posTopCor", cutP is defined as the number of most 
+correlated features with 'fdr' = NULL.}
 
 \item{fdr}{Multiple testing correction method. Available options are 
 c(NULL, 'fdr', 'BH', 'holm', etc.). 
