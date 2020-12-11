@@ -60,7 +60,7 @@ BioMM installation from Github
 ```{r eval=FALSE}
 install.packages("devtools")
 library("devtools")
-install_github("transbioZI/BioMM", build_vignettes=TRUE)
+install_github("transbioZI/BioMM", build_vignettes=FALSE)
 ``` 
 
 * Load required libraries
@@ -168,13 +168,12 @@ The end-to-end prediction is performed using `BioMM()` function. Both supervised
 To apply BioMM with the Random Forest model, we use the argument `supervisedStage1=TRUE` and `classifier=randForest` in `BioMM()`. DNA methylation data mapping to GO pathways is used.
 
 ```{r BioMMrandForest4methylGO, eval=TRUE}
-## To reduce the runtime, only use a subset of DNA methylation data
-## However, if possible, subsetting the data is not suggested.
+## To reduce the runtime, only use a subset of DNA methylation data 
 ## random split the data into training and test
-set.seed(123)
-trainIndex <- sample(nrow(methylData), nrow(methylData)*0.7)
-trainData <- methylData[trainIndex,1:10000]
-testData <- methylData[-trainIndex, 1:10000]
+set.seed(1)
+trainIndex <- sample(nrow(methylData), nrow(methylData)*0.6)
+trainData <- methylData[trainIndex,]
+testData <- methylData[-trainIndex,]
 trainDataY <- trainData[,1]
 testDataY <- testData[,1]
 table(trainDataY)
@@ -192,26 +191,17 @@ result <- BioMM(trainData=trainData, testData=testData,
                 pathlistDB=golistSub, featureAnno, 
                 restrictUp=200, restrictDown=10, minPathSize=10, 
                 supervisedStage1, typePCA="regular", 
-                resample1="BS", resample2="CV", dataMode="allTrain",
+                resample1="BS", dataMode="allTrain",
                 repeatA1=50, repeatA2=1, repeatB1=10, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
                 cutP1=0.05, cutP2=0.05, fdr2=NULL, 
                 FScore=MulticoreParam(workers = 1), 
                 classifier, predMode, paramlist, innerCore=core)
 
-if (is.null(testData)) {
-    metricCV <- getMetrics(dataY = trainDataY, predY = result)
-    message("Cross-validation prediction performance:")
-    print(metricCV)
-} else if (!is.null(testData)){
-    testDataY <- testData[,1]  
-    metricCV <- getMetrics(dataY = trainDataY, cvYscore = result[[1]])
-    metricTest <- getMetrics(dataY = testDataY, testYscore = result[[2]])
-    message("Cross-validation performance:")
-    print(metricCV)
-    message("Test set prediction performance:")
-    print(metricTest)
-}
+metricTest <- getMetrics(dataY = testDataY, predY = result)
+message("Test set prediction performance:")
+print(metricTest)
+
 
 ``` 
 
@@ -227,12 +217,17 @@ To apply BioMM with the random forest model, we use the argument `supervisedStag
 
 ```{r BioMMrandForest4expKEGG, eval=TRUE}
 ## to reduce the runtime, only use a subset of gene expression data
-## However, if possible, subsetting the data is not suggested.
-trainData <- expData[,1:3000] 
-trainDataY <- trainData[,1] 
-testData <- NULL 
 ## Only for gene expression data
-featureAnno=NULL
+featureAnno=NULL 
+set.seed(1)
+trainIndex <- sample(nrow(expData), nrow(expData)*0.5)
+trainData <- expData[trainIndex,]
+testData <- expData[-trainIndex,]
+trainDataY <- trainData[,1]
+testDataY <- testData[,1]
+table(trainDataY)
+table(testDataY)
+
 ## Model parameters
 supervisedStage1=TRUE
 classifier <- "randForest"
@@ -241,21 +236,20 @@ paramlist <- list(ntree=100, nthreads=20)
 core <- MulticoreParam(workers = 10) 
 
 set.seed(123)
-result <- BioMM(trainData=trainData, testData=NULL, 
-                pathlistDB=kegglistSub, featureAnno, 
+result <- BioMM(trainData=trainData, testData=testData, 
+                pathlistDB=kegglistSub[1:7], featureAnno, 
                 restrictUp=200, restrictDown=10, minPathSize=10, 
                 supervisedStage1, typePCA="regular", 
-                resample1="BS", resample2="CV", dataMode="allTrain",
+                resample1="BS", dataMode="allTrain",
                 repeatA1=50, repeatA2=1, repeatB1=10, repeatB2=1, 
                 nfolds=10, FSmethod1=NULL, FSmethod2=NULL, 
                 cutP1=0.05, cutP2=0.05, fdr2=NULL, 
                 FScore=MulticoreParam(workers = 1), 
                 classifier, predMode, paramlist, innerCore=core)
 
-## Cross-validation is applied on the training data, therefore 'result' only returns the CV predicted score.
-metricCV <- getMetrics(dataY = trainDataY, predY = result)
-message("Cross-validation prediction performance:")
-print(metricCV)
+#metricTest <- getMetrics(dataY = testDataY, predY = result)
+message("Test set prediction performance:")
+print(metricTest)
 ``` 
 
 
@@ -265,10 +259,10 @@ Here we use BioMM with the Random Forest method on gene expression data incorpor
 
 ```{r stage2dataAprep, eval=TRUE} 
 ## Define the omics type 
-# omicsType <- "methylation"
-omicsType <- "expression"
+omicsType <- "methylation"
+# omicsType <- "expression"
 pathType <- "GO"
-pathType <- "KEGG"
+# pathType <- "KEGG"
 if (omicsType == "methylation" & pathType == "GO"){
     studylist <- methylGOlist
 } else if (omicsType == "methylation" & pathType == "KEGG"){
@@ -309,7 +303,7 @@ head(stage2dataA[,1:4])
 #### Explained variation of stage-2 data
 The distribution of the proportion of variance explained for the individual generated feature of stage-2 data for the classification task is illustrated `plotVarExplained()` below. Nagelkerke pseudo R-squared measure is used to compute the explained variance. The argument `posF=TRUE` indicates that only positively outcome-associated features are plotted since negative associations likely reflect random effects in the underlying data [6].
 
-``` {r stage2dataViz, eval=TRUE}
+``` {r stage2dataViz, eval=F}
 core <- MulticoreParam(workers = 10)   
 fileName <- paste0(omicsType,"_", pathType, "_featuresVarExplained.png")
 plotVarExplained(data=stage2dataA, posF=TRUE, binarize=FALSE, core=core, 
@@ -322,7 +316,7 @@ plot(load.image(fileName))
 #### Prioritization of outcome-associated functional patterns 
 `plotRankedFeature()` is employed to rank and visualize the outcome-associated features from stage-2 data. The argument `topF=10` and `posF=TRUE` are used to define the top 10 positively outcome-associated features. The negative log P value using logistic regression is utilized to evaluate the importance of the ranked features as indicated by the argument `rankMetric="negPlogit"`. Other metrics including Nagelkerke pseudo R-squared "R2", and Z score "Zscore" measure are also available (see `plotRankedFeature` in the manual for details). The size of the respective pathway is pictured as the argument `colorMetric="size"`. 
 
-``` {r topPathFeatures, eval=TRUE, fig.show="hold"} 
+``` {r topPathFeatures, eval=F, fig.show="hold"} 
 core <- MulticoreParam(workers = 1)   
 rankMetric <- "negPlogit" 
 filePrefix <- paste0(omicsType, "_", pathType, "_topPath_", rankMetric)
@@ -339,7 +333,7 @@ plot(load.image(paste0(filePrefix, ".png")))
 
 The statistical metrics and descriptions of these above top pathways are shown below:
 
-``` {r reportTopPath, eval=TRUE} 
+``` {r reportTopPath, eval=F} 
 ## Report the top pathways
 if (pathType == "GO"){
     
@@ -367,7 +361,7 @@ write.xlsx(topPath,file=paste0(filePrefix, ".xlsx"))
 #### The significance of CpGs in pathways of interest
 `cirPlot4pathway()` illustrates the significance of the individual CpGs (for DNA methylation data) or genes (for gene expression data) falling into a set of pathways. Here the top 10 outcome-associated pathways are investigated. Negative log P value is used to define the significance of each CpG or genes within these pathways.
 
-``` {r cirPlot, eval=TRUE, fig.show="hold"}  
+``` {r cirPlot, eval=F, fig.show="hold"}  
 core <- MulticoreParam(workers = 10)   
 pathID <- gsub("\\.", ":", rownames(topPath))
 ## The number of top pathways must be bigger than overall investigated pathways
