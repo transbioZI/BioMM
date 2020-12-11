@@ -170,9 +170,15 @@ To apply BioMM with the Random Forest model, we use the argument `supervisedStag
 ```{r BioMMrandForest4methylGO, eval=TRUE}
 ## To reduce the runtime, only use a subset of DNA methylation data
 ## However, if possible, subsetting the data is not suggested.
-trainData <- methylData[,1:3000]  
+## random split the data into training and test
+set.seed(123)
+trainIndex <- sample(nrow(methylData), nrow(methylData)*0.7)
+trainData <- methylData[trainIndex,1:3000]
+testData <- methylData[-trainIndex, 1:3000]
 trainDataY <- trainData[,1]
-testData <- NULL
+testDataY <- testData[,1]
+table(trainDataY)
+table(testDataY)
 
 ## Model parameters
 supervisedStage1=TRUE
@@ -182,7 +188,7 @@ paramlist <- list(ntree=100, nthreads=20)
 core <- MulticoreParam(workers = 10) 
 
 set.seed(123)
-result <- BioMM(trainData=trainData, testData=NULL, 
+result <- BioMM(trainData=trainData, testData=testData, 
                 pathlistDB=golistSub, featureAnno, 
                 restrictUp=200, restrictDown=10, minPathSize=10, 
                 supervisedStage1, typePCA="regular", 
