@@ -15,7 +15,6 @@ BioMM(
   supervisedStage1 = TRUE,
   typePCA,
   resample1 = "BS",
-  resample2 = "CV",
   dataMode = "allTrain",
   repeatA1 = 100,
   repeatA2 = 1,
@@ -72,10 +71,6 @@ models are applied; if FALSE, unsupervised learning.}
 'CV' and 'BS'. 'CV' for cross validation and 'BS' for bootstrapping 
 resampling. The default is 'BS'.}
 
-\item{resample2}{The resampling methods at stage-2. Valid options are 'CV' 
-and 'BS'. 'CV' for cross validation and 'BS' for bootstrapping resampling.
-The default is 'CV'.}
-
 \item{dataMode}{The input training data mode for model training.
 It is used only if 'testData' is present. It can be a subset of 
 the whole training data or the entire training data. 'subTrain' 
@@ -107,11 +102,15 @@ positively associated with the outcome will be used.}
 
 \item{cutP1}{The cutoff used for p value thresholding at stage-1.
 Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). If "FSmethod1" is NULL,
-Then no cutoff is applied.}
+Then no cutoff is applied. 
+If FSmethod = "posTopCor", cutP is defined as the number of most 
+correlated features with 'fdr' = NULL.}
 
 \item{cutP2}{The cutoff used for p value thresholding at stage-2. 
 Commonly used cutoffs are c(0.5, 0.1, 0.05, 0.01, etc). If "FSmethod2" is NULL,
-Then no cutoff is applied.}
+Then no cutoff is applied.
+If FSmethod = "posTopCor", cutP is defined as the number of most 
+correlated features with 'fdr' = NULL.}
 
 \item{fdr2}{Multiple testing correction method at stage-2. 
 Available options are c(NULL, 'fdr', 'BH', 'holm', etc). 
