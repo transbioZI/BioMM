@@ -156,7 +156,6 @@ print(metricTest)
 Stage-2 feature is reconstructed using resampling prediction on the training set or on the test set if the argument `testData` is provided. Here we use BioMM with a set of predetermined/optimal parameters to create stage-2 pathway-level data.  
 
 ```{r stage2dataAprep, eval=TRUE} 
-## Define the omics type 
 pathType <- "GO"
 # pathType <- "KEGG"
 if (pathType == "GO"){
@@ -166,8 +165,6 @@ if (pathType == "GO"){
 } else {
     stop("Wrong specified pathType!")
 } 
-
-length(studylist)
 
 ## Model parameters 
 supervisedStage1=TRUE
@@ -180,13 +177,13 @@ core <- MulticoreParam(workers = 10)
 
 set.seed(123)
 stage2dataA <- reconBySupervised(trainDataList=studylist, 
-                   testDataList=NULL,
-                   resample="BS", dataMode="allTrain",
-                   repeatA=50, repeatB=1, nfolds=10,
-                   FSmethod, cutP, fdr=NULL, 
-                   FScore=MulticoreParam(workers = 1),
-                   classifier, predMode, paramlist,
-                   innerCore=core, outFileA=NULL, outFileB=NULL)
+			                     testDataList=NULL,
+			                     resample="BS", dataMode="allTrain",
+			                     repeatA=50, repeatB=1, nfolds=10,
+			                     FSmethod, cutP, fdr=NULL, 
+			                     FScore=MulticoreParam(workers = 1),
+			                     classifier, predMode, paramlist,
+			                     innerCore=core, outFileA=NULL, outFileB=NULL)
 ## Check stage-2 data
 dim(stage2dataA)
 print(table(stage2dataA[,1]))
@@ -231,7 +228,6 @@ The statistical metrics and descriptions of these above top pathways are shown b
 ``` {r reportTopPath, eval=TRUE} 
 ## Report the top pathways
 if (pathType == "GO"){
-    
   goterms = unlist(Term(GOTERM))  
   topGOID = gsub("\\.", ":", rownames(topPath))
   subTerm = goterms[is.element(names(goterms), topGOID)] 
@@ -265,15 +261,12 @@ pathMatch <- pathSet[match(pathID, names(pathSet))]
 fileName <- paste0(pathType, "_SigRankBy_", rankMetric)
 
 cirPlot4pathway(datalist=pathMatch, topPathID=names(pathMatch), core, fileName)
-
-
 ``` 
 
 ## Computational consideration
 BioMM with supervised models at both stages will take longer to run than unsupervised approaches. But the prediction can be more powerful. Given the potential of BioMM beyond its prediction performance, the computational load may be negligible. Furthermore, more efficient programming languages or environments can help reduce the runtime vastly, and the adoption of next-generation technology (e.g., 5G) is pushing advances in computational storage and speed. 
 
 The stability of BioMM prediction is often facilitated with the increasing number of resampling repetitions and some other related model parameters such as the number of trees used in the Random Forest model. Due to the runtime, we only showcased the smaller examples and models with less computation in this vignette.
-
 
 
 ## Citation
