@@ -15,8 +15,7 @@ We have implemented a biologically informed multi-stage machine learning framewo
 2. Various biological stratification strategies.    
 3. Prioritizing outcome-associated functional patterns.   
 4. Personalized scoring based on biological stratified patterns.   
-4. Possibility for an extension to learning models of interest.   
-6. Parallel computing. 
+5. Possibility for an extension to learning models of interest.   
 
 ## Installation 
 
@@ -43,7 +42,6 @@ library(topGO)
 library(xlsx)
 ```
 
-# Omics and biological database
 ## DNA methylation data
 For a better understanding of the BioMM framework, we used one small examplar datasets: one genome-wide DNA methylation data consisting of 40 subjects and 26486 CpGs for demonstration.  
 
