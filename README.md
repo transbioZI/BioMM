@@ -43,7 +43,8 @@ library(topGO)
 library(xlsx)
 ```
 
-## Omics data 
+# Omics and biological database
+## DNA methylation data
 For a better understanding of the BioMM framework, we used one small examplar datasets: one genome-wide DNA methylation data consisting of 40 subjects and 26486 CpGs for demonstration.  
 
 ```{r studyData, eval=TRUE}
@@ -56,8 +57,7 @@ table(methylData[,1])
 dim(methylData)
 
 ``` 
-
-## Feature stratification
+## Feature mapping
 Features like CpGs, genes or SNPs can be mapped into pathways based on genomic location and pathway annotation, as implemented in the function `omics2pathlist()`. The examples of pathway databases are gene ontology (GO), KEGG and Reactome. Gene ontological and KEGG pathways are used in this tutorial.
 
 ```{r annotationFile, eval=TRUE}
