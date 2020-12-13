@@ -43,7 +43,7 @@ library(topGO)
 library(xlsx)
 ```
 
-# Omics data 
+## Omics data 
 For a better understanding of the BioMM framework, we used one small examplar datasets: one genome-wide DNA methylation data consisting of 40 subjects and 26486 CpGs for demonstration.  
 
 ```{r studyData, eval=TRUE}
@@ -57,7 +57,7 @@ dim(methylData)
 
 ``` 
 
-# Feature stratification
+## Feature stratification
 Features like CpGs, genes or SNPs can be mapped into pathways based on genomic location and pathway annotation, as implemented in the function `omics2pathlist()`. The examples of pathway databases are gene ontology (GO), KEGG and Reactome. Gene ontological and KEGG pathways are used in this tutorial.
 
 ```{r annotationFile, eval=TRUE}
@@ -107,7 +107,7 @@ methylKEGGlist <- omics2pathlist(data=methylData, pathlistDB=kegglistSub,
 The BioMM model framework mainly consists of two learning stages [1]. During the first stage, the stage-1 model (either supervised or unsupervised learning model) is aimed to learn the 'latent variables' (i.e., stage-2 features) based on the original dataset incorporating biological meta-information with a resampling strategy. In the second stage, a supervised model (stage-2 model) is built using the stage-2 data with non-negative outcome-associated features for final prediction.
 
 ## Choice of model parameters
-The end-to-end prediction is performed using `BioMM()` fit on the training dataset to provide predictions on the test data set. `pathlistDB` indicates the type of the stratification of predictors using biological information. Both supervised and unsupervised learning are implemented. `predMode` indicates the prediction type. Generic resampling methods defined using the argument `resample1="CV"` or `resample1="BS"` are used for reconstructing stage-2 features. For more details regarding parameter options, please check `BioMM()` in the manual. The 'biological' parameters such as choice of pathway databases, gene length within a pathway, and targeted CpGs should be reasonably prespecified. In terms of other parameters such as the number of features at both stages, the classifier, and the hyperparameters within each classifier can be informed using cross-validation or bootstrapping procedure.  
+The end-to-end prediction is performed using `BioMM()` fit on the training dataset to provide predictions on the test data set. `pathlistDB` indicates the type of the stratification of predictors using biological information. Both supervised and unsupervised learning are implemented. `predMode` indicates the prediction type. Generic resampling methods defined using the argument `resample1="CV"` or `resample1="BS"` are used for reconstructing stage-2 features. For more details regarding parameter options, please check `BioMM()` in the manual. The 'biological' parameters such as choice of pathway databases, gene length within a pathway, and targeted CpGs should be reasonably prespecified, with human involvement. In terms of other parameters such as the number of features at both stages, the classifier, and the hyperparameters within each classifier can be informed using cross-validation or bootstrapping procedure.  
 
 #### An example of disease outcome prediction
 To apply BioMM with the Random Forest model, we use the argument `supervisedStage1=TRUE` and `classifier=randForest` in `BioMM()`. DNA methylation data mapping to GO pathways are used.
@@ -117,10 +117,8 @@ To apply BioMM with the Random Forest model, we use the argument `supervisedStag
 set.seed(1)
 trainIndex <- sample(nrow(methylData), nrow(methylData)*0.6)
 trainData <- methylData[trainIndex,]
-testData <- methylData[-trainIndex,]
-trainDataY <- trainData[,1]
-testDataY <- testData[,1]
-table(trainDataY)
+testData <- methylData[-trainIndex,] 
+testDataY <- testData[,1] 
 table(testDataY)
 
 ## Prespecificed parameters
