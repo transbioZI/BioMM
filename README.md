@@ -267,3 +267,6 @@ The stability of BioMM prediction is often facilitated with the increasing numbe
 ## Citation
 
 NIPS ML4H submission: Chen, J. and Schwarz, E., 2017. BioMM: Biologically-informed Multi-stage Machine learning for identification of epigenetic fingerprints. arXiv preprint arXiv:1712.00336.
+
+## Contact
+Email: chenjunfang@ipm-gba.org.cn or junfang.chen@protonmail.com
