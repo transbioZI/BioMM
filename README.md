@@ -266,7 +266,8 @@ The stability of BioMM prediction is often facilitated with the increasing numbe
 
 ## Citation
 
-NIPS ML4H submission: Chen, J. and Schwarz, E., 2017. BioMM: Biologically-informed Multi-stage Machine learning for identification of epigenetic fingerprints. arXiv preprint arXiv:1712.00336.
+1. NIPS ML4H submission: Chen, J. and Schwarz, E., 2017. BioMM: Biologically-informed Multi-stage Machine learning for identification of epigenetic fingerprints. arXiv preprint arXiv:1712.00336.
+2. Chen, Junfang, et al. "Association of a reproducible epigenetic risk profile for schizophrenia with brain methylation and function." JAMA psychiatry 77.6 (2020): 628-636.
 
 ## Contact
 Email: chenjunfang@ipm-gba.org.cn or junfang.chen@protonmail.com
